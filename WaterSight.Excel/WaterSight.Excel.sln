@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaterSight.Excel", "WaterSight.Excel\WaterSight.Excel.csproj", "{318EA411-2400-4183-9DBB-7439179B00FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{318EA411-2400-4183-9DBB-7439179B00FA}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{318EA411-2400-4183-9DBB-7439179B00FA}.Debug|Any CPU.Build.0 = Debug|x64
+		{318EA411-2400-4183-9DBB-7439179B00FA}.Debug|x64.ActiveCfg = Debug|x64
+		{318EA411-2400-4183-9DBB-7439179B00FA}.Debug|x64.Build.0 = Debug|x64
+		{318EA411-2400-4183-9DBB-7439179B00FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{318EA411-2400-4183-9DBB-7439179B00FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{318EA411-2400-4183-9DBB-7439179B00FA}.Release|x64.ActiveCfg = Release|Any CPU
+		{318EA411-2400-4183-9DBB-7439179B00FA}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6C57E168-A934-445E-BF3E-944443F6B87B}
+	EndGlobalSection
+EndGlobal

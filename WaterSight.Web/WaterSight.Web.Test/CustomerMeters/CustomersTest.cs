@@ -1,0 +1,96 @@
+﻿using NUnit.Framework;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using WaterSight.Web.Core;
+using WaterSight.Web.Customers;
+
+namespace WaterSight.Web.Test.CustomerMeters;
+
+public class CustomersTest : TestBase
+{
+    #region Constructor
+    public CustomersTest()
+        //: base(4549, Env.Qa)
+        //: base(233, Env.Prod)
+    {
+        Logger.Debug($"----+----+---- Performing Customers Related Tests ----+----+----");
+    }
+    #endregion
+
+    #region Properties
+    public Meters Meters => WS.Customers.Meters;
+    public Billings Billings => WS.Customers.Billings;
+    #endregion
+
+    #region Tests
+
+    [Test, Order(1)]
+    public async Task MeterData_Upload()
+    {
+        var excelFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown_Configuration.xlsx");
+        FileAssert.Exists(excelFilePath);
+
+        var uploaded = await Meters.UploadMeterFileAsync(new FileInfo(excelFilePath));
+        Assert.IsTrue(uploaded);
+        Separator("Uploaded");
+
+        // delete uploaded data
+        var deleted = await Meters.DeleteMetersDataAsync();
+        Assert.IsTrue(deleted);
+        Separator("Deleted");
+    }
+
+    [Test, Order(2)]
+    public async Task Meter_Delete()
+    {
+        var deleted = await Meters.DeleteMetersDataAsync();
+        Assert.IsTrue(deleted);
+        Separator("Deleted");
+    }
+
+    [Test, Order(3)]
+    public async Task Billing_Delete()
+    {
+        var deleted = await Billings.DeleteBillingDataAsync();
+        Assert.IsTrue(deleted);
+    }
+
+
+    [Test, Order(4)]
+    public async Task Billing_Upload()
+    {
+        // Excel Upload
+        var excelFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown_Configuration.xlsx");
+        var uploaded = await Billings.UploadBillingFileAsync(new FileInfo(excelFilePath));
+        Assert.IsTrue(uploaded);
+        Separator("Uploaded Excel");
+
+        // CSV Upload
+        var csvData = "" +
+            "ID,Billing month,Value,Units\n" +
+            "C-5-28,2020-May-01,1,hft³\n" +
+            "C-5-29,2020-May-02,4,hft³";
+
+        var csvFilePath = Path.GetTempFileName() + ".csv";
+        File.WriteAllText(csvFilePath, csvData);
+
+        uploaded = await Billings.UploadBillingFileAsync(new FileInfo(csvFilePath));
+        Assert.IsTrue(uploaded);
+        Separator("Uploaded CSV");
+
+        // delete csvFile
+        File.Delete(csvFilePath);
+        Assert.IsTrue(!File.Exists(csvFilePath));
+        Separator("CSV deleted");
+
+        // Delete Billings data
+        var deleted = await WS.Customers.Billings.DeleteBillingDataAsync();
+        Assert.IsTrue(deleted);
+        Separator("Deleted");
+
+    }
+
+
+    #endregion
+}
