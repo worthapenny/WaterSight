@@ -98,6 +98,9 @@ public class EndPoints
     //
     // Geographic Feature
     public string GeoFeatures => $"{RootApiVersion}/GeographicFeatures";
+    public string GeoFeaturesShpProps => $"{GeoFeatures}/GetShpFilePropertiesList";
+    public string GeoFeaturesShpPropsQDT => $"{GeoFeaturesShpProps}?{Query.DTID}";
+
     public string GeoFeaturesVectorData => $"{GeoFeatures}/VectorData";
     public string GeoFeaturesVectorDataQDT => $"{GeoFeaturesVectorData}?{Query.DTID}";
     public string GeoFeaturesVectorDataQDTVectorType(string name) => $"{GeoFeaturesVectorDataQDT}&{Query.VectorType(name)}";

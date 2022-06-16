@@ -33,7 +33,15 @@ public class GisTest : TestBase
 
         Logger.Debug(Util.LogSeparatorDashes);
     }
-    [Test, Order(2)]
+
+    [Test, Order(2), Category("Shapefile")]
+    public async Task GetShapefilePropsTest()
+    {
+        var shapefileProps = await WS.GIS.GetShapefileProperties();
+        Assert.IsNotNull(shapefileProps);
+    }
+
+    [Test, Order(3)]
     public async Task DeleteZippedPipeShapefile()
     {
         var success = await WS.GIS.DeletePipeZippedShpFile();
@@ -45,7 +53,7 @@ public class GisTest : TestBase
     //
     // Zones
     //
-    [Test, Order(3)]
+    [Test, Order(4)]
     public async Task UploadPressureZoneShapefile()
     {
         var zoneZipFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\GIS\TestPressureZones.zip");
@@ -57,7 +65,7 @@ public class GisTest : TestBase
         Logger.Debug(Util.LogSeparatorDashes);
 
     }
-    [Test, Order(4)]
+    [Test, Order(5)]
     public async Task DeleteZippedZoneShapefile()
     {
         var success = await WS.GIS.DeletePressureZoneZippedShpFile();
@@ -69,10 +77,10 @@ public class GisTest : TestBase
     //
     // Any shapefile
     //
-    [Test, Order(5)]
+    [Test, Order(6)]
     public async Task UploadAnyShapefile()
     {
-        var myDataType = "MyType"; // this name MUST match with below test
+        var myDataType = $"MyType_{DateTime.Now:yyyyMMddhh}"; // this name MUST match with below test
         var anyShapefilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles/GIS/CriticalCustomers_mini.zip");
         Assert.IsTrue(File.Exists(anyShapefilePath));
 
@@ -81,15 +89,17 @@ public class GisTest : TestBase
 
         Logger.Debug(Util.LogSeparatorDashes);
     }
-    [Test, Order(6)]
+    [Test, Order(7)]
     public async Task DeleteAnyShapefile()
     {
-        var myDataType = "MyType"; // this name MUST match with above test
+        var myDataType = $"MyType_{DateTime.Now:yyyyMMddhh}"; // this name MUST match with above test
         var success = await WS.GIS.DeleteAnyZippedShpFile(myDataType);
         Assert.IsTrue(success);
 
         Logger.Debug(Util.LogSeparatorDashes);
     }
+
+    
     #endregion
 }
 

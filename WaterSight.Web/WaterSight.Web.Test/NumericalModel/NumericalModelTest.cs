@@ -12,7 +12,8 @@ public class NumericalModelTest : TestBase
 {
     #region Constructor
     public NumericalModelTest()
-    //: base(4549, Env.Qa)
+        //: base(4549, Env.Qa)
+        : base(179, Env.Prod)
     {
         Logger.Debug($"----+----+---- Performing NumericalModel Related Tests ----+----+----");
     }
@@ -23,6 +24,14 @@ public class NumericalModelTest : TestBase
     #endregion
 
     #region Tests
+    [Test, Category("Simulation Time-steps")]
+    public async Task GetSimulationTimeStepsTest()
+    {
+        var dates = await NumericModel.GetSimulationTimeSteps();
+        Assert.IsNotNull(dates);
+        Assert.IsNotEmpty(dates);
+    }
+
     [Test]
     public async Task NumericalModel_CRUD()
     {

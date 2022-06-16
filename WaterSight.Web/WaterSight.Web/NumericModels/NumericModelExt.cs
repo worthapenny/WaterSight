@@ -46,7 +46,7 @@ public class NumericModel : WSItem
             modelDomain = new ModelDomainConfig(
                 digitalTwinId: WS.Options.DigitalTwinId,
                 epsgCode: WS.Options.EPSGCode.ToString() ?? throw new InvalidDataException("ESPG code cannot be null"),
-                name: GetWaterModelDomainName(WS.Options.DigitalTwinId)
+                name: GetNewWaterModelDomainName(WS.Options.DigitalTwinId)
                 );
             var id = await AddWaterModelDomain(modelDomain);
             if (id == null)
@@ -88,8 +88,20 @@ public class NumericModel : WSItem
         return true;
     }
 
+    public async Task<List<ModelDomainConfig>> GetModelDomains()
+    {
+        var url = EndPoints.NumModelingModelDomainDomainsQDT;
+        var modelDomains = await WS.GetManyAsync<ModelDomainConfig>(url,"Model Domain");
+        if (modelDomains != null)
+            Logger.Information($"Model domain received. Count = {modelDomains.Count}");
+        else
+            Logger.Error($"Failed to receive model domain");
 
-    private string GetWaterModelDomainName(int dtId)
+        return modelDomains; 
+    }
+
+
+    private string GetNewWaterModelDomainName(int dtId)
     {
         return $"Water_{dtId}_{DateTime.Now:yyyyyMMddHmmss}";
     }
@@ -160,11 +172,84 @@ public class NumericModel : WSItem
     }
     #endregion
 
+
+    #region Simulation Run Times
+    public async Task<List<DateTimeOffset>> GetSimulationTimeSteps()
+    {
+        var MODEL_DOMAIN_TYPE = "WaterGems";
+
+        var modelDomains = await GetModelDomains();
+        if(modelDomains == null || !modelDomains.Any())
+        {
+            Logger.Error($"Model domains cannot be blank.");
+            return new List<DateTimeOffset>();
+        }
+
+        var waterGEMSModelDomainCheck = modelDomains.Where(m=>m.Type == MODEL_DOMAIN_TYPE);
+        if (!waterGEMSModelDomainCheck.Any())
+        {
+            Logger.Error($"No {MODEL_DOMAIN_TYPE} model domain found");
+            return new List<DateTimeOffset>();
+        }
+
+        var waterGEMSModelDomain = waterGEMSModelDomainCheck.First();
+
+        var urlPart = EndPoints.NumModelingModelDomainTimeInstanceLastModelRun;
+        urlPart += $@"?{EndPoints.Query.ModelDomainName(waterGEMSModelDomain.Name)}";
+        urlPart += $"&{EndPoints.Query.DTID}&emergencyEventId=undefined";
+        
+        var res = await Request.Get(urlPart);
+        var dates = await Request.GetJsonAsync<List<DateTimeOffset>>(res);
+        
+        if(dates != null && dates.Count > 0)
+            Logger.Information($"List of simulation time-steps received. Count = {dates.Count}");
+        else
+            Logger.Error($"Failed to get the list of simulation time-steps.");
+        
+        return dates;
+    }
+    #endregion
+
+    #region Model Elements
+    public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElements()
+    {
+        var map = new Dictionary<string, List<ModelScadaElementConfig>>();
+        // https://connect-watersight.bentley.com/api/v1/NumericalModelling/ScadaElement/ModelElements?digitalTwinId=179&modelDomainName=Water-179-0055321969
+
+
+
+        return map;
+    }
+    #endregion
+
     #endregion
 }
 
 
 #region Models
+
+[DebuggerDisplay("{ToString()}")]
+public class ModelScadaElementConfig
+{
+    #region Public Methods
+    public int ScadaElementId { get; set; }
+    public string SignalLabel { get; set; }
+    public int ModelElementId { get; set; }
+    public string ResultAttribute { get; set; }
+    public string TargetField { get; set; }
+
+    #endregion
+
+
+    #region Overridden Methods
+    public override string ToString()
+    {
+        return base.ToString();
+    }
+    #endregion
+
+}
+
 
 
 [DebuggerDisplay("{ToString()}")]

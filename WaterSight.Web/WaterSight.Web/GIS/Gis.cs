@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 
@@ -15,6 +17,16 @@ public class GIS : WSItem
     #region Public Methods
 
     //
+    // Shapefile Lists
+    //
+    public async Task<List<ShapefileProperty>> GetShapefileProperties()
+    {
+        var url = EndPoints.GeoFeaturesShpPropsQDT;
+        var props = await WS.GetManyAsync<ShapefileProperty>(url, "Shapefile propperties");
+        return props;
+    }
+
+    //
     // Zones
     //
     public async Task<bool?> UploadPressureZoneZippedShpFile(string shapefilePath)
@@ -22,32 +34,14 @@ public class GIS : WSItem
 
         WS.Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO("Zones") + "#upload";
-        var res = await Request.PostFile(url, new FileInfo(shapefilePath));
-
-        if (res.IsSuccessStatusCode)
-        {
-            WS.Logger.Debug($"Pressure zone shapefile uploaded. Checking LRO...");
-            _ = await Request.WaitForLRO(res);
-        }
-        else
-            WS.Logger.Error($"Failed to upload pressure zone shapefile. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
-
-        return res.IsSuccessStatusCode;
+        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), "Shapefile");
+        return uploaded;
     }
     public async Task<bool?> DeletePressureZoneZippedShpFile()
     {
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO("Zones") + "#delete&removeVectorType=false";
-        var res = await Request.Delete(url);
-
-        if (res.IsSuccessStatusCode)
-        {
-            Logger.Debug($"Zones shapefile deleted. Checking LRO...");
-            _ = await Request.WaitForLRO(res);
-        }
-        else
-            Logger.Error($"Failed to delete zones shapefile. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
-
-        return res.IsSuccessStatusCode;
+        var deleted = await WS.DeleteAsync(null, url, "Pressure Zone Shapefile", true);
+        return deleted;
     }
 
     //
@@ -58,32 +52,15 @@ public class GIS : WSItem
 
         WS.Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO("Pipes") + "#upload";
-        var res = await Request.PostFile(url, new FileInfo(shapefilePath));
-
-        if (res.IsSuccessStatusCode)
-        {
-            Logger.Debug($"Pipes shapefile uploaded. Checking LRO...");
-            _ = await Request.WaitForLRO(res);
-        }
-        else
-            Logger.Error($"Failed to upload pipes shapefile. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
-
-        return res.IsSuccessStatusCode;
+                
+        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), "Shapefile");
+        return uploaded;
     }
     public async Task<bool?> DeletePipeZippedShpFile()
     {
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO("Pipes") + "#delete&removeVectorType=false";
-        var res = await Request.Delete(url);
-
-        if (res.IsSuccessStatusCode)
-        {
-            WS.Logger.Debug($"Pipes shapefile deleted. Checking LRO...");
-            _ = await Request.WaitForLRO(res);
-        }
-        else
-            WS.Logger.Error($"Failed to delete pipes shapefile. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
-
-        return res.IsSuccessStatusCode;
+        var deleted = await WS.DeleteAsync(null, url, "Pipe Shapefile", true);
+        return deleted;
     }
 
     //
@@ -100,7 +77,8 @@ public class GIS : WSItem
 
         // Create the data type first
         var url = EndPoints.GeoFeaturesVectorDataTypesQDTVectorType(dataTypeName);
-        var dataTypeRes = await Request.PostJsonString(url, "{timeout: 30000}");
+        
+        var dataTypeRes =  await Request.PostJsonString(url, "{timeout: 30000}");
         if (!dataTypeRes.IsSuccessStatusCode)
         {
             Logger.Error($"Failed to create '{dataTypeName}' data type without which custom shapefile cannot be uploaded. Make sure '{dataTypeName}' does not exits already");
@@ -115,33 +93,41 @@ public class GIS : WSItem
 
         Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO(dataTypeName);
-        var res = await Request.PostFile(url, new FileInfo(shapefilePath));
+        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), "Shapefile");
+        return uploaded;
 
-        if (res.IsSuccessStatusCode)
-        {
-            Logger.Debug($"Custom '{dataTypeName}' type shapefile uploaded. Checking LRO...");
-            _ = await Request.WaitForLRO(res);
-        }
-        else
-            Logger.Error($"Failed to upload custom '{dataTypeName}' type shapefile. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
-
-        return res.IsSuccessStatusCode;
     }
     public async Task<bool?> DeleteAnyZippedShpFile(string dataTypeName)
     {
         Logger.Debug($"About to delete a shapefile data type {dataTypeName}. Path: {dataTypeName}");
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO(dataTypeName) + "#delete&removeVectorType=true";
-        var res = await Request.Delete(url);
+        var deleted = await WS.DeleteAsync(null, url, "Any shapefile", true);
+        return deleted;
 
-        if (res.IsSuccessStatusCode)
-        {
-            Logger.Debug($"Shapefile of type '{dataTypeName}' deleted. Checking LRO...");
-            _ = await Request.WaitForLRO(res);
-        }
-        else
-            Logger.Error($"Failed to delete shapefile of type '{dataTypeName}'. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
-
-        return res.IsSuccessStatusCode;
     }
     #endregion
 }
+
+#region Model Classes
+
+[DebuggerDisplay("{ToString()}")]
+public class ShapefileProperty
+{
+    public string Name { get; set; }
+    public string NameZip { get; set; }
+    public string Type { get; set; }
+    public object IdAsset { get; set; }
+    public double SizeMb { get; set; }
+    public double SizeMbZip { get; set; }
+    public double SizeMbCollection { get; set; }
+    public string Date { get; set; }
+    public int BridgedVersion { get; set; }
+
+    #region Overridden Methods
+    public override string ToString()
+    {
+        return $"{Name} [{Type}]";
+    }
+    #endregion
+}
+#endregion

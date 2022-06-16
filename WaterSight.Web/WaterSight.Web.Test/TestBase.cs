@@ -22,7 +22,7 @@ public class TestBase
     {
         if (env == Env.Prod)
         {
-            Logger.Warning($">>>>> You using {env.ToString()} environment!!! <<<<<");
+            var message = $">>>>> You using {env.ToString()} environment!!! <<<<<";
             Debugger.Break();
         }
 
