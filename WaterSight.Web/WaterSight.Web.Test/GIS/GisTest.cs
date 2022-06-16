@@ -25,7 +25,7 @@ public class GisTest : TestBase
     [Test, Order(1)]
     public async Task UploadZippedPipeShpe()
     {
-        var pipeZipFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles/GIS/TestPipes.zip");
+        var pipeZipFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\GIS\TestPipes.zip");
         Assert.IsTrue(File.Exists(pipeZipFilePath));
 
         var success = await WS.GIS.UploadPipeZippedShpFile(pipeZipFilePath);
@@ -48,7 +48,7 @@ public class GisTest : TestBase
     [Test, Order(3)]
     public async Task UploadPressureZoneShapefile()
     {
-        var zoneZipFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles/GIS/TestPressureZones.zip");
+        var zoneZipFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\GIS\TestPressureZones.zip");
         Assert.IsTrue(File.Exists(zoneZipFilePath));
 
         var success = await WS.GIS.UploadPressureZoneZippedShpFile(zoneZipFilePath);
@@ -73,8 +73,8 @@ public class GisTest : TestBase
     public async Task UploadAnyShapefile()
     {
         var myDataType = "MyType"; // this name MUST match with below test
-        var anyShapefilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles/GIS/TestPressureZones.zip");
-        Assert.IsTrue(!File.Exists(myDataType));
+        var anyShapefilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles/GIS/CriticalCustomers_mini.zip");
+        Assert.IsTrue(File.Exists(anyShapefilePath));
 
         var success = await WS.GIS.UploadAnyZippedShpFile(anyShapefilePath, myDataType);
         Assert.IsTrue(success);

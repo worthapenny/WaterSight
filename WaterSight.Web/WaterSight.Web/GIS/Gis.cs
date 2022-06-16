@@ -91,18 +91,27 @@ public class GIS : WSItem
     //
     public async Task<bool?> UploadAnyZippedShpFile(string shapefilePath, string dataTypeName)
     {
+        // Check if path is valid
+        if(!File.Exists(shapefilePath))
+        {
+            Logger.Error($"Given path is not valid. Path:{shapefilePath}");
+            return false;
+        }
+
         // Create the data type first
         var url = EndPoints.GeoFeaturesVectorDataTypesQDTVectorType(dataTypeName);
         var dataTypeRes = await Request.PostJsonString(url, "{timeout: 30000}");
         if (!dataTypeRes.IsSuccessStatusCode)
         {
-            Logger.Error($"Failed to create '{dataTypeName}' data type without which custom shapefile cannot be uploaded");
+            Logger.Error($"Failed to create '{dataTypeName}' data type without which custom shapefile cannot be uploaded. Make sure '{dataTypeName}' does not exits already");
             return false;
         }
         else
         {
-            WS.Logger.Information($"Give type '{dataTypeName}' create successfully.");
+            WS.Logger.Information($"Given type '{dataTypeName}' create successfully.");
         }
+
+        Support.Util.IsFileInUse(shapefilePath);
 
         Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO(dataTypeName);
