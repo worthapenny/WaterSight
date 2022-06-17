@@ -86,7 +86,7 @@ public static class CRUDBase
         if (res.IsSuccessStatusCode)
         {
             t = await Request.GetJsonAsync<List<T?>>(res) ?? t;
-            WS.Logger.Information($"Number of {typeName}: {t.Count}.");
+            WS.Logger.Information($"Number of {typeName} received. Count = {t.Count}.");
         }
         else
             WS.Logger.Error($"Failed to get {typeName} data. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");

@@ -27,18 +27,20 @@ public class NumericalModelTest : TestBase
     [Test, Category("Simulation Time-steps")]
     public async Task GetSimulationTimeStepsTest()
     {
-        var dates = await NumericModel.GetSimulationTimeSteps();
+        var dates = await NumericModel.GetSimulationTimeStepsWaterModel();
         Assert.IsNotNull(dates);
         Assert.IsNotEmpty(dates);
+
+        Separator("Done Simulation Time-steps");
     }
 
-    [Test]
+    [Test, Category("CRUD")]
     public async Task NumericalModel_CRUD()
     {
         //
         // Delete existing if any
         //
-        var modelDomains = await NumericModel.GetWaterModelDomains();
+        var modelDomains = await NumericModel.GetModelDomainsWaterType();
         var modelDomainWtrg = modelDomains?.Where(m => m.Type == "WaterGems");
         if (modelDomainWtrg?.Any() ?? false)
             foreach (var md in modelDomainWtrg)
@@ -84,7 +86,7 @@ public class NumericalModelTest : TestBase
         //
         // read
         //
-        var newModelDomains = await NumericModel.GetWaterModelDomains();
+        var newModelDomains = await NumericModel.GetModelDomainsWaterType();
         Assert.IsNotNull(newModelDomains);
         Assert.IsTrue(newModelDomains.Count > 0);
         var newModelDomain = newModelDomains.Where(m => m.Name == modelDomainName)?.First() ?? null;
@@ -101,7 +103,7 @@ public class NumericalModelTest : TestBase
         Separator($"Deleted {nameof(NumericModel)}");
     }
 
-    [Test]
+    [Test, Category("Upload")]
     public async Task UploadWaterModel()
     {
         var zippedModelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown.wtg.sqlite.zip");
@@ -112,7 +114,14 @@ public class NumericalModelTest : TestBase
         var success = await NumericModel.UpdloadZippedWaterModel(fileInfo);
         Assert.IsTrue(success);
         Separator("Model Uploaded");
+    }
 
+    [Test, Category("Elements"), Category("SCADA")]
+    public async Task GetTargetElementsWaterModel()
+    {
+        var map = await NumericModel.GetModelTargetElementsWaterModel();
+        Assert.IsNotNull(map);
+        Assert.IsTrue(map.Count > 0);
     }
     #endregion
 }

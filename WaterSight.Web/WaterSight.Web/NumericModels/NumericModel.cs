@@ -18,6 +18,8 @@ public class NumericModel : WSItem
     #endregion
 
     #region Public Methods
+
+    #region Upload Files
     public async Task<bool> UpdloadZippedWaterModel(FileInfo fileInfo, TimeSpan? timeout = null)
     {
         if (!File.Exists(fileInfo.FullName))
@@ -32,7 +34,7 @@ public class NumericModel : WSItem
         }
 
         // See if an entry (model domain) is already there
-        var modelDomains = await GetWaterModelDomains();
+        var modelDomains = await GetModelDomainsWaterType();
         ModelDomainConfig? modelDomain = null;
 
         // if model domain is not there, CREATE model domain
@@ -63,7 +65,7 @@ public class NumericModel : WSItem
         }
 
         // upload the model
-        var userName = "ANir"; // TODO: find a way to get the right username
+        var userName = "CSharpAPI"; // TODO: find a way to get the right username
         var query = EndPoints.Query;
         var url = EndPoints.NumModelingModelDomainUploadOpModelDomain +
             $"?{query.DTID}&{query.Username(userName)}&{query.ModelDomainName(modelDomain.Name)}" +
@@ -87,24 +89,7 @@ public class NumericModel : WSItem
         Logger.Information($"Model uploaded. Path: {fileInfo.FullName}, ModelDomain = {modelDomain}");
         return true;
     }
-
-    public async Task<List<ModelDomainConfig>> GetModelDomains()
-    {
-        var url = EndPoints.NumModelingModelDomainDomainsQDT;
-        var modelDomains = await WS.GetManyAsync<ModelDomainConfig>(url,"Model Domain");
-        if (modelDomains != null)
-            Logger.Information($"Model domain received. Count = {modelDomains.Count}");
-        else
-            Logger.Error($"Failed to receive model domain");
-
-        return modelDomains; 
-    }
-
-
-    private string GetNewWaterModelDomainName(int dtId)
-    {
-        return $"Water_{dtId}_{DateTime.Now:yyyyyMMddHmmss}";
-    }
+    #endregion
 
     #region Water Model Domain CRUD
     public async Task<int?> AddWaterModelDomain(ModelDomainConfig modelDomain)
@@ -120,35 +105,16 @@ public class NumericModel : WSItem
         return id;
     }
 
-    //public async Task<ModelDomainConfig?> GetWaterModelDomain()
-    //{
-    //    ModelDomainConfig? modelDomain = null;
-
-    //    // Get an existing one
-    //    var url = EndPoints.NumModelingModelDomainDomainsQDT + $"&{EndPoints.Query.DTTypeWater}";
-    //    var res = await Request.Get(url);
-    //    if (res.IsSuccessStatusCode)
-    //    {
-    //        modelDomain = await Request.GetJsonAsync<ModelDomainConfig?>(res);
-    //        Logger.Information($"Model domain data received. {modelDomain}");
-    //    }
-
-    //    return modelDomain;
-    //}
-
-    public async Task<List<ModelDomainConfig?>?> GetWaterModelDomains()
-    {
-        List<ModelDomainConfig?>? modelDomains = new List<ModelDomainConfig?>();
-
-        // Get an existing one
+    public async Task<List<ModelDomainConfig>> GetModelDomainsWaterType()
+    {        
         var url = EndPoints.NumModelingModelDomainDomainsQDT + $"&{EndPoints.Query.DTTypeWater}";
-        var res = await Request.Get(url);
-        if (res.IsSuccessStatusCode)
-        {
-            modelDomains = await Request.GetJsonAsync<List<ModelDomainConfig?>?>(res);
-            Logger.Information($"Model domain data received. {modelDomains}");
-        }
-
+        var modelDomains = await WS.GetManyAsync<ModelDomainConfig>(url, "Water model domains");
+        return modelDomains;
+    }
+    public async Task<List<ModelDomainConfig>> GetModelDomainsAllTypes()
+    {
+        var url = EndPoints.NumModelingModelDomainDomainsQDT;
+        var modelDomains = await WS.GetManyAsync<ModelDomainConfig>(url, "Model Domain");
         return modelDomains;
     }
 
@@ -172,56 +138,68 @@ public class NumericModel : WSItem
     }
     #endregion
 
-
-    #region Simulation Run Times
-    public async Task<List<DateTimeOffset>> GetSimulationTimeSteps()
+    #region Simulation Time Steps
+    public async Task<List<DateTimeOffset>> GetSimulationTimeSteps(string modelDomainName)
     {
-        var MODEL_DOMAIN_TYPE = "WaterGems";
+        var urlPart = EndPoints.NumModelingModelDomainTimeInstanceLastModelRun;
+        urlPart += $@"?{EndPoints.Query.ModelDomainName(modelDomainName)}";
+        urlPart += $"&{EndPoints.Query.DTID}&emergencyEventId=undefined";
 
-        var modelDomains = await GetModelDomains();
+        var dates = await WS.GetManyAsync<DateTimeOffset>(urlPart, "Simulation time-steps");
+        return dates;
+    }
+    public async Task<List<DateTimeOffset>> GetSimulationTimeStepsWaterModel(string waterModelDomainName = "")
+    {
+        if(string.IsNullOrEmpty(waterModelDomainName))
+            return await GetSimulationTimeSteps(waterModelDomainName);
+
+        // Find out the water-model-domain-name
+        var modelDomains = await GetModelDomainsWaterType();
         if(modelDomains == null || !modelDomains.Any())
         {
             Logger.Error($"Model domains cannot be blank.");
             return new List<DateTimeOffset>();
         }
 
-        var waterGEMSModelDomainCheck = modelDomains.Where(m=>m.Type == MODEL_DOMAIN_TYPE);
-        if (!waterGEMSModelDomainCheck.Any())
-        {
-            Logger.Error($"No {MODEL_DOMAIN_TYPE} model domain found");
-            return new List<DateTimeOffset>();
-        }
-
-        var waterGEMSModelDomain = waterGEMSModelDomainCheck.First();
-
-        var urlPart = EndPoints.NumModelingModelDomainTimeInstanceLastModelRun;
-        urlPart += $@"?{EndPoints.Query.ModelDomainName(waterGEMSModelDomain.Name)}";
-        urlPart += $"&{EndPoints.Query.DTID}&emergencyEventId=undefined";
-        
-        var res = await Request.Get(urlPart);
-        var dates = await Request.GetJsonAsync<List<DateTimeOffset>>(res);
-        
-        if(dates != null && dates.Count > 0)
-            Logger.Information($"List of simulation time-steps received. Count = {dates.Count}");
-        else
-            Logger.Error($"Failed to get the list of simulation time-steps.");
-        
-        return dates;
+        var waterModelDomain = modelDomains.First();
+        return await GetSimulationTimeSteps(waterModelDomain.Name);
     }
     #endregion
 
     #region Model Elements
-    public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElements()
+    public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElementsWaterModel(string modelDomainName= "")
     {
-        var map = new Dictionary<string, List<ModelScadaElementConfig>>();
-        // https://connect-watersight.bentley.com/api/v1/NumericalModelling/ScadaElement/ModelElements?digitalTwinId=179&modelDomainName=Water-179-0055321969
+        if(!string.IsNullOrEmpty(modelDomainName))
+            return await GetModelTargetElements(modelDomainName);
 
+        // Find out the water-model-domain-name
+        var modelDomains = await GetModelDomainsWaterType();
+        if (modelDomains == null || !modelDomains.Any())
+        {
+            Logger.Error($"Model domains cannot be blank.");
+            return new Dictionary<string, List<ModelScadaElementConfig>>();
+        }
 
+        var waterModelDomain = modelDomains.First();
+        return await GetModelTargetElements(waterModelDomain.Name);
+    }
+    public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElements(string modelDomainName)
+    {
+        var url = EndPoints.NumModelingScadaElementModelElementsQDT;
+        url += $"&{EndPoints.Query.ModelDomainName(modelDomainName)}";
 
+        var map = await WS.GetAsync<Dictionary<string, List<ModelScadaElementConfig>>>(url, null, "SCADAElments");
         return map;
     }
     #endregion
 
+    #endregion
+
+    #region Private Methods
+    private string GetNewWaterModelDomainName(int dtId)
+    {
+        return $"Water_{dtId}_{DateTime.Now:yyyyMMddHmmss}";
+    }
     #endregion
 }
 
