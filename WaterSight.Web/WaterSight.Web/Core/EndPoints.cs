@@ -143,6 +143,9 @@ public class EndPoints
     //
     // Numerical Modeling
     public string NumModeling => $"{RootApiVersion}/NumericalModelling";
+
+    public string NumModelingElements => $"{NumModeling}/Elements";
+    public string NumModelingElementsResults => $"{NumModelingElements}/Results";
     public string NumModelingScadaElement => $"{NumModeling}/ScadaElement";
     public string NumModelingScadaElementModelElements => $"{NumModelingScadaElement}/ModelElements";
     public string NumModelingScadaElementModelElementsQDT => $"{NumModelingScadaElementModelElements}?{Query.DTID}";
@@ -159,7 +162,7 @@ public class EndPoints
     public string NumModelingModelElements => $"{NumModeling}/IModelElements";
     public string NumModelingModelElementsAllElements => $"{NumModelingModelElements}/AllElements";
     public string NumModelingParam => $"{NumModeling}/Parameter";
-    public string NumModelingParamGetElemType => $"{NumModelingParam}/GetByModelDomainAndElementType";
+    public string NumModelingParamGetByDomainAndElemType => $"{NumModelingParam}/GetByModelDomainAndElementType";
     public string NumModelingParamResultAttribInfo => $"{NumModelingParam}/ResultAttributeInfos";
     public string NumModelingModelTSD => $"{NumModeling}/ModelTimeSeriesValues";
 

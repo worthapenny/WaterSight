@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
+using WaterSight.Web.Sensors;
 
 namespace WaterSight.Web.NumericModels;
 
@@ -106,7 +108,7 @@ public class NumericModel : WSItem
     }
 
     public async Task<List<ModelDomainConfig>> GetModelDomainsWaterType()
-    {        
+    {
         var url = EndPoints.NumModelingModelDomainDomainsQDT + $"&{EndPoints.Query.DTTypeWater}";
         var modelDomains = await WS.GetManyAsync<ModelDomainConfig>(url, "Water model domains");
         return modelDomains;
@@ -150,12 +152,12 @@ public class NumericModel : WSItem
     }
     public async Task<List<DateTimeOffset>> GetSimulationTimeStepsWaterModel(string waterModelDomainName = "")
     {
-        if(string.IsNullOrEmpty(waterModelDomainName))
+        if (string.IsNullOrEmpty(waterModelDomainName))
             return await GetSimulationTimeSteps(waterModelDomainName);
 
         // Find out the water-model-domain-name
         var modelDomains = await GetModelDomainsWaterType();
-        if(modelDomains == null || !modelDomains.Any())
+        if (modelDomains == null || !modelDomains.Any())
         {
             Logger.Error($"Model domains cannot be blank.");
             return new List<DateTimeOffset>();
@@ -167,9 +169,9 @@ public class NumericModel : WSItem
     #endregion
 
     #region Model Elements
-    public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElementsWaterModel(string modelDomainName= "")
+    public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElementsWaterModel(string modelDomainName = "")
     {
-        if(!string.IsNullOrEmpty(modelDomainName))
+        if (!string.IsNullOrEmpty(modelDomainName))
             return await GetModelTargetElements(modelDomainName);
 
         // Find out the water-model-domain-name
@@ -191,6 +193,61 @@ public class NumericModel : WSItem
         var map = await WS.GetAsync<Dictionary<string, List<ModelScadaElementConfig>>>(url, null, "SCADAElments");
         return map;
     }
+    public async Task<List<ResultParameter>> GetParameters(
+        string modelDomainName,
+        int domainElementTypeId)
+    {
+        var sb = new StringBuilder(EndPoints.NumModelingParamGetByDomainAndElemType)
+            .Append($"?{EndPoints.Query.DTID}")
+            .Append($"&{EndPoints.Query.ModelDomainName(modelDomainName)}")
+            .Append($"&{EndPoints.Query.DomainElementTypeId(domainElementTypeId)}");
+
+        var url = sb.ToString();
+        var parameters = await WS.GetManyAsync<ResultParameter>(url, "Result Parameters");
+        return parameters;
+    }
+    #endregion
+
+    #region Model Results
+    public async Task<ElementResults> GetModelResultsAtTime(
+        int elementId,
+        int domainElementTypeId,
+        string modelDomainName,
+        DateTimeOffset at)
+    {
+        var sb = new StringBuilder(EndPoints.NumModelingElementsResults)
+            .Append($"?{EndPoints.Query.ModelDomainName(modelDomainName)}")
+            .Append($"&{EndPoints.Query.ElementId(elementId)}")
+            .Append($"&{EndPoints.Query.DomainElementTypeId(domainElementTypeId)}")
+            .Append($"&{EndPoints.Query.TimeStep(at)}")
+            .Append($"&{EndPoints.Query.DTID}")
+            .Append($"&{EndPoints.Query.EmergencyEventId(null)}");
+
+        var url = sb.ToString();
+        var results = await WS.GetAsync<ElementResults>(url, null, "Element Results");
+        return results;
+    }
+    public async Task<ElementTsdResult> GetModelResults(
+        int elementId,
+        string parameterName,
+        string modelDomainName,
+        DateTimeOffset? startDate = null, // default = T-24hrs
+        DateTimeOffset? endDate = null // default = Now
+        )
+    {
+        var sb = new StringBuilder(EndPoints.NumModelingModelTSD)
+            .Append($"/{elementId}")
+            .Append($"?{EndPoints.Query.ModelDomainName(modelDomainName)}")
+            .Append($"&{EndPoints.Query.ParameterName(parameterName)}")
+            .Append($"&{EndPoints.Query.StartDateTime(startDate ?? DateTimeOffset.UtcNow.AddDays(-1))}")
+            .Append($"&{EndPoints.Query.EndDateTime(endDate ?? DateTimeOffset.UtcNow)}")
+            .Append($"&{EndPoints.Query.DTID}");
+
+        var url = sb.ToString();
+        var tsdResults = await WS.GetAsync<ElementTsdResult>(url, null, "Element TSD Result");
+        return tsdResults;
+    }
+
     #endregion
 
     #endregion
@@ -222,13 +279,76 @@ public class ModelScadaElementConfig
     #region Overridden Methods
     public override string ToString()
     {
-        return base.ToString();
+        return $"{ScadaElementId}: {SignalLabel} ({ResultAttribute})";
     }
     #endregion
 
 }
 
+[DebuggerDisplay("{ToString()}")]
+public class ResultParameter
+{
+    public int ID { get; set; }
+    public string Name { get; set; }
+    public string DisplayName { get; set; }
+    public string Units { get; set; }
+    public int Quantity { get; set; }
+    public int? StorageUnit { get; set; }
 
+    #region Overridden Methods
+    public override string ToString()
+    {
+        return $"{ID}: {DisplayName} Quants = {Quantity}";
+    }
+    #endregion
+}
+
+[DebuggerDisplay("{ToString()}")]
+public class ElementFieldResult
+{
+    public string Name { get; set; }
+    public string DisplayName { get; set; }
+    public double Value { get; set; }
+
+
+    #region Overridden Methods
+    public override string ToString()
+    {
+        return $"{Value} [{DisplayName}]";
+    }
+    #endregion
+}
+
+[DebuggerDisplay("{ToString()}")]
+public class ElementResults
+{
+    public int ElementId { get; set; }
+    public List<ElementFieldResult> ElementFieldResults { get; set; } = new List<ElementFieldResult>();
+
+    #region Overridden Methods
+    public override string ToString()
+    {
+        return $"{ElementId}: Count = {ElementFieldResults.Count}";
+    }
+    #endregion
+}
+
+
+public class ElementTsdResult
+{
+    public string Name { get; set; }
+    public string Parameter { get; set; }
+    public string Units { get; set; }
+    public List<SensorTSDWebPoint> Values { get; set; }
+    public object Percentiles { get; set; }
+
+    #region Overridden Methods
+    public override string ToString()
+    {
+        return $"{Name} [{Parameter}, {Units}] Count = {Values.Count}";
+    }
+    #endregion
+}
 
 [DebuggerDisplay("{ToString()}")]
 public class ModelDomainConfig

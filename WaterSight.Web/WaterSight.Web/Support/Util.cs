@@ -19,7 +19,8 @@ namespace WaterSight.Web.Support
 
 
         #region Public Methods
-        public static string ISODateTime(DateTimeOffset dt) => dt.ToString("u").Replace(" ", "T");
+        // OR => dt.UtcDateTime.ToString("O")
+        //public static string ISODateTime(DateTimeOffset dt) => dt.ToString("u").Replace(" ", "T");
         public static Stopwatch StartTimer() => Stopwatch.StartNew();
         public static TimeSpan Elapsed(Stopwatch sw) => sw.Elapsed;
 

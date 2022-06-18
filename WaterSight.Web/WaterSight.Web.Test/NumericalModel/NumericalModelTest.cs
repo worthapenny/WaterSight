@@ -12,8 +12,9 @@ public class NumericalModelTest : TestBase
 {
     #region Constructor
     public NumericalModelTest()
-        //: base(4549, Env.Qa)
-        : base(179, Env.Prod)
+    //: base(4549, Env.Qa) // Akshaya
+    : base(3377, Env.Qa) // Watertown
+    //: base(179, Env.Prod)
     {
         Logger.Debug($"----+----+---- Performing NumericalModel Related Tests ----+----+----");
     }
@@ -122,6 +123,60 @@ public class NumericalModelTest : TestBase
         var map = await NumericModel.GetModelTargetElementsWaterModel();
         Assert.IsNotNull(map);
         Assert.IsTrue(map.Count > 0);
+    }
+    
+    [Test, Category("Elements"), Category("Parameters")]
+    public async Task GetElementParameters()
+    {
+        // Get model Domain Name
+        var modelDomain = await NumericModel.GetModelDomainsWaterType();
+        Assert.IsNotNull(modelDomain);
+        Assert.AreEqual(true, modelDomain.Any());
+
+        var parameters = await NumericModel.GetParameters(
+            modelDomainName: modelDomain.First().Name,
+            domainElementTypeId: 1);
+
+        Assert.IsNotNull(parameters);
+        Assert.IsTrue(parameters.Count > 0);
+    }
+
+    [Test, Category("Element"), Category("Results")]
+    [TestCase(49420, 0)] // Pipe:
+    public async Task GetElementResultsAtTime(int elementId, int domainElementTypeId)
+    {
+        // Get model Domain Name
+        var modelDomain = await NumericModel.GetModelDomainsWaterType();
+        Assert.IsNotNull(modelDomain);
+        Assert.AreEqual(true, modelDomain.Any());
+
+        var results = await NumericModel.GetModelResultsAtTime(
+            elementId: elementId,
+            domainElementTypeId: domainElementTypeId, 
+            modelDomainName: modelDomain.First().Name,
+            at: DateTimeOffset.UtcNow.AddHours(-1));
+        
+        Assert.IsNotNull(results);
+        Assert.AreEqual(true, results.ElementFieldResults.Any());
+    }
+    [Test, Category("Element"), Category("Results"), Category("TSD")]
+    [TestCase(49420, "Reaches/flow")]
+    public async Task GetElementResultsTSD(int elementId, string parameterName)
+    {
+        // Get model Domain Name
+        var modelDomain = await NumericModel.GetModelDomainsWaterType();
+        Assert.IsNotNull(modelDomain);
+        Assert.AreEqual(true, modelDomain.Any());
+
+        var results = await NumericModel.GetModelResults(
+            elementId: elementId,
+            parameterName: parameterName,
+            modelDomainName: modelDomain.First().Name,
+            startDate: DateTimeOffset.UtcNow.AddDays(-1),
+            endDate: DateTimeOffset.UtcNow);
+
+        Assert.IsNotNull(results);
+        Assert.AreEqual(true, results.Values.Any());
     }
     #endregion
 }
