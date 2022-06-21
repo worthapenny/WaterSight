@@ -149,6 +149,8 @@ public class EndPoints
     public string NumModelingScadaElement => $"{NumModeling}/ScadaElement";
     public string NumModelingScadaElementModelElements => $"{NumModelingScadaElement}/ModelElements";
     public string NumModelingScadaElementModelElementsQDT => $"{NumModelingScadaElementModelElements}?{Query.DTID}";
+    public string NumModelingScadaElementScadaElements => $"{NumModelingScadaElement}/ScadaElements";
+    public string NumModelingScadaElementScadaElementsQDT => $"{NumModelingScadaElementScadaElements}?{Query.DTID}";
     public string NumModelingModelDomain => $"{NumModeling}/ModelDomain";
     public string NumModelingModelDomainDomainsLRO(int modelDomainId) => $"{NumModelingModelDomain}/ModelDomainsLRO?{Query.ModelDomainId(modelDomainId)}&{Query.DTID}";
     public string NumModelingModelDomainDomains => $"{NumModelingModelDomain}/ModelDomains";

@@ -56,6 +56,7 @@ public class Query
     public string Longitude(double lng) => $"longitude={lng}";
     public string ModelDomainId(int modelDomainId) => $"modelDomainId={modelDomainId}";
     public string ModelDomainName(string name) => $"modelDomainName={Uri.EscapeDataString(name)}";
+    public string ModelElementId(int id) => $"modelElementId={id}";
     public string Name(string name) => $"name={Uri.EscapeDataString(name)}";
     public string ParameterFlow => $"parameter=Flow";
     public string ParameterName(string name) => $"parameterName={name}";

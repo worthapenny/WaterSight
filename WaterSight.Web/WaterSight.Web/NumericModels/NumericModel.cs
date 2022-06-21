@@ -169,6 +169,32 @@ public class NumericModel : WSItem
     #endregion
 
     #region Model Elements
+    public async Task<List<ModelScadaElementConfig>> GetMappedScadaElementsWaterModel(int modelElementId, string modelDomainName = "")
+    {
+        if (!string.IsNullOrEmpty(modelDomainName))
+            return await GetMappedScadaElements(modelDomainName, modelElementId);
+
+        // Find out the water-model-domain-name
+        var modelDomains = await GetModelDomainsWaterType();
+        if (modelDomains == null || !modelDomains.Any())
+        {
+            Logger.Error($"Model domains cannot be blank.");
+            return new List<ModelScadaElementConfig>();
+        }
+
+        var waterModelDomain = modelDomains.First();
+        return await GetMappedScadaElements(waterModelDomain.Name, modelElementId);
+    }
+    public async Task<List<ModelScadaElementConfig>> GetMappedScadaElements(string modelDomainName, int modelElementId)
+    {
+        var sb = new StringBuilder(EndPoints.NumModelingScadaElementScadaElementsQDT)
+            .Append($"&{EndPoints.Query.ModelDomainName(modelDomainName)}")
+            .Append($"&{EndPoints.Query.ModelElementId(modelElementId)}");
+
+        var map = await WS.GetAsync<List<ModelScadaElementConfig>>(url: sb.ToString(), id: null, typeName: "Mapped SCADAElments");
+        return map;
+    }
+
     public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElementsWaterModel(string modelDomainName = "")
     {
         if (!string.IsNullOrEmpty(modelDomainName))

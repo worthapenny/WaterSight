@@ -124,7 +124,16 @@ public class NumericalModelTest : TestBase
         Assert.IsNotNull(map);
         Assert.IsTrue(map.Count > 0);
     }
-    
+
+    [Test, Category("Elements"), Category("SCADA")]
+    public async Task GetMappedElementsWaterModel()
+    {
+        var elementId = 49510;
+        var mappedElements = await NumericModel.GetMappedScadaElementsWaterModel(elementId);
+        Assert.IsNotNull(mappedElements);
+        Assert.IsTrue(mappedElements.Count > 0);
+    }
+
     [Test, Category("Elements"), Category("Parameters")]
     public async Task GetElementParameters()
     {
