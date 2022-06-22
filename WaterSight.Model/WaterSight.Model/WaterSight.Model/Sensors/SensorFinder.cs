@@ -24,33 +24,33 @@ public class SensorFinder
     #endregion
 
     #region Public Methods
-    public async Task<List<Sensor>> SearchFeatureAsync(IDomainProject domainProject, SensorFinderOptions options, bool isDuplicateOK = false)
-    {
-        var connectivity = await Library.GetConnectivityAsync(domainProject);
+    //public async Task<List<Sensor>> SearchFeatureAsync(IDomainProject domainProject, SensorFinderOptions options, bool isDuplicateOK = false)
+    //{
+    //    var connectivity = await Library.GetConnectivityAsync(domainProject);
 
-        var sensors = new List<Sensor>();
-        sensors.AddRange(SerachTanks(connectivity, options));
-        //sensors.AddRange(await SearchPumpsAsync(connectivity, options));
-        //sensors.AddRange(SearchValves(connectivity, options));
-        //sensors.AddRange(await SearchReservoirsAsync(connectivity, options));
+    //    var sensors = new List<Sensor>();
+    //    sensors.AddRange(SerachTanks(connectivity, options));
+    //    //sensors.AddRange(await SearchPumpsAsync(connectivity, options));
+    //    //sensors.AddRange(SearchValves(connectivity, options));
+    //    //sensors.AddRange(await SearchReservoirsAsync(connectivity, options));
 
-        // Drop the duplicates
-        if (!isDuplicateOK)
-        {
-            var count = sensors.Count();
-            sensors = sensors.GroupBy(s => new { s.NetworkElement.Id, s.SensorType, s.IsDirection, s.IsDirectionOutwards })
-                            .Select(s => s.FirstOrDefault()).ToList();
-            Log.Information($"Duplicate sensors values are dropped, before count {count}, after coulnt {sensors.Count}");
-        }
+    //    // Drop the duplicates
+    //    if (!isDuplicateOK)
+    //    {
+    //        var count = sensors.Count();
+    //        sensors = sensors.GroupBy(s => new { s.NetworkElement.Id, s.SensorType, s.IsDirection, s.IsDirectionOutwards })
+    //                        .Select(s => s.FirstOrDefault()).ToList();
+    //        Log.Information($"Duplicate sensors values are dropped, before count {count}, after coulnt {sensors.Count}");
+    //    }
 
-        return sensors;
+    //    return sensors;
 
-    }
+    //}
 
     public async Task<List<Sensor>> SearchElementsAsync(SensorFinderOptions options, bool isDuplicateOK = false)
     {        
         var sensors = new List<Sensor>();
-        sensors.AddRange(SerachTanks(options));
+        sensors.AddRange(SearchTanks(options));
         sensors.AddRange(await SearchPumpsAsync(options));
         sensors.AddRange(SearchValves(options));
         sensors.AddRange(SearchReservoirs(options));
@@ -67,7 +67,7 @@ public class SensorFinder
         return sensors;
     
     }
-    public List<Sensor> SerachTanks(ConnectionTopology conntivity, SensorFinderOptions options)
+    public List<Sensor> SearchTanks(ConnectionTopology conntivity, SensorFinderOptions options)
     {
         Log.Debug($"Searching possible sensors for tanks...");
 
@@ -111,7 +111,7 @@ public class SensorFinder
 
         return sensors;
     }
-    public List<Sensor> SerachTanks(SensorFinderOptions options)
+    public List<Sensor> SearchTanks(SensorFinderOptions options)
     {
         Log.Debug($"Searching possible sensors for tanks...");
 

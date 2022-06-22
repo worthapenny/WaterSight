@@ -10,6 +10,9 @@ using WaterSight.Web.Zones;
 
 namespace WaterSight.Web.Core;
 
+/// <summary>
+/// The main access point for the WaterSight Web API
+/// </summary>
 public class WS
 {
 

@@ -26,7 +26,7 @@ namespace WaterSight.Model.Test
         {
             var connectivity = await Library.GetConnectivityAsync(DomainProject);
             var sensorFinder = new SensorFinder(WaterModel);
-            var tanks = sensorFinder.SerachTanks(connectivity, new SensorFinderOptions());
+            var tanks = sensorFinder.SearchTanks(connectivity, new SensorFinderOptions());
         }
         #endregion
     }
