@@ -135,7 +135,18 @@ public class NumericalModelTest : TestBase
     }
 
     [Test, Category("Elements"), Category("Parameters")]
-    public async Task GetElementParameters()
+    [TestCase(WaterDomainElementTypeId.Pipe)] 
+    [TestCase(WaterDomainElementTypeId.Node)] // Junction
+    [TestCase(WaterDomainElementTypeId.Pump)]
+    [TestCase(WaterDomainElementTypeId.Tank)]
+    [TestCase(WaterDomainElementTypeId.FCV)]
+    [TestCase(WaterDomainElementTypeId.GPV)]
+    [TestCase(WaterDomainElementTypeId.PBV)]
+    [TestCase(WaterDomainElementTypeId.TCV)]
+    [TestCase(WaterDomainElementTypeId.PRV)]
+    [TestCase(WaterDomainElementTypeId.PSV)]
+    [TestCase(WaterDomainElementTypeId.Reservoir)]
+    public async Task GetElementParameters(int domainElementTypeId)
     {
         // Get model Domain Name
         var modelDomain = await NumericModel.GetModelDomainsWaterType();
@@ -144,7 +155,7 @@ public class NumericalModelTest : TestBase
 
         var parameters = await NumericModel.GetParameters(
             modelDomainName: modelDomain.First().Name,
-            domainElementTypeId: 1);
+            domainElementTypeId: domainElementTypeId);
 
         Assert.IsNotNull(parameters);
         Assert.IsTrue(parameters.Count > 0);

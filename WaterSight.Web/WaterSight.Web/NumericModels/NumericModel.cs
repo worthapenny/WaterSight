@@ -13,6 +13,59 @@ namespace WaterSight.Web.NumericModels;
 
 public class NumericModel : WSItem
 {
+
+
+    #region Constants
+    public const string ParameterLinkFlowAbs = "Reaches/flowabsolute";
+    public const string ParameterLinkHeadLossGradient = "Reaches/headlossgradient";
+    public const string ParameterLinkVelocity = "Reaches/velocity";
+    public const string ParameterLinkHeadloss = "Reaches/headloss";
+    public const string ParameterLinkFlow = "Reaches/flow";
+    public const string ParameterLinkTrace = "Reaches/trace";
+    public const string ParameterLinkAge = "Reaches/age";
+    public const string ParameterLinkConcentration = "Reaches/concentration";
+
+    public const string ParameterNodeDemand = "Nodes/demand";
+    public const string ParameterNodeHGL = "Nodes/hgl";
+    public const string ParameterNodePressure = "Nodes/pressure";
+    public const string ParameterNodeTrace = "Nodes/trace";
+    public const string ParameterNodeAge = "Nodes/age";
+    public const string ParameterNodeConcentration = "Nodes/concentration";
+
+    public const string ParameterPumpDischargePressure = "Pumps/dischargepressure";
+    public const string ParameterPumpSuctionPressure = "Pumps/intakepressure";
+    public const string ParameterPumpHead = "Pumps/pumphead";
+    public const string ParameterPumpStatus = "Pumps/pumpstatus";
+    public const string ParameterPumpRelativeSpeed = "Pumps/relativespeed";
+    public const string ParameterPumpFlow = "Pumps/flow";
+    public const string ParameterPumpTrace = "Pumps/trace";
+    public const string ParameterPumpAge = "Pumps/age";
+    public const string ParameterPumpConcentration = "Pumps/concentration";
+
+    public const string ParameterTankHGL = "Tank/hgl";
+    public const string ParameterTankLevel = "Tank/tanklevel";
+    public const string ParameterTankPercentFull = "Tank/percentfull";
+    public const string ParameterTankFlowOutNet = "Tank/flowoutnet";
+    public const string ParameterTankTrace = "Tank/trace";
+    public const string ParameterTankAge = "Tank/age";
+    public const string ParameterTankConcentration = "Tank/concentration";
+
+    public const string ParameterValveFromPressure = "Valves/valvefrompressure";
+    public const string ParameterValveHeadLoss = "Valves/valveheadloss";
+    public const string ParameterValveStatus = "Valves/valvestatus";
+    public const string ParameterValveToPressure = "Valves/topressure";
+    public const string ParameterValveFlow = "Valves/flow";
+    public const string ParameterValveTrace = "Valves/trace";
+    public const string ParameterValveAge = "Valves/age";
+    public const string ParameterValveConcentration = "Valves/concentration";
+
+    public const string ParameterReservoirFlowOut = "Reservoir/flowout";
+    public const string ParameterReservoirHGL = "Reservoir/hgl";
+    public const string ParameterReservoirTrace = "Reservoir/trace";
+    public const string ParameterReservoirAge = "Reservoir/age";
+    public const string ParameterReservoirConcentration = "Reservoir/concentration";
+    #endregion
+
     #region Constructor
     public NumericModel(WS ws) : base(ws)
     {
@@ -286,6 +339,52 @@ public class NumericModel : WSItem
     #endregion
 }
 
+
+#region Enums
+public enum WaterDomainElementTypeId
+{
+    Pipe = 0,
+    Node = 1,
+    Pump = 2,
+    Tank = 3,
+    FCV = 4,
+    GPV = 5,
+    PBV = 6,
+    TCV = 7,
+    PRV = 8,
+    PSV = 9,
+    Reservoir = 10,
+    SCADA = 11,
+    Lateral = 12,
+    Customer = 13,
+    PumpStation = 14,
+    IsolationValve = 15,
+}
+
+public enum SewerDomainElementTypeId
+{
+    PondOutletStructure = 30,
+    CrossSectionNode = 31,
+    CatchBasin = 32,
+    Manhole = 33,
+    JunctionChamber = 34,
+    Pump = 35,
+    Outfall = 36,
+    WetWell = 37,
+    PressureJunction = 38,
+    AirValve = 39,
+    Headwall = 40,
+    PropertyConnection = 41,
+    Gutter = 42,
+    Conduit = 43,
+    PressurePipe = 44,
+    Channel = 45,
+    Catchment = 46,
+    Pond = 47,
+    LID = 48,
+}
+
+#endregion
 
 #region Models
 
