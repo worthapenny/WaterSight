@@ -5,10 +5,10 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Pump;
 
 [DebuggerDisplay("Count: {PumpStationItemsList.Count}")]
-public class PumpStations:ExcelSheetBase
+public class PumpStationsXlSheet:ExcelSheetBase
 {
     #region Constructor
-    public PumpStations(string excelFilePath)
+    public PumpStationsXlSheet(string excelFilePath)
         : base(ExcelSheetName.PumpStations, excelFilePath)
     {
         PumpStationItemsList = new List<PumpStationItem>();

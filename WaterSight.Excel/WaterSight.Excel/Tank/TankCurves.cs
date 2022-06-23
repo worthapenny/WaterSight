@@ -6,10 +6,10 @@ namespace WaterSight.Excel.Tank;
 
 
 [DebuggerDisplay("Count: {TankItemsList.Count}")]
-public class TankCurves : ExcelSheetBase
+public class TankCurvesXlSheet : ExcelSheetBase
 {
     #region Constructor
-    public TankCurves(string excelFilePath)
+    public TankCurvesXlSheet(string excelFilePath)
         : base(ExcelSheetName.TankCurves, excelFilePath)
     {
         TankCurveItemsList = new List<TankCurveItem>();

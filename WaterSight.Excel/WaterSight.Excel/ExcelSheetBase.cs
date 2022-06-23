@@ -47,9 +47,12 @@ namespace WaterSight.Excel
 
         #endregion
 
+        #region Public Properties
+        public string SheetName { get; set; }
+        public string FilePath{ get; protected set; }
+        #endregion
+
         #region Protected Properties
-        protected string SheetName { get; set; }
-        protected string FilePath{ get; set; }
         protected ExcelMapper Xl { get; set; }
         #endregion
     }

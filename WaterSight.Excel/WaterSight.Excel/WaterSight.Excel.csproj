@@ -11,8 +11,8 @@
     <AssemblyName>WaterSight.Excel</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <BaseIntermediateOutputPath>$(SolutionDir)..\Output\$(AssemblyName)\obj</BaseIntermediateOutputPath>    
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <BaseIntermediateOutputPath>$(SolutionDir)..\Output\$(AssemblyName)\obj</BaseIntermediateOutputPath>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -72,6 +72,7 @@
     <Compile Include="Names.cs" />
     <Compile Include="Pump\Pumps.cs" />
     <Compile Include="Pump\PumpStations.cs" />
+    <Compile Include="Sensor\PossibleSensors.cs" />
     <Compile Include="Sensor\Sensors.cs" />
     <Compile Include="Tank\TankCurves.cs" />
     <Compile Include="Tank\Tanks.cs" />

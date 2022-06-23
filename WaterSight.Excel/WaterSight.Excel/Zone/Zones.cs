@@ -6,10 +6,10 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Zone;
 
 [DebuggerDisplay("Count: {ZoneItemsList.Count}")]
-public class Zones : ExcelSheetBase
+public class ZonesXlSheet : ExcelSheetBase
 {
     #region Constructor
-    public Zones(string excelFilePath)
+    public ZonesXlSheet(string excelFilePath)
         : base(ExcelSheetName.Zone, excelFilePath)
     {
         ZoneItemsList = new List<ZoneItem>();

@@ -5,10 +5,10 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Customer;
 
 [DebuggerDisplay("Count: {CustomerMeterItemsList.Count}")]
-public class CustomerMeters: ExcelSheetBase
+public class CustomerMetersXlSheet: ExcelSheetBase
 {
     #region Constructor
-    public CustomerMeters(string excelFilePath)
+    public CustomerMetersXlSheet(string excelFilePath)
         : base(ExcelSheetName.CustomerMeters, excelFilePath)
     {
         CustomerMeterItemsList = new List<CustomerMeterItem>();

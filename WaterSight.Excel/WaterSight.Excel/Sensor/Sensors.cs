@@ -6,10 +6,10 @@ using System.Linq;
 namespace WaterSight.Excel.Sensor;
 
 [DebuggerDisplay("Count: {SensorItemsList.Count}")]
-public class Sensors : ExcelSheetBase
+public class SensorsXlSheet : ExcelSheetBase
 {
     #region Constructor
-    public Sensors(string excelFilePath)
+    public SensorsXlSheet(string excelFilePath)
         : base(ExcelSheetName.Sensors, excelFilePath)
     {
         SensorItemsList = new List<SensorItem>();

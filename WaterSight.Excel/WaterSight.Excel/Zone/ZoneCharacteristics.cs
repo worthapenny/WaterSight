@@ -5,10 +5,10 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Zone;
 
 [DebuggerDisplay("Count: {CustomerMeterItemsList.Count}")]
-public class ZoneCharacteristics : ExcelSheetBase
+public class ZoneCharacteristicsXlSheet : ExcelSheetBase
 {
     #region Constructor
-    public ZoneCharacteristics(string excelFilePath)
+    public ZoneCharacteristicsXlSheet(string excelFilePath)
         : base(ExcelSheetName.ZoneCharacteristics, excelFilePath)
     {
         ZoneCharacteristicsItemsList = new List<ZoneCharacteristicsItem>();

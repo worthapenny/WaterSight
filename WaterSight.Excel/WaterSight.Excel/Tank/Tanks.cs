@@ -5,10 +5,10 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Tank;
 
 [DebuggerDisplay("Count: {TankItemsList.Count}")]
-public class Tanks: ExcelSheetBase
+public class TanksXlSheet: ExcelSheetBase
 {
     #region Constructor
-    public Tanks(string excelFilePath)
+    public TanksXlSheet(string excelFilePath)
         : base(ExcelSheetName.Tanks, excelFilePath)
     {
         TankItemsList = new List<TankItem>();

@@ -5,10 +5,10 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Pump;
 
 [DebuggerDisplay("Count: {Curves.Count}")]
-public class PumpCurves : ExcelSheetBase
+public class PumpCurvesXlSheet : ExcelSheetBase
 {
     #region Constructor
-    public PumpCurves(string excelFilePath)
+    public PumpCurvesXlSheet(string excelFilePath)
         : base(ExcelSheetName.PumpCurves, excelFilePath)
     {
         Curves = new List<PumpCurveItem>();

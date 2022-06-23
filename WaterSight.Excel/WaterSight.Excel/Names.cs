@@ -67,6 +67,7 @@ public class ExcelFileNames
 public struct ExcelSheetName
 {
     public const string Sensors = "Sensors";
+    public const string PossibleSensors = "Possible Sensors";
     public const string Tanks = "Tanks";
     public const string TankCurves = "Tank curves";
     public const string Pumps = "Pumps";

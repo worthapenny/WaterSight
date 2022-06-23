@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 namespace WaterSight.Excel.Customer;
 
 [DebuggerDisplay("Count: {ConsumptionItemsList.Count}")]
-public class Consumptions
+public class ConsumptionsXlSheet
 {
     #region Constructor
-    public Consumptions(string csvFilePath)
+    public ConsumptionsXlSheet(string csvFilePath)
     {
         CsvFilePath = csvFilePath;
         ConsumptionItemsList = new List<ConsumptionItem>();
