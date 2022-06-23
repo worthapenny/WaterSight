@@ -49,7 +49,7 @@ public class Sensor : WSItem
 
     public async Task<bool> PostExcelFile(FileInfo fileInfo)
     {
-        return await WS.PostFile(EndPoints.RtdaSignalsFileQDT, fileInfo, "Excel");
+        return await WS.PostFile(EndPoints.RtdaSignalsFileQDT, fileInfo, true, "Excel");
     }
 
     public async Task<List<SensorConfig>> AddMissingSensorConfigAsync(List<SensorConfig> sensorConfigs)

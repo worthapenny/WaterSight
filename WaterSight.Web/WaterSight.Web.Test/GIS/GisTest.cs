@@ -83,6 +83,8 @@ public class GisTest : TestBase
     public async Task UploadAnyShapefile()
     {
         var myDataType = $"MyType_{DateTime.Now:yyyyMMdd}"; // this name MUST match with below test
+        // TODO: Check if myDataType exists
+        // if it does exits, delete it first
         var anyShapefilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles/GIS/CriticalCustomers_mini.zip");
         Assert.IsTrue(File.Exists(anyShapefilePath));
 

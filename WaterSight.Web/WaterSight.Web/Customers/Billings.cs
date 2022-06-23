@@ -20,10 +20,10 @@ public class Billings : WSItem
         var url = EndPoints.HydStructureMonthlyBillingQDT;
 
         if (fileInfo.Extension.ToLower().EndsWith("csv"))
-            return await WS.PostFile(url, fileInfo, "CSV");
+            return await WS.PostFile(url, fileInfo,true, "CSV");
 
         if (fileInfo.Extension.ToLower().Contains("xl"))
-            return await WS.PostFile(url, fileInfo, "Excel");
+            return await WS.PostFile(url, fileInfo, true, "Excel");
 
         Logger.Error($"Given file extension is not supported. Supported types are, csv and xlsx");
         return false;

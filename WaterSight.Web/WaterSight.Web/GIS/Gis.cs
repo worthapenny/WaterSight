@@ -34,7 +34,7 @@ public class GIS : WSItem
 
         WS.Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO("Zones") + "#upload";
-        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), "Shapefile");
+        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath),true, "Shapefile");
         return uploaded;
     }
     public async Task<bool?> DeletePressureZoneZippedShpFile()
@@ -53,7 +53,7 @@ public class GIS : WSItem
         WS.Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO("Pipes") + "#upload";
                 
-        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), "Shapefile");
+        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath),true, "Shapefile");
         return uploaded;
     }
     public async Task<bool?> DeletePipeZippedShpFile()
@@ -93,7 +93,7 @@ public class GIS : WSItem
 
         Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO(dataTypeName);
-        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), "Shapefile");
+        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), true, "Shapefile");
         return uploaded;
 
     }

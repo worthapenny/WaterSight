@@ -189,7 +189,7 @@ public class SensorsTest : TestBase
     };
     }
 
-    private async Task<SensorConfig> NewSensorConfigAsync()
+    public async Task<SensorConfig> NewSensorConfigAsync()
     {
         var sensor = new SensorConfig();
         sensor.TagId = $"Sensor_Test_{DateTime.Now:u}";

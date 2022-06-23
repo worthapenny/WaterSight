@@ -15,7 +15,7 @@ public class PumpStation : WSItem
     #region Public Properties
     public async Task<bool> PostExcelFile(FileInfo fileInfo)
     {
-        return await WS.PostFile(EndPoints.HydStructuresPumpingStationsQDT, fileInfo, "Excel");
+        return await WS.PostFile(EndPoints.HydStructuresPumpingStationsQDT, fileInfo, true, "Excel");
     }
     #endregion
 }

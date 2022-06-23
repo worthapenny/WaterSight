@@ -87,7 +87,7 @@ public class DigitalTwin : WSItem
         }
 
         var url = EndPoints.DTAvatarQDT;
-        return await WS.PostFile(url, new FileInfo(imagePath), "Bitmap");
+        return await WS.PostFile(url, new FileInfo(imagePath), true,"Bitmap");
     }
 
     //

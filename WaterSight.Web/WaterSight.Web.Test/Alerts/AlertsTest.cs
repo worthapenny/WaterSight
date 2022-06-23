@@ -25,6 +25,11 @@ public class AlertsTest : TestBase
     [Test]
     public async Task Alerts_CRUD()
     {
+        // add a sensor so that the SensorConfig list is not empty
+        var sensorTest = new SensorsTest();
+        var sensorCreated = await WS.Sensor.AddSensorConfigAsync(await sensorTest.NewSensorConfigAsync());
+        Assert.IsTrue(sensorCreated.ID > 0);
+
         var sensors = await WS.Sensor.GetSensorsConfigAsync();
         Assert.IsNotEmpty(sensors);
 
@@ -72,6 +77,9 @@ public class AlertsTest : TestBase
         Assert.IsTrue(deletedMany);
         Separator("Done delete, many items, testing");
 
+        // Delete created sensor as well
+        var deletedSensor = await WS.Sensor.DeleteSensorConfigAsync(sensorCreated.ID);
+        Assert.AreEqual(true, deletedSensor);
     }
 
     public AlertConfig NewThresholdAlertConfig(AlertOrigin origin, string unit)
