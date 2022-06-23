@@ -10,6 +10,7 @@ public class SensorFinderOptions
     #endregion
 
     #region Public Properties
+    public bool ActiveElementsOnly { get; set; } = true;
     public bool TankLevel { get; set; } = true;
     public bool TankFlow { get; set; } = true;
 

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Model.Support;
 using Haestad.Framework.Application;
+using OpenFlows.Domain.ModelingElements.NetworkElements;
 
 namespace WaterSight.Model.Sensors;
 
@@ -119,7 +120,8 @@ public class SensorFinder
         var sw = new Stopwatch();
         sw.Start();
 
-        var tankElements = WaterModel.Network.Tanks.Elements();
+        var isActiveState = options.ActiveElementsOnly ? ElementStateType.Active : ElementStateType.Inactive;
+        var tankElements = WaterModel.Network.Tanks.Elements(isActiveState);
 
         Sensor sensor;
         if (options.TankLevel)
@@ -165,7 +167,8 @@ public class SensorFinder
         // VSPBs are not supported
 
         // Regular Pumps
-        var pumps = WaterModel.Network.Pumps.Elements();
+        var isActiveState = options.ActiveElementsOnly ? ElementStateType.Active : ElementStateType.Inactive;
+        var pumps = WaterModel.Network.Pumps.Elements(isActiveState);
 
         foreach (var pump in pumps)
         {
@@ -256,12 +259,14 @@ public class SensorFinder
         var sensors = new List<Sensor>();
 
         var valves = new List<IWaterElement>();
-        valves.AddRange(WaterModel.Network.FCVs.Elements());
-        valves.AddRange(WaterModel.Network.PRVs.Elements());
-        valves.AddRange(WaterModel.Network.PSVs.Elements());
-        valves.AddRange(WaterModel.Network.PBVs.Elements());
-        if (options.TCVs) valves.AddRange(WaterModel.Network.TCVs.Elements());
-        if (options.GPVs) valves.AddRange(WaterModel.Network.GPVs.Elements());
+        var isActiveState = options.ActiveElementsOnly ? ElementStateType.Active : ElementStateType.Inactive;
+
+        valves.AddRange(WaterModel.Network.FCVs.Elements(isActiveState));
+        valves.AddRange(WaterModel.Network.PRVs.Elements(isActiveState));
+        valves.AddRange(WaterModel.Network.PSVs.Elements(isActiveState));
+        valves.AddRange(WaterModel.Network.PBVs.Elements(isActiveState));
+        if (options.TCVs) valves.AddRange(WaterModel.Network.TCVs.Elements(isActiveState));
+        if (options.GPVs) valves.AddRange(WaterModel.Network.GPVs.Elements(isActiveState));
 
         foreach (var valve in valves)
         {
@@ -327,7 +332,9 @@ public class SensorFinder
         sw.Start();
 
         var sensors = new List<Sensor>();
-        var reservoirs = WaterModel.Network.Reservoirs.Elements();
+
+        var isActiveState = options.ActiveElementsOnly ? ElementStateType.Active : ElementStateType.Inactive;
+        var reservoirs = WaterModel.Network.Reservoirs.Elements(isActiveState);
 
         foreach (var res in reservoirs)
         {
