@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.NumericModels;
 
-namespace WaterSight.Web.Test.NumericalModel;
+namespace WaterSight.Web.Test;
 
+[TestFixture, Order(102900), Category("NumericalModel"), Category("Model")]
 public class NumericalModelTest : TestBase
 {
     #region Constructor
@@ -135,7 +136,7 @@ public class NumericalModelTest : TestBase
     }
 
     [Test, Category("Elements"), Category("Parameters")]
-    [TestCase(WaterDomainElementTypeId.Pipe)] 
+    [TestCase(WaterDomainElementTypeId.Pipe)]
     [TestCase(WaterDomainElementTypeId.Node)] // Junction
     [TestCase(WaterDomainElementTypeId.Pump)]
     [TestCase(WaterDomainElementTypeId.Tank)]
@@ -172,10 +173,10 @@ public class NumericalModelTest : TestBase
 
         var results = await NumericModel.GetModelResultsAtTime(
             elementId: elementId,
-            domainElementTypeId: domainElementTypeId, 
+            domainElementTypeId: domainElementTypeId,
             modelDomainName: modelDomain.First().Name,
             at: DateTimeOffset.UtcNow.AddHours(-1));
-        
+
         Assert.IsNotNull(results);
         Assert.AreEqual(true, results.ElementFieldResults.Any());
     }

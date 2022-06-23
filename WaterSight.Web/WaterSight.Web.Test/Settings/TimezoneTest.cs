@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Settings;
-using WaterSight.Web.Test;
 
-namespace WaterSight.Base.Test.Settings;
+namespace WaterSight.Web.Test;
 
-public class TimezoneTest: TestBase
+[TestFixture, Order(100200), Category("Settings"), Category("Zones")]
+public class TimezoneTest : TestBase
 {
     #region Constructor
     public TimezoneTest()

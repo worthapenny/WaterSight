@@ -5,16 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Sensors;
-using WaterSight.Web.Support;
 
-namespace WaterSight.Web.Test.Sensors;
+namespace WaterSight.Web.Test;
 
 
+[TestFixture, Order(101000), Category("Sensors")]
 public class SensorsTest : TestBase
 {
     #region Constructor
     public SensorsTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     {
         Separator($"----+----+---- Performing Sensors Related Tests ----+----+----");
     }
@@ -189,7 +189,7 @@ public class SensorsTest : TestBase
     };
     }
 
-    private  async Task<SensorConfig> NewSensorConfigAsync()
+    private async Task<SensorConfig> NewSensorConfigAsync()
     {
         var sensor = new SensorConfig();
         sensor.TagId = $"Sensor_Test_{DateTime.Now:u}";
@@ -207,7 +207,7 @@ public class SensorsTest : TestBase
         sensor.UtcOffSet = "00:00";
 
         var allPatternWeeks = await WS.Settings.PatternWeeks.GetPatternWeeksConfigAsync();
-        var patternWeek =  allPatternWeeks.Where(p=>p.IsDefault).First();
+        var patternWeek = allPatternWeeks.Where(p => p.IsDefault).First();
         sensor.PatternWeekId = patternWeek.ID;
 
 

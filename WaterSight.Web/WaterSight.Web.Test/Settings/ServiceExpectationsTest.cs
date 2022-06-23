@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Settings;
 
-namespace WaterSight.Web.Test.Settings;
+namespace WaterSight.Web.Test;
 
-
+[TestFixture, Order(100300), Category("Settings"), Category("ServiceExpectation")]
 public class ServiceExpectationsTest : TestBase
 {
     #region Constructor
     public ServiceExpectationsTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     {
         Logger.Debug($"----+----+---- Performing Service Expectations Related Tests ----+----+----");
     }

@@ -4,14 +4,15 @@ using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Settings;
 
-namespace WaterSight.Web.Test.Settings;
+namespace WaterSight.Web.Test;
 
 
+[TestFixture, Order(100500), Category("Settings"), Category("Costs")]
 public class CostsTest : TestBase
 {
     #region Constructor
     public CostsTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     {
         Logger.Debug($"----+----+---- Performing Costs Related Tests ----+----+----");
     }

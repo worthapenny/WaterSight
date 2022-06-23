@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.HydrulicStructures;
 
-namespace WaterSight.Web.Test.NumericalModel;
+namespace WaterSight.Web.Test;
 
 
+[TestFixture, Order(102100), Category("NumericalModel"), Category("TankCurve")]
 public class TankCurvesTest : TestBase
 {
     #region Constructor

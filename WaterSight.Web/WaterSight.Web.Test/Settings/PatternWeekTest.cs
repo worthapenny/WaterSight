@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
@@ -7,13 +6,15 @@ using WaterSight.Web.Settings;
 using WaterSight.Web.Support;
 using WaterSight.Web.Test;
 
-namespace WaterSight.Base.Test.Settings;
+namespace WaterSight.Web.Test;
 
+
+[TestFixture, Order(100600), Category("Settings"), Category("ParameterWeek")]
 public class PatternWeeksTest : TestBase
 {
     #region Constructor
     public PatternWeeksTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     //:base(244, Env.Prod)
     {
         Logger.Debug($"----+----+---- Performing Pattern Weeks Related Tests ----+----+----");
@@ -41,7 +42,7 @@ public class PatternWeeksTest : TestBase
         Logger.Debug("Done create testing");
         Logger.Debug(Util.LogSeparatorDots);
 
-        
+
         // Update
         var newName = "New Pattern Week Name";
         patternWeek.Name = newName;

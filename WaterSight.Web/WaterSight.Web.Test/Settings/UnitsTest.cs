@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Settings;
 
-namespace WaterSight.Web.Test.Settings;
+namespace WaterSight.Web.Test;
 
-
+[TestFixture, Order(100100), Category("Settings"), Category("Units")]
 public class UnitsTest : TestBase
 {
     #region Constructor
     public UnitsTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     {
         Logger.Debug($"----+----+---- Performing Units Related Tests ----+----+----");
     }

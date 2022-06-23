@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Support;
-using WaterSight.Web.Test;
 using WaterSight.Web.Zones;
 
 
-namespace WaterSight.Base.Test.Zones;
+namespace WaterSight.Web.Test;
 
-public class ZoneTest:TestBase
+[TestFixture, Order(104000), Category("Zone")]
+public class ZoneTest : TestBase
 {
     #region Constructor
     public ZoneTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     //: base(235, Env.Prod)
     {
         Logger.Debug($"----+----+---- Performing Zones Related Tests ----+----+----");
@@ -74,19 +74,19 @@ public class ZoneTest:TestBase
     {
         return new ZoneConfig()
         {
-            Id=0,
-            Name="NewZoneCS",
-            IsSystemZone=false,
-            IsDirty=false,
+            Id = 0,
+            Name = "NewZoneCS",
+            IsSystemZone = false,
+            IsDirty = false,
             FlowUnits = null,
-            PopulationServed =0,
-            NumberOfCustomers=0,
-            NumberOfConnections=0,
-            MinimumNightlyFlowConsumed=80,
+            PopulationServed = 0,
+            NumberOfCustomers = 0,
+            NumberOfConnections = 0,
+            MinimumNightlyFlowConsumed = 80,
             WaterLossesMethod = WaterLossMethod.BasedOnMNF,
             WaterLossesPercentage = 11,
-            AuthorizedUnbilledConsumption=5,
-            InflowSignalIds =  new List<int?>(),
+            AuthorizedUnbilledConsumption = 5,
+            InflowSignalIds = new List<int?>(),
             OutflowSignalIds = new List<int?>(),
             StorageSignalIds = new List<int?>(),
         };

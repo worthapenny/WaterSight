@@ -3,11 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Alerts;
 using WaterSight.Web.Core;
-using WaterSight.Web.Test;
 
-namespace WaterSight.Base.Test.Alerts;
+namespace WaterSight.Web.Test;
 
-public class AlertsTest: TestBase
+[TestFixture, Order(105000), Category("Alerts")]
+public class AlertsTest : TestBase
 {
     #region Constructor
     public AlertsTest()
@@ -52,7 +52,7 @@ public class AlertsTest: TestBase
         var alertsFound = await Alert.GetAlertsConfigAsync();
         Assert.IsNotNull(alertsFound);
         Assert.IsNotEmpty(alertsFound);
-        Logger.Debug("Done read, many items, testing");
+        Separator("Done read, many items, testing");
 
 
         // Update
@@ -64,21 +64,19 @@ public class AlertsTest: TestBase
 
 
         // Delete
-        if (alertCreated != null)
-        {
-            var deleted = await Alert.DeleteAlertConfigAsync(alertCreated.Id);
-            Assert.IsTrue(deleted);
-            Separator("Done delete, single item, testing");
+        var deleted = await Alert.DeleteAlertConfigAsync(alertCreated.Id);
+        Assert.IsTrue(deleted);
+        Separator("Done delete, single item, testing");
 
-            var deletedMany = await Alert.DeleteAlertsConfigAsync();
-            Assert.IsTrue(deletedMany);
-            Separator("Done delete, many items, testing");
-        }
+        var deletedMany = await Alert.DeleteAlertsConfigAsync();
+        Assert.IsTrue(deletedMany);
+        Separator("Done delete, many items, testing");
+
     }
 
     public AlertConfig NewThresholdAlertConfig(AlertOrigin origin, string unit)
     {
-        var alertConfig =  new AlertConfig()
+        var alertConfig = new AlertConfig()
         {
             Name = "NewHighAlertTest",
             Type = AlertType.Absolute,

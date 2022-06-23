@@ -5,14 +5,15 @@ using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Customers;
 
-namespace WaterSight.Web.Test.CustomerMeters;
+namespace WaterSight.Web.Test;
 
+[TestFixture, Order(106000), Category("CustomerMeters")]
 public class CustomersTest : TestBase
 {
     #region Constructor
     public CustomersTest()
-        //: base(4549, Env.Qa)
-        //: base(233, Env.Prod)
+    //: base(4549, Env.Qa)
+    //: base(233, Env.Prod)
     {
         Logger.Debug($"----+----+---- Performing Customers Related Tests ----+----+----");
     }
@@ -25,7 +26,7 @@ public class CustomersTest : TestBase
 
     #region Tests
 
-    [Test, Order(1)]
+    [Test, Order(106001)]
     public async Task MeterData_Upload()
     {
         var excelFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown_Configuration.xlsx");
@@ -41,23 +42,24 @@ public class CustomersTest : TestBase
         Separator("Deleted");
     }
 
-    [Test, Order(2)]
+    [Test, Order(106002)]
     public async Task Meter_Delete()
     {
         var deleted = await Meters.DeleteMetersDataAsync();
         Assert.IsTrue(deleted);
-        Separator("Deleted");
+        Separator("Meter Deleted");
     }
 
-    [Test, Order(3)]
+    [Test, Order(106003)]
     public async Task Billing_Delete()
     {
         var deleted = await Billings.DeleteBillingDataAsync();
         Assert.IsTrue(deleted);
+        Separator("Billing Deleted");
     }
 
 
-    [Test, Order(4)]
+    [Test, Order(106004)]
     public async Task Billing_Upload()
     {
         // Excel Upload

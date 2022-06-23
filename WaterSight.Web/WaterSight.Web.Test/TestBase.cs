@@ -1,12 +1,12 @@
 ﻿using NUnit.Framework;
 using Serilog;
-using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 
 namespace WaterSight.Web.Test;
 
+[TestFixture]
 public class TestBase
 {
     #region Static Fields

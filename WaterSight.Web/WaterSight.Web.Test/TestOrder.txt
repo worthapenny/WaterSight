@@ -1,0 +1,8 @@
+﻿Settings = 100100
+Sensors = 101000
+Num model = 102000
+GIS = 103000
+Zone = 104000
+Alerts = 105000
+Customer Meters = 106000
+DigitalTwin = 107000

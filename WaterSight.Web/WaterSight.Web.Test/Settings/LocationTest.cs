@@ -3,14 +3,15 @@ using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Settings;
 
-namespace WaterSight.Web.Test.Settings;
+namespace WaterSight.Web.Test;
 
 
+[TestFixture, Order(100500), Category("Settings"), Category("Location")]
 public class LocationTest : TestBase
 {
     #region Constructor
     public LocationTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     {
         Logger.Debug($"----+----+---- Performing Location Systems Related Tests ----+----+----");
     }

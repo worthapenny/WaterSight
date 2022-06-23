@@ -1,19 +1,20 @@
 ﻿using NUnit.Framework;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.DT;
 using WaterSight.Web.Support;
 
-namespace WaterSight.Web.Test.DT;
+namespace WaterSight.Web.Test;
 
+
+[TestFixture, Order(107000), Category("GIS")]
 public class DigitalTwinTest : TestBase
 {
     #region Constructor
     public DigitalTwinTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     {
         Separator($"----+----+---- Performing Digital Twin Related Tests ----+----+----");
     }
@@ -37,7 +38,7 @@ public class DigitalTwinTest : TestBase
         Assert.IsTrue(twins.Count > 0);
 
         // Check against current DT
-        var currectDt = twins.Where(dt=>dt.ID == WS.Options.DigitalTwinId).FirstOrDefault();
+        var currectDt = twins.Where(dt => dt.ID == WS.Options.DigitalTwinId).FirstOrDefault();
         Assert.IsNotNull(currectDt);
         Assert.AreEqual(WS.Options.DigitalTwinId, currectDt.ID);
         Separator("Read Digital Twins");
@@ -54,7 +55,7 @@ public class DigitalTwinTest : TestBase
         var currentDTConfig = await DigitalTwin.GetDigitalTwinAsync(WS.Options.DigitalTwinId);
         Assert.IsNotNull(currentDTConfig);
         Assert.AreEqual(newDescription, currentDTConfig.Description);
-        
+
         Separator("Updated Description");
 
         //// update - Avatar (Image)

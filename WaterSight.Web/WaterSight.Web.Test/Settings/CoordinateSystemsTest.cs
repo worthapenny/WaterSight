@@ -4,14 +4,15 @@ using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Settings;
 
-namespace WaterSight.Web.Test.Settings;
+namespace WaterSight.Web.Test;
 
 
+[TestFixture, Order(100400), Category("Settings"), Category("Coord Systems")]
 public class CoordinateSystemsTest : TestBase
 {
     #region Constructor
     public CoordinateSystemsTest()
-        //: base(4549, Env.Qa)
+    //: base(4549, Env.Qa)
     {
         Logger.Debug($"----+----+---- Performing Coordinate Systems Related Tests ----+----+----");
     }
