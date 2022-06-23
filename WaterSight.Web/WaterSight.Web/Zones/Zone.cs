@@ -28,7 +28,7 @@ public class Zone : WSItem
     // Create
     public async Task<ZoneConfig?> AddZoneConfigAsync(ZoneConfig zoneConfig)
     {
-        var url = EndPoints.HydStructuresZones;
+        var url = EndPoints.HydStructuresZonesQDT;
         int? id = await WS.AddAsync(zoneConfig, url, "Zone");
         if (id.HasValue)
         {

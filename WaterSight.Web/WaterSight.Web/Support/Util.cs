@@ -184,7 +184,7 @@ namespace WaterSight.Web.Support
                 return false;
             }
 
-            bool inUse = true;
+            bool inUse;
             try
             {
                 using (Stream stream = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))

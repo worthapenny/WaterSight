@@ -26,17 +26,22 @@ public class NumericalModelTest : TestBase
     #endregion
 
     #region Tests
-    [Test, Category("Simulation Time-steps")]
-    public async Task GetSimulationTimeStepsTest()
-    {
-        var dates = await NumericModel.GetSimulationTimeStepsWaterModel();
-        Assert.IsNotNull(dates);
-        Assert.IsNotEmpty(dates);
 
-        Separator("Done Simulation Time-steps");
+    [Test, Order(102910), Category("Upload")]
+    public async Task UploadWaterModel()
+    {
+        var zippedModelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown.wtg.sqlite.zip");
+        Assert.IsTrue(File.Exists(zippedModelPath));
+        Separator($"Zipped model exits");
+
+        var fileInfo = new FileInfo(zippedModelPath);
+        var success = await NumericModel.UpdloadZippedWaterModel(fileInfo);
+        Assert.IsTrue(success);
+        Separator("Model Uploaded");
     }
 
-    [Test, Category("CRUD")]
+
+    [Test, Order(102920), Category("CRUD")]
     public async Task NumericalModel_CRUD()
     {
         //
@@ -105,20 +110,17 @@ public class NumericalModelTest : TestBase
         Separator($"Deleted {nameof(NumericModel)}");
     }
 
-    [Test, Category("Upload")]
-    public async Task UploadWaterModel()
+    [Test, Order(102930), Category("Simulation Time-steps")]
+    public async Task GetSimulationTimeStepsTest()
     {
-        var zippedModelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown.wtg.sqlite.zip");
-        Assert.IsTrue(File.Exists(zippedModelPath));
-        Separator($"Zipped model exits");
+        var dates = await NumericModel.GetSimulationTimeStepsWaterModel();
+        Assert.IsNotNull(dates);
+        Assert.IsNotEmpty(dates);
 
-        var fileInfo = new FileInfo(zippedModelPath);
-        var success = await NumericModel.UpdloadZippedWaterModel(fileInfo);
-        Assert.IsTrue(success);
-        Separator("Model Uploaded");
+        Separator("Done Simulation Time-steps");
     }
 
-    [Test, Category("Elements"), Category("SCADA")]
+    [Test, Order(102940), Category("Elements"), Category("SCADA")]
     public async Task GetTargetElementsWaterModel()
     {
         var map = await NumericModel.GetModelTargetElementsWaterModel();
@@ -126,7 +128,7 @@ public class NumericalModelTest : TestBase
         Assert.IsTrue(map.Count > 0);
     }
 
-    [Test, Category("Elements"), Category("SCADA")]
+    [Test, Order(102940), Category("Elements"), Category("SCADA")]
     public async Task GetMappedElementsWaterModel()
     {
         var elementId = 49510;
@@ -135,7 +137,7 @@ public class NumericalModelTest : TestBase
         Assert.IsTrue(mappedElements.Count > 0);
     }
 
-    [Test, Category("Elements"), Category("Parameters")]
+    [Test, Order(102950), Category("Elements"), Category("Parameters")]
     [TestCase(WaterDomainElementTypeId.Pipe)]
     [TestCase(WaterDomainElementTypeId.Node)] // Junction
     [TestCase(WaterDomainElementTypeId.Pump)]
@@ -162,7 +164,7 @@ public class NumericalModelTest : TestBase
         Assert.IsTrue(parameters.Count > 0);
     }
 
-    [Test, Category("Element"), Category("Results")]
+    [Test, Order(102960), Category("Element"), Category("Results")]
     [TestCase(49420, 0)] // Pipe:
     public async Task GetElementResultsAtTime(int elementId, int domainElementTypeId)
     {
@@ -180,7 +182,8 @@ public class NumericalModelTest : TestBase
         Assert.IsNotNull(results);
         Assert.AreEqual(true, results.ElementFieldResults.Any());
     }
-    [Test, Category("Element"), Category("Results"), Category("TSD")]
+
+    [Test, Order(102960), Category("Element"), Category("Results"), Category("TSD")]
     [TestCase(49420, "Reaches/flow")]
     public async Task GetElementResultsTSD(int elementId, string parameterName)
     {

@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Support;
@@ -28,44 +30,65 @@ public class ZoneTest : TestBase
     [Test, Category("CRUD")]
     public async Task Zone_CRUD()
     {
-        // Create
-        var zoneConfig = NewZoneConfig();
-        //var addZoneConfig = await Zone.AddZoneConfigAsync(zoneConfig);
-        //Assert.IsNotNull(addZoneConfig);
-        //Assert.AreEqual(zoneConfig.Id, addZoneConfig.Id);
-        //Assert.IsTrue(zoneConfig.Id > 0);
-        //Logger.Debug("Add new tested");
-
-        // Read
-        //var zoneConfigFound = await Zone.GetZoneConfigAsync(zoneConfig.Id);
-        //Assert.IsNotNull(zoneConfigFound);
-        //Assert.AreEqual(zoneConfig.Id, zoneConfigFound.Id);
-        //Assert.AreEqual(zoneConfig.Name, zoneConfigFound.Name);
-        //Logger.Debug("Read tested");
-
+        // Read Many
         var zones = await Zone.GetZonesConfigAsync();
         Assert.IsNotNull(zones);
-        Assert.IsTrue(zones.Count > 0);
+        Assert.IsTrue(zones.Count > 0); // System will always be there so it should be true 
         Logger.Debug("Read many tested");
 
-        // Update
-        var newName = "New Zone Name";
-        zoneConfig.Name = newName;
-        var success = await Zone.UpdateZonesConfigAsync(zoneConfig);
-        Assert.IsTrue(success);
-        Logger.Debug("Update tested");
+        var zoneConfig = NewZoneConfig();
+
+        // Delete (if old one is still out there)
+        var zoneCheck = zones.Where(z => z.Name == zoneConfig.Name);
+        if(zoneCheck.Any())
+        {
+            var deletedOldZone = await Zone.DeleteZoneConfigAsync(zoneCheck.First().Id);
+            Assert.AreEqual(true, deletedOldZone);
+        }
+
+        // Find out the parent zone first
+        var systemZoneCheck = zones.Where(z => z.IsSystemZone);
+        Assert.AreEqual(true, systemZoneCheck.Any());
+        var systemZone = systemZoneCheck.First();
+
+
+        // Create
+        var addZoneConfig = await Zone.AddZoneConfigAsync(zoneConfig);
+        addZoneConfig.ParentZoneId = systemZone.Id;
+        zoneConfig.ParentZoneId = systemZone.Id;
+
+        Assert.IsNotNull(addZoneConfig);
+        Assert.AreEqual(zoneConfig.Id, addZoneConfig.Id);
+        Assert.IsTrue(zoneConfig.Id > 0);
+        Separator("Add new tested");
+
+        // Read single
+        var zoneConfigFound = await Zone.GetZoneConfigAsync(zoneConfig.Id);
+        Assert.IsNotNull(zoneConfigFound);
+        Assert.AreEqual(zoneConfig.Id, zoneConfigFound.Id);
+        Assert.AreEqual(zoneConfig.Name, zoneConfigFound.Name);
+        Separator("Read tested");
+
+        //// It appears that the Update by changing the name is not allowed
+        //// Update
+        
+        //var newName = "New Zone Name";
+        //zoneConfig.Name = newName;
+        //var success = await Zone.UpdateZonesConfigAsync(zoneConfig);
+        //Assert.IsTrue(success);
+        //Separator("Update tested");
 
         // Delete
         var deleted = await Zone.DeleteZoneConfigAsync(zoneConfig.Id);
         Assert.IsTrue(deleted);
-        Logger.Debug("Delete tested");
+        Separator("Delete tested");
 
         // Delete All
         deleted = await Zone.DeleteZonesConfigAsync();
         Assert.IsTrue(deleted);
         var allZones = await Zone.GetZonesConfigAsync();
-        Assert.AreEqual(0, allZones.Count);
-        Logger.Debug("Delete all tested");
+        Assert.AreEqual(1, allZones.Count); // System zone cannot be deleted hence count = 1
+        Separator("Delete all tested");
 
         Logger.Debug(Util.LogSeparatorDashes);
     }
@@ -75,7 +98,7 @@ public class ZoneTest : TestBase
         return new ZoneConfig()
         {
             Id = 0,
-            Name = "NewZoneCS",
+            Name = $"NewZoneCS_{DateTime.Now:yyyyMMdd}",
             IsSystemZone = false,
             IsDirty = false,
             FlowUnits = null,

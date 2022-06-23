@@ -205,7 +205,7 @@ public class NumericModel : WSItem
     }
     public async Task<List<DateTimeOffset>> GetSimulationTimeStepsWaterModel(string waterModelDomainName = "")
     {
-        if (string.IsNullOrEmpty(waterModelDomainName))
+        if (!string.IsNullOrEmpty(waterModelDomainName))
             return await GetSimulationTimeSteps(waterModelDomainName);
 
         // Find out the water-model-domain-name
