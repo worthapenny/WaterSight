@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -102,6 +103,7 @@ public class WaterModel : WSItem
 }
 
 #region Support Class
+[DebuggerDisplay("{ToString()}")]
 public class ModelMeasureData
 {
 	public int SensorConfigId { get; set; }
