@@ -9,7 +9,7 @@ using WaterSight.Web.Support;
 namespace WaterSight.Web.Test;
 
 
-[TestFixture, Order(107000), Category("GIS")]
+[TestFixture, Order(107000), Category("DigitalTwin")]
 public class DigitalTwinTest : TestBase
 {
     #region Constructor

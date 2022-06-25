@@ -11,11 +11,13 @@ public class TestBase
 {
     #region Static Fields
     public static int TEST_DT_ID = 4736;
+    public static int TEST_DT_ID2 = 4827;
+    public static int TEST_DT_ID3 = 4828; // Fully Setup
     public static Env TEST_ENV = Env.Qa;
     #endregion
 
     #region Constructor
-    public TestBase() : this(TEST_DT_ID, TEST_ENV)
+    public TestBase() : this(TEST_DT_ID2, TEST_ENV)
     {
     }
     public TestBase(int dtID, Env env)

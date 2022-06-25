@@ -8,8 +8,8 @@
     <ProjectGuid>{BD8B7B32-CDD5-44D4-B7E9-4C56C25CACCF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WaterSight.Base.Test</RootNamespace>
-    <AssemblyName>WaterSight.Base.Test</AssemblyName>
+    <RootNamespace>WaterSight.Web.Test</RootNamespace>
+    <AssemblyName>WaterSight.Web.Test</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Alerts\AlertsTest.cs" />
     <Compile Include="CustomerMeters\CustomersTest.cs" />
+    <Compile Include="Custom\WaterModelTest.cs" />
     <Compile Include="DT\DigitalTwinTest.cs" />
     <Compile Include="GIS\GisTest.cs" />
     <Compile Include="NumericalModel\NumericalModelTest.cs" />

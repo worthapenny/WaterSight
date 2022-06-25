@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using WaterSight.Web.Custom;
 using WaterSight.Web.DT;
 using WaterSight.Web.HydrulicStructures;
 using WaterSight.Web.NumericModels;
@@ -46,6 +47,7 @@ public class WS
         Settings = new Settings.Settings(this);
         UserInfo = new UserInfo(this);
         Setup = new Setup.Setup(this);
+        CustomWaterModel = new WaterModel(this);
 
         if (logger == null)
         {
@@ -309,5 +311,6 @@ public class WS
     public Settings.Settings Settings { get; }
     public UserInfo UserInfo { get; }
     public Setup.Setup Setup { get; }
+    public WaterModel CustomWaterModel { get; }
     #endregion
 }

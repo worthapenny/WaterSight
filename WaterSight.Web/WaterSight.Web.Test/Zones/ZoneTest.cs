@@ -33,9 +33,10 @@ public class ZoneTest : TestBase
         // Read Many
         var zones = await Zone.GetZonesConfigAsync();
         Assert.IsNotNull(zones);
-        Assert.IsTrue(zones.Count > 0); // System will always be there so it should be true 
+        Assert.IsTrue(zones.Count > 0); // System zone will always be there so it should be true 
         Logger.Debug("Read many tested");
 
+        // New zone object/payload
         var zoneConfig = NewZoneConfig();
 
         // Delete (if old one is still out there)

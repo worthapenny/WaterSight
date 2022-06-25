@@ -116,7 +116,7 @@ public class Sensor : WSItem
 
     #region Sensor TSD
 
-    public async Task<SensorTSDWeb?> GetSensorTSDAsync(
+    public async Task<SensorTsdWeb?> GetSensorTSDAsync(
         int id,
         DateTimeOffset startAt,
         DateTimeOffset endAt,
@@ -124,7 +124,7 @@ public class Sensor : WSItem
     {
         var url = EndPoints.RtdaTsValuesWithin(id, startAt, endAt, integrationType);
         var res = await Request.Get(url);
-        var tsd15M = await Request.GetJsonAsync<SensorTSDWeb>(res) ?? new SensorTSDWeb();
+        var tsd15M = await Request.GetJsonAsync<SensorTsdWeb>(res) ?? new SensorTsdWeb();
 
         if (res.StatusCode == HttpStatusCode.OK)
             Logger.Debug($"Sensor TSD received for {id} [{startAt:u},{endAt:u}]. Count = {tsd15M?.UnifiedTSD?.Count}");
@@ -294,7 +294,7 @@ public class SensorConfig
 
 
 [DebuggerDisplay("{ToString()}")]
-public class SensorTSDWeb
+public class SensorTsdWeb
 {
     #region Public Methods
     public DataTable PointsToDataTable(string tagName)

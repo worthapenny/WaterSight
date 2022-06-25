@@ -82,6 +82,7 @@
     <Compile Include="Customers\Billings.cs" />
     <Compile Include="Customers\Customers.cs" />
     <Compile Include="Customers\Meters.cs" />
+    <Compile Include="Custom\WaterModel.cs" />
     <Compile Include="DT\DigitalTwin.cs" />
     <Compile Include="DT\DigitalTwinCreateOptions.cs" />
     <Compile Include="Extensions\Extensions.cs" />
