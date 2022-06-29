@@ -23,26 +23,25 @@ public class SetupTest : TestBase
         var excelFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown_Configuration.xlsx");
         Assert.IsTrue(File.Exists(excelFilePath));
         Logger.Debug($"Found Excel file at: {excelFilePath}");
-        Separator();
+        Separator("Located test Excel file");
 
         // Delete all existing
         var deleted = await WS.Sensor.DeleteSensorsConfigAsync();
         Assert.IsTrue(deleted);
-        Logger.Debug($"Deleted all sensor config");
-        Separator();
+        Separator("Deleted all sensor config");
 
         // Sensors
         var success = await WS.Sensor.PostExcelFile(new FileInfo(excelFilePath));
         Assert.IsTrue(success);
         Logger.Debug($"Uploaded {excelFilePath}");
-        Separator();
+        Separator("Uploaded Sensor Xl");
 
 
         // Get created sensors
         var sensors = await WS.Sensor.GetSensorsConfigAsync();
         Assert.AreEqual(37, sensors.Count);
         Logger.Debug($"Sensors count between Excel and server matched");
-        Separator();
+        Separator("Sensor count matched!");
 
     }
     #endregion

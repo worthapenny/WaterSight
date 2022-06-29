@@ -108,6 +108,11 @@ public class NumericalModelTest : TestBase
         var deleted = await NumericModel.DeleteWaterModelDomain(newModelDomain.Id);
         Assert.IsTrue(deleted);
         Separator($"Deleted {nameof(NumericModel)}");
+
+
+        //
+        // Re upload the model for rest of the test
+        await UploadWaterModel();
     }
 
     [Test, Order(102930), Category("Simulation Time-steps")]

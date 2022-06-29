@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 
@@ -25,6 +26,15 @@ public class GisTest : TestBase
     [Test, Order(103010)]
     public async Task UploadZippedPipeShpe()
     {
+        // Check if something already exits
+        var shapefileProps = await WS.GIS.GetShapefileProperties();
+        var pipeGisItem = shapefileProps.Where(p => p.Name == GIS.GIS.PIPES_TYPE_NAME);
+        if(pipeGisItem.Any())
+        {
+            var deleted = await WS.GIS.DeletePipeZippedShpFile();
+            Assert.AreEqual(true, deleted);
+        }
+
         var pipeZipFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\GIS\TestPipes.zip");
         Assert.IsTrue(File.Exists(pipeZipFilePath));
 
@@ -58,6 +68,16 @@ public class GisTest : TestBase
     [Test, Order(103040)]
     public async Task UploadPressureZoneShapefile()
     {
+
+        // Check if something already exits
+        var shapefileProps = await WS.GIS.GetShapefileProperties();
+        var zoneGisItem = shapefileProps.Where(p => p.Name == GIS.GIS.ZONES_TYPE_NAME);
+        if (zoneGisItem.Any())
+        {
+            var deleted = await WS.GIS.DeletePressureZoneZippedShpFile();
+            Assert.AreEqual(true, deleted);
+        }
+
         var zoneZipFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\GIS\TestPressureZones.zip");
         Assert.IsTrue(File.Exists(zoneZipFilePath));
 

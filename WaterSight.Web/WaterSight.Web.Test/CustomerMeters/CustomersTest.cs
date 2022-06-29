@@ -35,34 +35,16 @@ public class CustomersTest : TestBase
         var uploaded = await Meters.UploadMeterFileAsync(new FileInfo(excelFilePath));
         Assert.IsTrue(uploaded);
         Separator("Uploaded");
-
-        // delete uploaded data
-        var deleted = await Meters.DeleteMetersDataAsync();
-        Assert.IsTrue(deleted);
-        Separator("Deleted");
     }
+
 
     [Test, Order(106002)]
-    public async Task Meter_Delete()
-    {
-        var deleted = await Meters.DeleteMetersDataAsync();
-        Assert.IsTrue(deleted);
-        Separator("Meter Deleted");
-    }
-
-    [Test, Order(106003)]
-    public async Task Billing_Delete()
-    {
-        var deleted = await Billings.DeleteBillingDataAsync();
-        Assert.IsTrue(deleted);
-        Separator("Billing Deleted");
-    }
-
-
-    [Test, Order(106004)]
     public async Task Billing_Upload()
     {
         // Excel Upload
+        // There is some weirdness going on with time
+        // So wait 5 seconds
+        await Task.Delay(5 * 1000);
         var excelFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown_Configuration.xlsx");
         var uploaded = await Billings.UploadBillingFileAsync(new FileInfo(excelFilePath));
         Assert.IsTrue(uploaded);
@@ -83,7 +65,7 @@ public class CustomersTest : TestBase
 
         // delete csvFile
         File.Delete(csvFilePath);
-        Assert.IsTrue(!File.Exists(csvFilePath));
+        Assert.AreEqual(false, File.Exists(csvFilePath));
         Separator("CSV deleted");
 
         // Delete Billings data
@@ -93,6 +75,22 @@ public class CustomersTest : TestBase
 
     }
 
+    [Test, Order(106009)]
+    public async Task Billing_Delete()
+    {
+        var deleted = await Billings.DeleteBillingDataAsync();
+        Assert.IsTrue(deleted);
+        Separator("Billing Deleted");
+    }
+
+
+    [Test, Order(106010)]
+    public async Task Meter_Delete()
+    {
+        var deleted = await Meters.DeleteMetersDataAsync();
+        Assert.IsTrue(deleted);
+        Separator("Meter Deleted");
+    }
 
     #endregion
 }
