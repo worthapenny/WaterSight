@@ -88,11 +88,11 @@ public class WS
         //int? id = null;
         T t = default;
         if (res.IsSuccessStatusCode)
-        {            
+        {
             var content = await res.Content.ReadAsStringAsync();
             //id = Convert.ToInt32(content.Replace("\"", ""));
             t = JsonConvert.DeserializeObject<T>(content);
-            
+
             Logger.Information($"{typeName} added, '{t}'.");
         }
         else
@@ -135,7 +135,8 @@ public class WS
         var res = await Request.Get(url);
         if (!res.IsSuccessStatusCode)
         {
-            Logger.Error($"Failed to get {typeName} data for id: {id}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            var resContentText = res.Content == null ? "" : await res.Content?.ReadAsStringAsync();
+            Logger.Error($"Failed to get {typeName} data for id: {id}. Reason: {res.ReasonPhrase}. Text: {resContentText}. URL: {url}");
             return t;
         }
 
