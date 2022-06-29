@@ -257,6 +257,8 @@ public static class Request
             return false;
         }
 
+        Logger.Debug(Util.LogSeparator("LRO Started", Util.BulletPlus));
+
         var stopwatch = Util.StartTimer();
         var completed = false;
         while (!completed)
@@ -279,26 +281,28 @@ public static class Request
 
                 if ((int)statusCode == 0 || (int)statusCode == 1)
                 {
-                    WS.Logger.Information($"LRO status {statusCode}, % done: {percentDone} Message: {message}, Source: {source}. Sleeping for {checkIntervalSeconds} seconds...");
+                    WS.Logger.Information($"LRO status {statusCode}, [{percentDone}%] Message: {message}, Source: {source}. Sleeping for {checkIntervalSeconds} seconds...");
                     await Task.Delay(checkIntervalSeconds * 1000);
                 }
                 else if ((int)statusCode == 2)
                 {
-                    WS.Logger.Information($"LRO completed.  % done: {percentDone} Message: {message}, Source: {source}, URL: {lroStatusUrl}");
+                    WS.Logger.Information($"LRO completed. [{percentDone}%] Message: {message}, Source: {source}, URL: {lroStatusUrl}");
                     completed = true;
                     isLroSuccessful = true;
                 }
                 else if ((int)statusCode == 3)
                 {
-                    WS.Logger.Error($"LRO status is Failed. % done: {percentDone} Message: {message}, Source: {source} URL: {lroStatusUrl}");
+                    WS.Logger.Error($"LRO status is Failed. [{percentDone}%] Message: {message}, Source: {source} URL: {lroStatusUrl}");
                     completed = true;
                 }
             }
         }
 
         var timeTaken = stopwatch.Elapsed;
-        WS.Logger.Information($"Time-taken by LRO: {timeTaken}");
         stopwatch.Stop();
+
+        Logger.Debug(Util.LogSeparator("LRO Ended", Util.BulletPlus));
+        WS.Logger.Information($"Time-taken by LRO: {timeTaken}");
 
         return isLroSuccessful;
     }

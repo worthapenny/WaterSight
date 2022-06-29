@@ -16,7 +16,26 @@ namespace WaterSight.Web.Support
 
     public static class Util
     {
-
+        #region Constancts
+        public const char Equal = '=';
+        public const char Dot = '.';
+        public const char Star = '*';
+        public const char Plus = '+';
+        public const char XSmall = 'x';
+        public const char XBig = 'X';
+        public const char Dash = '-';
+        public const char Abovescore = '‾';
+        public const char Underscore = '_';
+        public const char Bullet = '•';
+        public const char BulletPlus = '●';
+        public const char BulletInverse = '◘';
+        public const char BulletWhite = '◦';
+        public const char Square = '▪';
+        public const char SquarePlus = '■';
+        public const char Infinity = '∞';
+        public const char OSmall = 'o';
+        public const char OBig = 'O';
+        #endregion
 
         #region Public Methods
         // OR => dt.UtcDateTime.ToString("O")
@@ -32,7 +51,14 @@ namespace WaterSight.Web.Support
         public static string LogSeparatorDashes { get; } = new string('-', LogSeparatorSize);
         public static string LogSeparatorPluses { get; } = new string('+', LogSeparatorSize);
         public static string LogSeparatorUpperBar { get; } = new string('‾', LogSeparatorSize);
-
+        public static string LogSeparator(char symbol, int repeatSymbol = 100)
+        {
+            return $"{new string(symbol, repeatSymbol)}";
+        }
+        public static string LogSeparator(string message, char symbol, int repeatSymbol = 50)
+        {
+            return $"{new string(symbol, repeatSymbol)}  {message}  {new string(symbol, repeatSymbol)}";
+        }
         #endregion
 
         public static async Task<Dictionary<string, List<object>>> ReadCsvToDataFrameAsync(
