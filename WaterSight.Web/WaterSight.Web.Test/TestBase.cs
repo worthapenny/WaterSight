@@ -66,7 +66,7 @@ public class TestBase
 
     #region Methods
 
-    public void Separator(string name = null) => Logger.Debug($"{new string('.', 35)} {name} {new string('.', 35)}");
+    public void Separator(string name = null) => Logger.Debug($"{new string('.', 35)} ↑↑↑ {name} ↑↑↑ {new string('.', 35)}");
     #endregion
 
     #region Properties
