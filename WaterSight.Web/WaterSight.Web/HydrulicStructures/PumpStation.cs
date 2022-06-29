@@ -15,6 +15,7 @@ public class PumpStation : WSItem
     #region Public Properties
     public async Task<bool> PostExcelFile(FileInfo fileInfo)
     {
+        Logger.Debug($"About to upload Excel file for PumpStations.");
         return await WS.PostFile(EndPoints.HydStructuresPumpingStationsQDT, fileInfo, true, "Excel");
     }
     #endregion

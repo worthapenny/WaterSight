@@ -44,7 +44,7 @@
     <LangVersion>10.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <DocumentationFile>..\..\Output\WaterSight.Web\bin\x64\Debug\WaterSight.Web.xml</DocumentationFile>
-    <NoWarn>CS1591</NoWarn>
+    <NoWarn>CS1591,CS8632</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -87,6 +87,7 @@
     <Compile Include="DT\DigitalTwinCreateOptions.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="GIS\Gis.cs" />
+    <Compile Include="HydrulicStructures\Curve.cs" />
     <Compile Include="HydrulicStructures\HydStructure.cs" />
     <Compile Include="HydrulicStructures\Pump.cs" />
     <Compile Include="HydrulicStructures\PumpStation.cs" />

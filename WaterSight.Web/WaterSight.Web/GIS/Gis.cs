@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 
@@ -34,7 +35,7 @@ public class GIS : WSItem
 
         WS.Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO("Zones") + "#upload";
-        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath),true, "Shapefile");
+        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), true, "Shapefile");
         return uploaded;
     }
     public async Task<bool?> DeletePressureZoneZippedShpFile()
@@ -52,8 +53,8 @@ public class GIS : WSItem
 
         WS.Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
         var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO("Pipes") + "#upload";
-                
-        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath),true, "Shapefile");
+
+        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), true, "Shapefile");
         return uploaded;
     }
     public async Task<bool?> DeletePipeZippedShpFile()
@@ -66,34 +67,48 @@ public class GIS : WSItem
     //
     // Any Shapefile
     //
-    public async Task<bool?> UploadAnyZippedShpFile(string shapefilePath, string dataTypeName)
+    public async Task<bool?> UploadAnyZippedShpFile(string zippedShapefilePath, string dataTypeName)
     {
         // Check if path is valid
-        if(!File.Exists(shapefilePath))
+        if (!File.Exists(zippedShapefilePath))
         {
-            Logger.Error($"Given path is not valid. Path:{shapefilePath}");
+            Logger.Error($"Given path is not valid. Path:{zippedShapefilePath}");
             return false;
         }
 
         // Create the data type first
-        var url = EndPoints.GeoFeaturesVectorDataTypesQDTVectorType(dataTypeName);
-        
-        var dataTypeRes =  await Request.PostJsonString(url, "{timeout: 30000}");
-        if (!dataTypeRes.IsSuccessStatusCode)
+        // but before creating check if it exists
+        var existingGisConfigs = await GetShapefileProperties();
+        if (existingGisConfigs?.Count > 1)
         {
-            Logger.Error($"Failed to create '{dataTypeName}' data type without which custom shapefile cannot be uploaded. Make sure '{dataTypeName}' does not exits already");
-            return false;
-        }
-        else
-        {
-            WS.Logger.Information($"Given type '{dataTypeName}' create successfully.");
+            var nameCheck = existingGisConfigs.Where(c => c.Type == dataTypeName);
+            if (nameCheck.Any())
+            {
+                Logger.Debug($"Given type '{dataTypeName}' already exists, skip creating again.");
+            }
+            else
+            {
+                var urlDataTypes = EndPoints.GeoFeaturesVectorDataTypesQDTVectorType(dataTypeName);
+
+                var dataTypeRes = await Request.PostJsonString(urlDataTypes, "{timeout: 30000}");
+                if (!dataTypeRes.IsSuccessStatusCode)
+                {
+                    Logger.Error($"FAILED to create '{dataTypeName}' data type without which custom shapefile cannot be uploaded. Make sure '{dataTypeName}' does not exits already");
+                    return false;
+                }
+                else
+                {
+                    WS.Logger.Information($"Given type '{dataTypeName}' create successfully.");
+                }
+            }
         }
 
-        Support.Util.IsFileInUse(shapefilePath);
 
-        Logger.Debug($"About to upload a shapefile. Path: {shapefilePath}");
-        url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO(dataTypeName);
-        var uploaded = await WS.PostFile(url, new FileInfo(shapefilePath), true, "Shapefile");
+        Support.Util.IsFileInUse(zippedShapefilePath);
+
+        Logger.Debug($"About to upload a shapefile. Path: {zippedShapefilePath}");
+        var url = EndPoints.GeoFeaturesVectorDataQDTVectorTypeLRO(dataTypeName);
+        var uploaded = await WS.PostFile(url, new FileInfo(zippedShapefilePath), true, "Shapefile");
         return uploaded;
 
     }

@@ -14,6 +14,8 @@ public class Meters : WSItem
     #region Public Methods
     public async Task<bool> UploadMeterFileAsync(FileInfo fileInfo)
     {
+        Logger.Debug($"About to upload Excel file for Customer Meters.");
+
         var url = EndPoints.HydStructureConsumptionPointsQDT;
         var res = await Request.PostFile(url, fileInfo);
 

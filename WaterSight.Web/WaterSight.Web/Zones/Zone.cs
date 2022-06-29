@@ -22,6 +22,15 @@ public class Zone : WSItem
     #endregion
 
     #region Public Methods
+    public void UploadZoneExcelFile()
+    {
+        //
+        // There is no direct support to upload 
+        // hence add zone configuration row by row
+        //
+
+        throw new NotSupportedException("WaterSight doesn't support uploading of Zone Excel file. Update ZoneConfig one by one.");
+    }
 
     #region CRUD Operation
     // 
@@ -54,10 +63,10 @@ public class Zone : WSItem
 
     //
     // UPDATE
-    public async Task<bool> UpdateZonesConfigAsync(ZoneConfig zoneConfig)
+    public async Task<bool> UpdateZoneConfigAsync(ZoneConfig zoneConfig)
     {
         var url = EndPoints.HydStructuresZonesForQDT(zoneConfig.Id);
-        return await WS.UpdateAsync(zoneConfig.Id, zoneConfig, url, "Zone", true);
+        return await WS.UpdateAsync(zoneConfig.Id, zoneConfig, url, "Zone", false);
     }
 
     //
@@ -76,6 +85,12 @@ public class Zone : WSItem
         var url = EndPoints.HydStructuresZonesForQDT(zoneId);
         return await WS.DeleteAsync(zoneId, url, "Zone", true);
     }
+
+    public async Task<bool> ReComputeMassBalanceAsync()
+    {
+        var url = EndPoints.HydStructureMassBalancesComputeQDT;
+        return await WS.GetAsync<bool>(url, null, "Mass Balance Recompute", true);
+   }
     #endregion
 
     #endregion
@@ -106,9 +121,9 @@ public class ZoneConfig
     public WaterLossMethod WaterLossesMethod { get; set; }
     public double? WaterLossesPercentage { get; set; }
     public double? AuthorizedUnbilledConsumption { get; set; }
-    public List<int?> InflowSignalIds { get; set; }
-    public List<int?> OutflowSignalIds { get; set; }
-    public List<int?> StorageSignalIds { get; set; }
+    public List<int?> InflowSignalIds { get; set; } = new List<int?>();
+    public List<int?> OutflowSignalIds { get; set; } = new List<int?>();
+    public List<int?> StorageSignalIds { get; set; } = new List<int?>();
     public int Priority { get; set; } = 1;
     public string Tags { get; set; } = String.Empty;
     public int? ParentZoneId { get; set; }

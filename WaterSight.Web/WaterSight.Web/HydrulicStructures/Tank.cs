@@ -33,6 +33,7 @@ public class Tank : WSItem
     }
     public async Task<bool> PostExcelFile(FileInfo fileInfo)
     {
+        Logger.Debug($"About to upload Excel file for Tanks.");
         return await WS.PostFile(EndPoints.HydStructuresTanksQDT, fileInfo, true, "Excel");
     }
     public async Task<bool> UpdateTankConfigAsync(TankConfig tankConfig)

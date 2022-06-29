@@ -117,12 +117,14 @@ public class EndPoints
     public string HydStructuresZonesQDT => $"{HydStructuresZones}?{Query.DTID}";
     public string HydStructuresZonesForQDT(int id) => $"{HydStructuresZones}/{id}?{Query.DTID}";
     public string HydStructuresPump => $"{HydStructures}/Pump";
+    public string HydStructuresPumpQDT => $"{HydStructuresPump}?{Query.DTID}";
+    public string HydStructuresPumpForQDT(int id) => $"{HydStructuresPump}/{Query.PumpId(id)}&{Query.DTID}";
     public string HydStructuresPumps => $"{HydStructures}/Pumps";
     public string HydStructuresPumpsQDT => $"{HydStructuresPumps}?{Query.DTID}";
 
     public string HydStructuresPumpingStation => $"{HydStructures}/PumpingStation";
     public string HydStructuresPumpingStations => $"{HydStructures}/PumpingStations";
-    public string HydStructuresPumpingStationsQDT => $"{HydStructures}?{Query.DTID}";
+    public string HydStructuresPumpingStationsQDT => $"{HydStructuresPumpingStations}?{Query.DTID}";
     public string HydStructuresTank => $"{HydStructures}/Tank";
     public string HydStructuresTankQDT => $"{HydStructuresTank}?{Query.DTID}";
     public string HydStructuresTanks => $"{HydStructures}/Tanks";
@@ -134,7 +136,9 @@ public class EndPoints
     public string HydStructuresTankCurveForQDT(int id) => $"{HydStructuresTankCurveQDT}&{Query.TankCurveId(id)}";
     public string HydStructureTankCurves => $"{HydStructures}/TankCurves";
     public string HydStructureTankTurnover => $"{HydStructures}/TankTurnover";
-    public string HydStructureMassBalance => $"{HydStructures}/MassBalance";
+    public string HydStructureMassBalances => $"{HydStructures}/MassBalances";
+    public string HydStructureMassBalancesCompute => $"{HydStructureMassBalances}/Compute";
+    public string HydStructureMassBalancesComputeQDT => $"{HydStructureMassBalancesCompute}?{Query.DTID}";
     public string HydStructureConsumptionPoints => $"{HydStructures}/ConsumptionPoints";
     public string HydStructureConsumptionPointsQDT => $"{HydStructureConsumptionPoints}?{Query.DTID}";
     public string HydStructureMonthlyBilling => $"{HydStructures}/MonthlyBilling";

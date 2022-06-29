@@ -87,14 +87,14 @@ public class WS
         {
             var idString = await res.Content.ReadAsStringAsync();
             id = Convert.ToInt32(idString.Replace("\"", ""));
-            WS.Logger.Information($"{typeName} added, id: {id}.");
+            Logger.Information($"{typeName} added, id: {id}.");
         }
         else
-            WS.Logger.Error($"Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
         return id;
     }
-    public  async Task<T> AddAsync<T>( string url, string typeName)
+    public async Task<T> AddAsync<T>(string url, string typeName)
     {
         var res = await Request.Post(url, null);
         T retValue = default;
@@ -102,10 +102,10 @@ public class WS
         {
             var responseString = await res.Content.ReadAsStringAsync();
             retValue = JsonConvert.DeserializeObject<T>(responseString);
-            WS.Logger.Information($"{typeName} added. {retValue}");
+            Logger.Information($"{typeName} added. {retValue}");
         }
         else
-            WS.Logger.Error($"Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
         return retValue;
     }
@@ -113,29 +113,47 @@ public class WS
     //
     // GET / READ
     //
-    public  async Task<T> GetAsync<T>(string url, int? id, string typeName)
+    /// <summary>
+    /// If LRO is true, the return type must be bool
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="url"></param>
+    /// <param name="id"></param>
+    /// <param name="typeName"></param>
+    /// <param name="isLRO">Supports Long Running Oprations. Return type must be bool</param>
+    /// <returns></returns>
+    public async Task<T> GetAsync<T>(string url, int? id, string typeName, bool isLRO = false)
     {
-        var res = await Request.Get(url);
         T t = default;
 
-        if (res.IsSuccessStatusCode)
+        var res = await Request.Get(url);
+        if (!res.IsSuccessStatusCode)
+        {
+            Logger.Error($"Failed to get {typeName} data for id: {id}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            return t;
+        }
+
+        if (!isLRO)
         {
             try
             {
                 var jsonString = await res.Content.ReadAsStringAsync();
                 t = JsonConvert.DeserializeObject<T>(jsonString);
-                WS.Logger.Information($"{typeName} info found {(id == null ? "" : $"for id: {id}")}, {t}.");
+                Logger.Information($"{typeName} info found {(id == null ? "" : $"for id: {id}")}, {t}.");
                 return t;
             }
             catch (Exception ex)
             {
-                WS.Logger.Error(ex, $"...while getting {typeName} from id: {id} \nMessage:{ex.Message}");
+                Logger.Error(ex, $"...while getting {typeName} from id: {id} \nMessage:{ex.Message}");
                 return t;
             }
+
         }
-        else
+        else // isLRO = true
         {
-            WS.Logger.Error($"Failed to get {typeName} data for id: {id}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            var completed = await Request.WaitForLRO(res);
+
+            t = (T)(object)completed;
             return t;
         }
     }
@@ -143,7 +161,7 @@ public class WS
     //
     // GET Many / READ many
     //
-    public  async Task<List<T>> GetManyAsync<T>(string url, string typeName)
+    public async Task<List<T>> GetManyAsync<T>(string url, string typeName)
     {
         var res = await Request.Get(url);
         var t = new List<T>();
@@ -151,10 +169,10 @@ public class WS
         if (res.IsSuccessStatusCode)
         {
             t = await Request.GetJsonAsync<List<T?>>(res) ?? t;
-            WS.Logger.Information($"Number of {typeName} received. Count = {t.Count}.");
+            Logger.Information($"Number of {typeName} received. Count = {t.Count}.");
         }
         else
-            WS.Logger.Error($"Failed to get {typeName} data. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"Failed to get {typeName} data. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
         return t;
     }
@@ -162,11 +180,11 @@ public class WS
     //
     // UPDATE
     //
-    public  async Task<bool> UpdateAsync<T>(int? id, T t, string url, string typeName, bool usePostMethod = false)
+    public async Task<bool> UpdateAsync<T>(int? id, T t, string url, string typeName, bool usePostMethod = false)
     {
         if (t == null)
         {
-            WS.Logger.Error($"{typeName} cannot be null");
+            Logger.Error($"{typeName} cannot be null");
             return false;
         }
 
@@ -177,10 +195,10 @@ public class WS
             res = await Request.PostJsonString(url, JsonConvert.SerializeObject(t));
 
         if (res?.IsSuccessStatusCode ?? false)
-            WS.Logger.Information($"{typeName} updated successfully.");
+            Logger.Information($"{typeName} updated successfully.");
 
         else
-            WS.Logger.Error($"Failed to update {typeName} with id: {id} ({t}). Reason: {res?.ReasonPhrase}. Text: {await res?.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"Failed to update {typeName} with id: {id} ({t}). Reason: {res?.ReasonPhrase}. Text: {await res?.Content.ReadAsStringAsync()}. URL: {url}");
 
         return res.IsSuccessStatusCode;
     }
@@ -188,18 +206,18 @@ public class WS
     // 
     // DELETE Single
     //
-    public  async Task<bool> DeleteAsync(int? id, string url, string typeName, bool supportsLRO = false)
+    public async Task<bool> DeleteAsync(int? id, string url, string typeName, bool supportsLRO = false)
     {
         var res = await Request.Delete(url);
         if (res.IsSuccessStatusCode)
         {
-            WS.Logger.Information($"{typeName}'s delete request was successful for id: {id}");
+            Logger.Information($"{typeName}'s delete request was successful for id: {id}");
             if (supportsLRO)
                 _ = await Request.WaitForLRO(res);
         }
         else
         {
-            WS.Logger.Warning($"{typeName}'s delete request failed for id: {id}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Warning($"{typeName}'s delete request failed for id: {id}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
         }
 
         return res.IsSuccessStatusCode;
@@ -208,18 +226,18 @@ public class WS
     // 
     // DELETE Many
     //
-    public  async Task<bool> DeleteManyAsync(string url, string typeName, bool supportsLRO = false)
+    public async Task<bool> DeleteManyAsync(string url, string typeName, bool supportsLRO = false)
     {
         var res = await Request.Delete(url);
         if (res.IsSuccessStatusCode)
         {
-            WS.Logger.Information($"{typeName}'s delete request for  was successful");
+            Logger.Information($"{typeName}'s delete request for  was successful");
             if (supportsLRO)
                 _ = await Request.WaitForLRO(res);
         }
         else
         {
-            WS.Logger.Warning($"{typeName}'s delete request failed. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Warning($"{typeName}'s delete request failed. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
         }
 
         return res.IsSuccessStatusCode;
@@ -228,18 +246,18 @@ public class WS
     //
     // POST (Any)
     //
-    public  async Task<bool> PostAsync(string url, HttpContent? content, string typeName, bool supportsLRO = false, string additionalInfo = "")
+    public async Task<bool> PostAsync(string url, HttpContent? content, string typeName, bool supportsLRO = false, string additionalInfo = "")
     {
         var res = await Request.Post(url, content);
         if (res.IsSuccessStatusCode)
         {
-            WS.Logger.Information($"{typeName}'s post request for  was successful. {additionalInfo}");
+            Logger.Information($"{typeName}'s post request for  was successful. {additionalInfo}");
             if (supportsLRO)
                 _ = await Request.WaitForLRO(res);
         }
         else
         {
-            WS.Logger.Warning($"{typeName}'s post request failed. {additionalInfo} Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Warning($"{typeName}'s post request failed. {additionalInfo} Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
         }
 
         return res.IsSuccessStatusCode;
@@ -252,7 +270,7 @@ public class WS
     {
         if (!fileInfo.Exists)
         {
-            WS.Logger.Error($"Given {fileTypeName} file path is not valid. Path: {fileInfo.FullName}");
+            Logger.Error($"Given {fileTypeName} file path is not valid. Path: {fileInfo.FullName}");
             return false;
         }
 
@@ -262,14 +280,15 @@ public class WS
         var res = await Request.PostFile(url, fileInfo);
         if (res.IsSuccessStatusCode)
         {
-            WS.Logger.Information($"{fileTypeName} file uploaded successfully. Path: {fileInfo.FullName}");
+            Logger.Information($"{fileTypeName} file uploaded successfully. Path: {fileInfo.FullName}");
             if (supportsLRO)
-                _ = await Request.WaitForLRO(res);
-            return true;
+                return await Request.WaitForLRO(res);
+
+            return res.IsSuccessStatusCode;
         }
         else
         {
-            WS.Logger.Error($"Failed to upload the {fileTypeName} file. Path: {fileInfo.FullName} Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"Failed to upload the {fileTypeName} file. Path: {fileInfo.FullName} Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
             return false;
         }
     }
@@ -277,18 +296,18 @@ public class WS
     //
     // PUT (Any)
     //
-    public  async Task<bool> PutAsync(string url, HttpContent? content, string typeName, bool supportsLRO = false, string additionalInfo = "")
+    public async Task<bool> PutAsync(string url, HttpContent? content, string typeName, bool supportsLRO = false, string additionalInfo = "")
     {
         var res = await Request.Put(url, content);
         if (res.IsSuccessStatusCode)
         {
-            WS.Logger.Information($"{typeName}'s put request for  was successful. {additionalInfo}");
+            Logger.Information($"{typeName}'s put request for  was successful. {additionalInfo}");
             if (supportsLRO)
                 _ = await Request.WaitForLRO(res);
         }
         else
         {
-            WS.Logger.Warning($"{typeName}'s put request failed. {additionalInfo} Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Warning($"{typeName}'s put request failed. {additionalInfo} Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
         }
 
         return res.IsSuccessStatusCode;

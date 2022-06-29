@@ -17,6 +17,8 @@ public class Billings : WSItem
 
     public async Task<bool> UploadBillingFileAsync(FileInfo fileInfo)
     {
+        Logger.Debug($"About to upload CSV/Excel file for Consumption/Billing.");
+
         var url = EndPoints.HydStructureMonthlyBillingQDT;
 
         if (fileInfo.Extension.ToLower().EndsWith("csv"))

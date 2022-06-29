@@ -249,6 +249,7 @@ public static class Request
         var lroStatusUrl = string.Empty;
         lroStatusUrl = lroStatusUrlPart.First().Value.First();
         lroStatusUrl = res.RequestMessage?.RequestUri?.ToString().Split(new[] { "api" }, StringSplitOptions.None)[0] + lroStatusUrl;
+        var isLroSuccessful = false;
 
         if (lroStatusUrl == null)
         {
@@ -272,23 +273,24 @@ public static class Request
             if (jsonData?.TryGetValue("Status", out statusCode) ?? false)
             {
                 statusCode = Convert.ToInt32(statusCode.ToString());
+                var percentDone = jsonData["PercentComplete"].ToString();
+                var message = jsonData["StatusMessage"].ToString();
+                var source = jsonData["ServiceName"].ToString();
+
                 if ((int)statusCode == 0 || (int)statusCode == 1)
                 {
-                    var percentDone = jsonData["PercentComplete"].ToString();
-                    var message = jsonData["StatusMessage"].ToString();
-                    var source = jsonData["ServiceName"].ToString();
-
-                    WS.Logger.Information($"LRO status {statusCode}, % done: {percentDone}, Message: {message}, Source: {source}. Sleeping for {checkIntervalSeconds} seconds...");
+                    WS.Logger.Information($"LRO status {statusCode}, % done: {percentDone} Message: {message}, Source: {source}. Sleeping for {checkIntervalSeconds} seconds...");
                     await Task.Delay(checkIntervalSeconds * 1000);
                 }
                 else if ((int)statusCode == 2)
                 {
-                    WS.Logger.Information($"LRO completed. URL: {lroStatusUrl}");
+                    WS.Logger.Information($"LRO completed.  % done: {percentDone} Message: {message}, Source: {source}, URL: {lroStatusUrl}");
                     completed = true;
+                    isLroSuccessful = true;
                 }
                 else if ((int)statusCode == 3)
                 {
-                    WS.Logger.Error($"LRO status is Failed. URL: {lroStatusUrl}");
+                    WS.Logger.Error($"LRO status is Failed. % done: {percentDone} Message: {message}, Source: {source} URL: {lroStatusUrl}");
                     completed = true;
                 }
             }
@@ -298,7 +300,7 @@ public static class Request
         WS.Logger.Information($"Time-taken by LRO: {timeTaken}");
         stopwatch.Stop();
 
-        return completed;
+        return isLroSuccessful;
     }
 
 

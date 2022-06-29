@@ -60,6 +60,7 @@ public class Query
     public string Name(string name) => $"name={Uri.EscapeDataString(name)}";
     public string ParameterFlow => $"parameter=Flow";
     public string ParameterName(string name) => $"parameterName={name}";
+    public string PumpId(int id) => $"pumpId={id}";
     public string QuantityUnits(string unit) => $"quantityUnits={Uri.EscapeDataString(unit)}";
     public string SpinupHours(object value) => $"spinupHours={value}";
     public string StartDateTime(DateTimeOffset at) => $"startDateTime={at.UtcDateTime:O}";

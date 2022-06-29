@@ -49,6 +49,7 @@ public class Sensor : WSItem
 
     public async Task<bool> PostExcelFile(FileInfo fileInfo)
     {
+        Logger.Debug($"About to upload Excel file for Sensors.");
         return await WS.PostFile(EndPoints.RtdaSignalsFileQDT, fileInfo, true, "Excel");
     }
 

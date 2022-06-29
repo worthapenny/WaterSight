@@ -191,12 +191,12 @@ namespace WaterSight.Web.Support
                 {
                 }
                 inUse = false;
-                Log.Debug($"File is NOT in use. Path: {filePath}");
+                Log.Debug($"File is not in use. Path: {filePath}");
             }
             catch (Exception ex)
             {
                 inUse = true;
-                Log.Error(ex, $"File IS in use. Path: {filePath}");
+                Log.Error(ex, $"File IS in USE. Path: {filePath}");
             }
 
             return inUse;
