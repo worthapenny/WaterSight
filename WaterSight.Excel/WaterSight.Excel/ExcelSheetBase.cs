@@ -20,6 +20,12 @@ namespace WaterSight.Excel
         #endregion
 
         #region Public Methods
+        public List<T> Read<T>()
+        {
+            var items = this.Xl.Fetch<T>(this.FilePath, SheetName);
+            return new List<T>(items);
+        }
+
         public void Save<T>(List<T> data)
         {
             Log.Debug($"About to write to an Excel sheet {SheetName}. File: {FilePath}");

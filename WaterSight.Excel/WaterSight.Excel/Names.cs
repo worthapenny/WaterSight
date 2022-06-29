@@ -73,7 +73,7 @@ public struct ExcelSheetName
     public const string Pumps = "Pumps";
     public const string PumpCurves = "Pump Curves";
     public const string PumpStations = "Pumping Stations";
-    public const string Zone = "Zone Balance";
+    public const string Zone = "Zones Balance";
     public const string ZoneCharacteristics = "Zones Characteristics";
     public const string CustomerMeters = "Customer meters";
 }

@@ -15,13 +15,27 @@ public class ZoneCharacteristicsXlSheet : ExcelSheetBase
     }
     #endregion
 
+    #region Public Methods
+    public void ReadExcel()
+    {
+        ZoneCharacteristicsItemsList = Read<ZoneCharacteristicsItem>();
+        //try
+        //{
+        //}
+        //catch (System.Exception ex)
+        //{
+
+        //}
+    }
+    #endregion
+
     #region Public Properties
     public List<ZoneCharacteristicsItem> ZoneCharacteristicsItemsList { get; set; }
     #endregion
 }
 
 
-[DebuggerDisplay("ToString()")]
+[DebuggerDisplay("{ToString()}")]
 public class ZoneCharacteristicsItem
 {
     #region Constructor
@@ -31,29 +45,30 @@ public class ZoneCharacteristicsItem
     #endregion
 
     #region Public Properties
-    [Column(1, "Display Name*")]
+    [Column("Display Name*")]
     public string DisplayName { get; set; }
 
-    [Column(2, "Population Served")]
+    [Column("Parent Zone")]
+    public string? ParentZone { get; set; } = string.Empty;
+
+    [Column("Population Served")]
     public int? PopulationServed { get; set; }
 
-    [Column(3, "Number of Connections")]
+    [Column("Number of Connections")]
     public int? NumberOfConnections { get; set; }
 
-    [Column(4, "Number of Customers")]
+    [Column("Number of Customers")]
     public int? NumberOfCustomers { get; set; }
 
-    [Column(5, "% of MNF Consumed")]
+    [Column("Percentage of MNF Consumed")]
     public double? PercentOfMnfConsumed { get; set; }
 
-    [Column(6, "% Of Authorized Unbilled Consumption")]
+    [Column("Percentage Of Authorized Unbilled Consumption")]
     public double? PercentOfAuthUnbilledConsumption { get; set; }
 
-    [Column(7, "Priority")]
+    [Column("Priority")]
     public int Priority { get; set; } = 1;
 
-    [Column(8, "Parent Zone")]
-    public string? ParentZone { get; set; } = string.Empty;
 
     [Ignore]
     public int? ParentZoneId { get; set; } = null;
