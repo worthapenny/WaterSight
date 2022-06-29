@@ -9,6 +9,11 @@ namespace WaterSight.Web.GIS;
 
 public class GIS : WSItem
 {
+    #region Constants
+    public const string PIPES_TYPE_NAME = "Pipes";
+    public const string ZONES_TYPE_NAME = "Zones";
+    #endregion
+
     #region Constructor
     public GIS(WS ws) : base(ws)
     {
