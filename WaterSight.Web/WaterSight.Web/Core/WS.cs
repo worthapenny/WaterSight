@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using WaterSight.Web.Custom;
 using WaterSight.Web.DT;
+using WaterSight.Web.ExternalService;
 using WaterSight.Web.HydrulicStructures;
 using WaterSight.Web.NumericModels;
 using WaterSight.Web.Support;
@@ -44,6 +45,7 @@ public class WS
         Zone = new Zones.Zone(this);
         NumericModel = new NumericModel(this);
         Customers = new Customers.Customers(this);
+        PowerBI = new PowerBI(this);
         Settings = new Settings.Settings(this);
         UserInfo = new UserInfo(this);
         Setup = new Setup.Setup(this);
@@ -79,20 +81,24 @@ public class WS
     //
     // ADD / CREATE
     //
-    public async Task<int?> AddAsync<T>(T t, string url, string typeName)
+    public async Task<T> AddAsync<T>(object data, string url, string typeName)
     {
-        var res = await Request.PostJsonString(url, JsonConvert.SerializeObject(t));
-        int? id = null;
+        var jsonText = JsonConvert.SerializeObject(data);
+        var res = await Request.PostJsonString(url, jsonText);
+        //int? id = null;
+        T t = default;
         if (res.IsSuccessStatusCode)
-        {
-            var idString = await res.Content.ReadAsStringAsync();
-            id = Convert.ToInt32(idString.Replace("\"", ""));
-            Logger.Information($"{typeName} added, id: {id}.");
+        {            
+            var content = await res.Content.ReadAsStringAsync();
+            //id = Convert.ToInt32(content.Replace("\"", ""));
+            t = JsonConvert.DeserializeObject<T>(content);
+            
+            Logger.Information($"{typeName} added, '{t}'.");
         }
         else
             Logger.Error($"Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
-        return id;
+        return t;
     }
     public async Task<T> AddAsync<T>(string url, string typeName)
     {
@@ -327,6 +333,7 @@ public class WS
     public Zone Zone { get; }
     public NumericModel NumericModel { get; }
     public Customers.Customers Customers { get; }
+    public PowerBI PowerBI { get; }
     public Settings.Settings Settings { get; }
     public UserInfo UserInfo { get; }
     public Setup.Setup Setup { get; }

@@ -68,6 +68,7 @@
     <Compile Include="CustomerMeters\CustomersTest.cs" />
     <Compile Include="Custom\WaterModelTest.cs" />
     <Compile Include="DT\DigitalTwinTest.cs" />
+    <Compile Include="ExternalService\PowerBITest.cs" />
     <Compile Include="GIS\GisTest.cs" />
     <Compile Include="NumericalModel\NumericalModelTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

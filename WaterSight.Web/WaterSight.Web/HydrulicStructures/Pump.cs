@@ -32,7 +32,7 @@ public class Pump : WSItem
     public async Task<PumpConfig?> AddPumpConfigAsync(PumpConfig pumpConfig)
     {
         var url = EndPoints.HydStructuresPumpQDT;
-        int? id = await WS.AddAsync(pumpConfig, url, "Pump");
+        int? id = await WS.AddAsync<int?>(pumpConfig, url, "Pump");
         if (id.HasValue)
 {
             pumpConfig.Id = id.Value;

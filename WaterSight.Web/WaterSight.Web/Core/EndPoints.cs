@@ -200,6 +200,7 @@ public class EndPoints
     
     public string DTPowerBI => $"{DT}/PowerBI";
     public string DTPowerBIUrl => $"{DTPowerBI}/Url";
+    public string DTPowerBIUrlQDT => $"{DTPowerBI}/Url?{Query.DTID}";
 
     //
     // Template

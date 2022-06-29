@@ -20,7 +20,7 @@ public class PatternWeeks : WSItem
     public async Task<PatternWeekConfig?> AddPatternWeekConfigAsync(PatternWeekConfig pattern)
     {
         var url = EndPoints.RtdaPatternWeeksQDT;
-        int? id = await WS.AddAsync(pattern, url, "PatternWeek");
+        int? id = await WS.AddAsync<int?>(pattern, url, "PatternWeek");
         if (id.HasValue)
         {
             pattern.ID = id.Value;

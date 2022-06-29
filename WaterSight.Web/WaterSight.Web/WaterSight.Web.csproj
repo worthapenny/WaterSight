@@ -86,6 +86,7 @@
     <Compile Include="DT\DigitalTwin.cs" />
     <Compile Include="DT\DigitalTwinCreateOptions.cs" />
     <Compile Include="Extensions\Extensions.cs" />
+    <Compile Include="ExternalService\PowerBI.cs" />
     <Compile Include="GIS\Gis.cs" />
     <Compile Include="HydrulicStructures\Curve.cs" />
     <Compile Include="HydrulicStructures\HydStructure.cs" />

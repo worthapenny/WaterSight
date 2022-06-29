@@ -3,6 +3,7 @@ using Serilog;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
+using WaterSight.Web.Support;
 
 namespace WaterSight.Web.Test;
 
@@ -66,7 +67,7 @@ public class TestBase
 
     #region Methods
 
-    public void Separator(string name = null) => Logger.Debug($"{new string('.', 35)} ↑↑↑ {name} ↑↑↑ {new string('.', 35)}");
+    public void Separator(string name = null) => Logger.Debug($"{new string(Util.Square, 35)} ↑↑↑ {name} ↑↑↑ {new string(Util.Square, 35)}");
     #endregion
 
     #region Properties

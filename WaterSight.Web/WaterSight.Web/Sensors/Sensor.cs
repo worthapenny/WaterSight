@@ -37,7 +37,7 @@ public class Sensor : WSItem
             sensor.PatternWeekId = defaultPattern.Id;
         }
 
-        int? id = await WS.AddAsync(sensor, url, "Sensor");
+        int? id = await WS.AddAsync<int?>(sensor, url, "Sensor");
         if (id.HasValue)
         {
             sensor.ID = id.Value;
@@ -287,10 +287,12 @@ public class SensorConfig
     public string? Tags { get; set; } = String.Empty;
     public int? PatternWeekId { get; set; } = null;
 
+    #region Overridden Methods
     public override string ToString()
     {
         return $"[{ParameterType}] {ID}: {Name}, Tag:{TagId}";
     }
+    #endregion
 }
 
 

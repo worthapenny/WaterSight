@@ -21,7 +21,7 @@ public class TankCurve : WSItem
     public async Task<TankCurveConfig?> AddTankCurveConfigAsync(TankCurveConfig tankCurveConfig)
     {
         var url = EndPoints.HydStructuresTankCurveQDTCurveType(0);
-        int? id = await WS.AddAsync(tankCurveConfig, url, "Tank curve");
+        int? id = await WS.AddAsync<int?>(tankCurveConfig, url, "Tank curve");
         if (id.HasValue)
         {
             tankCurveConfig.Id = id.Value;

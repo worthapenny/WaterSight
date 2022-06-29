@@ -22,7 +22,7 @@ public class Tank : WSItem
     public async Task<TankConfig?> AddTankConfigAsync(TankConfig tankConfig)
     {
         var url = EndPoints.HydStructuresTankQDT;
-        int? id = await WS.AddAsync(tankConfig, url, "Tank");
+        int? id = await WS.AddAsync<int?>(tankConfig, url, "Tank");
         if (id.HasValue)
         {
             tankConfig.Id = id.Value;

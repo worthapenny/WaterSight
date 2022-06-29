@@ -25,7 +25,7 @@ public class Alert : WSItem
     {
         var url = EndPoints.AlertingConfigsQDT;
 
-        int? id = await WS.AddAsync(alert, url, "Alert");
+        int? id = await WS.AddAsync<int?>(alert, url, "Alert");
         if (id.HasValue)
         {
             alert.Id = id.Value;

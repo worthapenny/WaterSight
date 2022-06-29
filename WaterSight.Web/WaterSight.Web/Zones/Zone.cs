@@ -38,7 +38,7 @@ public class Zone : WSItem
     public async Task<ZoneConfig?> AddZoneConfigAsync(ZoneConfig zoneConfig)
     {
         var url = EndPoints.HydStructuresZonesQDT;
-        int? id = await WS.AddAsync(zoneConfig, url, "Zone");
+        int? id = await WS.AddAsync<int?>(zoneConfig, url, "Zone");
         if (id.HasValue)
         {
             zoneConfig.Id= id.Value;

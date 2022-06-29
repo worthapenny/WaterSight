@@ -149,8 +149,8 @@ public class NumericModel : WSItem
     #region Water Model Domain CRUD
     public async Task<int?> AddWaterModelDomain(ModelDomainConfig modelDomain)
     {
-        var id = await WS.AddAsync(
-            t: modelDomain,
+        var id = await WS.AddAsync<int?>(
+            data: modelDomain,
             url: EndPoints.NumModelingModelDomainDomainsQDT,
             typeName: "Model domain");
 
