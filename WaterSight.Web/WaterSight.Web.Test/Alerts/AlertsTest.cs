@@ -35,7 +35,7 @@ public class AlertsTest : TestBase
 
         // Create Object
         var alert = NewThresholdAlertConfig(
-            origin: new AlertOrigin(sensors.First().ID, AlertOriginOriginType.Sensor),
+            origin: new AlertOrigin(sensors.First().ID, AlertOriginEnum.Sensor),
             unit: "ft"
             );
         Assert.IsNotNull(alert);

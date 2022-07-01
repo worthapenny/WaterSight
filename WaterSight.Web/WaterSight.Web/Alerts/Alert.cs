@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System;
+using System.Xml;
 
 namespace WaterSight.Web.Alerts;
 
@@ -74,7 +76,7 @@ public class Alert : WSItem
     {
         Logger.Verbose("About to delete all the alerts...");
         var url = EndPoints.AlertingConfigsQDT;
-        return await WS.DeleteManyAsync(url, "Alerts", true);
+        return await WS.DeleteManyAsync(url, "Alerts", false);
     }
     #endregion
 
@@ -130,8 +132,10 @@ public struct Duration
 
     public const string YearOne = "P365D";
 
+    public static string FromTimeSpan(TimeSpan timeSpan) =>
+        XmlConvert.ToString(timeSpan);
 }
-public enum AlertOriginOriginType
+public enum AlertOriginEnum
 {
     Sensor,
     Zone,
@@ -144,7 +148,7 @@ public class AlertOrigin
     public AlertOrigin()
     {
     }
-    public AlertOrigin(int originId, AlertOriginOriginType type)
+    public AlertOrigin(int originId, AlertOriginEnum type)
     {
         OriginId = originId;
         OriginType = type;
@@ -161,7 +165,7 @@ public class AlertOrigin
     #region Public Properties
 
     public int OriginId { get; set; }
-    public AlertOriginOriginType OriginType { get; set; }
+    public AlertOriginEnum OriginType { get; set; }
     #endregion
 }
 public enum AlertType
@@ -196,11 +200,11 @@ public class AlertConfig
     public int? PatternPercentileToStopEvent { get; set; } // 80
     public string ThresholdUnits { get; set; }
     public List<AlertOrigin> Origins { get; set; } = new List<AlertOrigin>();
-    public int NumericalModelTestType { get; set; }
+    public int NumericalModelTestType { get; set; } = 0; // 0: Water, 1: Sewer
 
     public override string ToString()
     {
-        return $"{Id}: {Name} [{Type}]";
+        return $"[{Type}] {Id}: {Name}";
     }
 }
 #endregion
