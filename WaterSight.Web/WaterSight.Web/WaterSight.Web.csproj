@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alerts\Alert.cs" />
+    <Compile Include="Alerts\EmailGroup.cs" />
     <Compile Include="Core\CRUDBase.cs" />
     <Compile Include="Core\EndPoints.cs" />
     <Compile Include="Core\enums.cs" />

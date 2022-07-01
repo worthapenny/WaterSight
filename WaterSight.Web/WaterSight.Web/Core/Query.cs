@@ -51,6 +51,7 @@ public class Query
     public string GetStartDateTime(DateTimeOffset dt) => $"startDateTime={dt.UtcDateTime:O}";
     public string GetStartDateTimeModel(DateTimeOffset dt) => $"startDateTime={dt.UtcDateTime:O}";
     public string GetStartMonth(DateTime dt) => $"startMonth={dt:yyyy-MM}";
+    public string GroupId(int id) => $"groupId={id}";
     public string HindcastHours(object value) => $"hindcastHours={value}";
     public string Latitude(double lat) => $"latitude={lat}";
     public string Longitude(double lng) => $"longitude={lng}";
@@ -64,6 +65,8 @@ public class Query
     public string QuantityUnits(string unit) => $"quantityUnits={Uri.EscapeDataString(unit)}";
     public string SpinupHours(object value) => $"spinupHours={value}";
     public string StartDateTime(DateTimeOffset at) => $"startDateTime={at.UtcDateTime:O}";
+    public string SubscriberGroupId(int id) => $"subscriberGroupId={id}";
+    public string SubscriberId(int id) => $"subscriberId={id}";
     public string TankCurveId(int id) => $"tankCurveId={id}";
     public string TimeStep(DateTimeOffset at) => $"timeStep={at.UtcDateTime:O}";
     public string Timezone(string timezoneName) => $"timeZoneId={Uri.EscapeDataString(timezoneName)}";

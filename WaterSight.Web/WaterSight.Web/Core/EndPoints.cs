@@ -69,6 +69,15 @@ public class EndPoints
     public string AlertingConfigsQDT => $"{AlertingConfigs}?{Query.DTID}";
     public string AlertingConfigsForId(int id) => $"{AlertingConfigs}/{id}?{Query.DTID}";
 
+    // Mailman
+    public string Mailman => $"{RootApiVersion}/Mailman";
+    public string MailmanSubsGroup => $"{Mailman}SubscriberGroup";
+    public string MailmanSubsGroupQDT => $"{MailmanSubsGroup}?{Query.DTID}";
+    public string MailmanSubsGroupQDTGroupId(int? id) => $"{MailmanSubsGroupQDT}&{Query.GroupId(id)}";
+    public string MailmanSubsGroupQDtQSubsGroupId(int id) => $"{MailmanSubsGroupQDT}&{Query.SubscriberGroupId(id)}";
+    public string MailmanSysnSubscribers => $"{Mailman}/SyncSubscribers";
+    public string MailmanSysnSubscribersQDT => $"{MailmanSysnSubscribers}?{Query.DTID}";
+
     //
     // RTDA
     public string Rtda => $"{RootApiVersion}/RealTimeDataAcquisition";

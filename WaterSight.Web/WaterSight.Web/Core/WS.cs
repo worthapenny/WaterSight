@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using WaterSight.Web.Custom;
 using WaterSight.Web.DT;
@@ -187,6 +188,16 @@ public class WS
     //
     // UPDATE
     //
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="id">For better logging</param>
+    /// <param name="t"></param>
+    /// <param name="url"></param>
+    /// <param name="typeName"></param>
+    /// <param name="usePostMethod"></param>
+    /// <returns></returns>
     public async Task<bool> UpdateAsync<T>(int? id, T t, string url, string typeName, bool usePostMethod = false)
     {
         if (t == null)
@@ -213,6 +224,14 @@ public class WS
     // 
     // DELETE Single
     //
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id">For better logging</param>
+    /// <param name="url"></param>
+    /// <param name="typeName"></param>
+    /// <param name="supportsLRO"></param>
+    /// <returns></returns>
     public async Task<bool> DeleteAsync(int? id, string url, string typeName, bool supportsLRO = false)
     {
         var res = await Request.Delete(url);
@@ -268,6 +287,23 @@ public class WS
         }
 
         return res.IsSuccessStatusCode;
+    }
+
+    //
+    // POST (JSON)
+    //
+    public async Task<bool> PostJson(string url, object? payload, bool supportsLRO = false, string additionalInfo = "")
+    {
+        var jsonString = JsonConvert.SerializeObject(payload);
+        var jsonStringContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+
+        return await PostAsync(
+            url: url,
+            content: jsonStringContent,
+            typeName: "JSON",
+            supportsLRO: supportsLRO,
+            additionalInfo: additionalInfo
+            );
     }
 
     //

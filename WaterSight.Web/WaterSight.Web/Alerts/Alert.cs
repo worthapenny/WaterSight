@@ -202,9 +202,11 @@ public class AlertConfig
     public List<AlertOrigin> Origins { get; set; } = new List<AlertOrigin>();
     public int NumericalModelTestType { get; set; } = 0; // 0: Water, 1: Sewer
 
+    #region Overridden Methods
     public override string ToString()
     {
         return $"[{Type}] {Id}: {Name}";
     }
+    #endregion
 }
 #endregion
