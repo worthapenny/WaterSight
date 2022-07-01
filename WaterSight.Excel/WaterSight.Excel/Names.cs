@@ -39,18 +39,20 @@ public class ExcelFileNames
 {
     public ExcelFileNames(
         string setupDir,
-        string sensorsName = "Sensors.xlsx",
-        string pumpsName = "Pumps.xlsx",
-        string tanksName = "Tanks.xlsx",
-        string consumption = "ConsumptionMeter.xlsx",
-        string zonesName = "Zones.xlsx")
+        string sensorsFileName = "Sensors.xlsx",
+        string pumpsFileName = "Pumps.xlsx",
+        string tanksFileName = "Tanks.xlsx",
+        string consumptionFileName = "ConsumptionMeter.xlsx",
+        string zonesFileName = "Zones.xlsx",
+        string alertsFileName = "Alerts.xlsx")
     {
         SetupDir = setupDir;
-        SensorsExcelPath = Path.Combine(setupDir, sensorsName);
-        PumpsExcelPath = Path.Combine(setupDir, pumpsName);
-        TanksExcelPath = Path.Combine(setupDir, tanksName);
-        CustomerMeterExcelPath = Path.Combine(setupDir, consumption);
-        ZonesExcelPath = Path.Combine(SetupDir, zonesName);
+        SensorsExcelPath = Path.Combine(setupDir, sensorsFileName);
+        PumpsExcelPath = Path.Combine(setupDir, pumpsFileName);
+        TanksExcelPath = Path.Combine(setupDir, tanksFileName);
+        CustomerMeterExcelPath = Path.Combine(setupDir, consumptionFileName);
+        ZonesExcelPath = Path.Combine(SetupDir, zonesFileName);
+        AlertsExcelPath = Path.Combine(SetupDir, alertsFileName);
     }
 
 
@@ -59,8 +61,9 @@ public class ExcelFileNames
     public string TanksExcelPath { get; }
     public string CustomerMeterExcelPath { get; }
     public string ZonesExcelPath { get; }
-
+    public string AlertsExcelPath { get; }
     private string SetupDir { get; }
+
 }
 
 
@@ -76,4 +79,5 @@ public struct ExcelSheetName
     public const string Zone = "Zones Balance";
     public const string ZoneCharacteristics = "Zones Characteristics";
     public const string CustomerMeters = "Customer meters";
+    public const string Alerts = "Alerts";
 }
