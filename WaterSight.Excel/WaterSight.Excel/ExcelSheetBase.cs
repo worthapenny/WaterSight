@@ -15,7 +15,7 @@ namespace WaterSight.Excel
             SheetName = sheetName;
             FilePath = filePath;
 
-            Xl = File.Exists(filePath)? new ExcelMapper(filePath) : new ExcelMapper();
+            Xl = File.Exists(filePath) ? new ExcelMapper(filePath) : new ExcelMapper();
         }
         #endregion
 
@@ -30,7 +30,7 @@ namespace WaterSight.Excel
         {
             Log.Debug($"About to write to an Excel sheet {SheetName}. File: {FilePath}");
             Xl.Save(FilePath, data, SheetName);
-            
+
             Log.Information($"Updated '{SheetName}' excel sheet. File: {FilePath}");
         }
         public async Task<bool> SaveAsync<T>(List<T> data)
@@ -55,7 +55,7 @@ namespace WaterSight.Excel
 
         #region Public Properties
         public string SheetName { get; set; }
-        public string FilePath{ get; protected set; }
+        public string FilePath { get; protected set; }
         #endregion
 
         #region Protected Properties

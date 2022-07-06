@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Tank;
 
 [DebuggerDisplay("Count: {TankItemsList.Count}")]
-public class TanksXlSheet: ExcelSheetBase
+public class TanksXlSheet : ExcelSheetBase
 {
     #region Constructor
     public TanksXlSheet(string excelFilePath)
@@ -21,7 +21,7 @@ public class TanksXlSheet: ExcelSheetBase
 }
 
 
-[DebuggerDisplay("ToString()")] 
+[DebuggerDisplay("ToString()")]
 public class TankItem
 {
     #region Constructor
@@ -61,7 +61,7 @@ public class TankItem
 
     [Column(10, "Desired Turnover Days")]
     public double DesiredTurnoverDays { get; set; }
-        
+
 
     [Column(11, "Tags/Groups")]
     public string? Tags { get; set; }

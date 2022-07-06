@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Customer;
 
 [DebuggerDisplay("Count: {CustomerMeterItemsList.Count}")]
-public class CustomerMetersXlSheet: ExcelSheetBase
+public class CustomerMetersXlSheet : ExcelSheetBase
 {
     #region Constructor
     public CustomerMetersXlSheet(string excelFilePath)
@@ -80,7 +80,7 @@ public class CustomerMeterItem
 
     [Column(10, "Deactivation Date")]
     public string? DecativationDate { get; set; }
-    
+
     [Column(11, "Customer Type")]
     public string? CustomerType { get; set; }
 

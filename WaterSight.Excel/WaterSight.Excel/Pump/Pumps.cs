@@ -8,7 +8,7 @@ namespace WaterSight.Excel.Pump;
 public class PumpsXlSheet : ExcelSheetBase
 {
     #region Constructor
-    public PumpsXlSheet (string excelFilePath)
+    public PumpsXlSheet(string excelFilePath)
         : base(ExcelSheetName.Pumps, excelFilePath)
     {
         PumpItemsList = new List<PumpItem>();

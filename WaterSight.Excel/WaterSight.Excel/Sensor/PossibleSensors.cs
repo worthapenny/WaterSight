@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace WaterSight.Excel.Sensor;
 
 [DebuggerDisplay("{ToString()}")]
-public class PossibleSensorsXlSheet: ExcelSheetBase
+public class PossibleSensorsXlSheet : ExcelSheetBase
 {
     #region Constructor
     public PossibleSensorsXlSheet(string excelFilePath)
@@ -13,7 +13,7 @@ public class PossibleSensorsXlSheet: ExcelSheetBase
     {
     }
     public PossibleSensorsXlSheet(string excelFilePath, string sheetName)
-        :base(sheetName, excelFilePath)
+        : base(sheetName, excelFilePath)
     {
         PossibleSensorsItemsList = new List<PossibleSensorItem>();
     }
