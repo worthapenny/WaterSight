@@ -23,17 +23,18 @@ public class TestBase
     }
     public TestBase(int dtID, Env env)
     {
-        if (env == Env.Prod)
+        ActiveEnvironment = env;
+        if (ActiveEnvironment == Env.Prod)
         {
-            var message = $">>>>> You using {env.ToString()} environment!!! <<<<<";
+            var message = $">>>>> You using {ActiveEnvironment.ToString()} environment!!! <<<<<";
             Debugger.Break();
         }
 
-        var registryPath = env == Env.Prod
+        var registryPath = ActiveEnvironment == Env.Prod
             ? @"SOFTWARE\WaterSight\BentleyProdOIDCToken"
             : @"SOFTWARE\WaterSight\BentleyQaOIDCToken";
 
-        WS = new WS(tokenRegistryPath: registryPath, dtID, env);
+        WS = new WS(tokenRegistryPath: registryPath, dtID, ActiveEnvironment);
         //WS.Options.EPSGCode = 26956; // Watertown DT
     }
     #endregion
@@ -72,6 +73,7 @@ public class TestBase
 
     #region Properties
     public WS WS { get; private set; }
+    public Env ActiveEnvironment { get; private set; }
     public ILogger Logger => WS.Logger;
     #endregion
 }
