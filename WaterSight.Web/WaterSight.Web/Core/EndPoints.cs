@@ -71,12 +71,19 @@ public class EndPoints
 
     // Mailman
     public string Mailman => $"{RootApiVersion}/Mailman";
-    public string MailmanSubsGroup => $"{Mailman}SubscriberGroup";
+    public string MailmanSubsGroup => $"{Mailman}/SubscriberGroup";
     public string MailmanSubsGroupQDT => $"{MailmanSubsGroup}?{Query.DTID}";
     public string MailmanSubsGroupQDTGroupId(int? id) => $"{MailmanSubsGroupQDT}&{Query.GroupId(id)}";
     public string MailmanSubsGroupQDtQSubsGroupId(int id) => $"{MailmanSubsGroupQDT}&{Query.SubscriberGroupId(id)}";
     public string MailmanSysnSubscribers => $"{Mailman}/SyncSubscribers";
     public string MailmanSysnSubscribersQDT => $"{MailmanSysnSubscribers}?{Query.DTID}";
+
+    public string MailmanGroupSubscriber => $"{Mailman}/GroupSubscriber";
+    public string MailmanGroupSubscriberDTID => $"{MailmanGroupSubscriber}?{Query.DTID}";
+    public string MailmanGroupSubscriberDTIDGroupIdSubscriberId(int groupId, int subscriberId) => $"{MailmanGroupSubscriberDTID}&groupId={groupId}&subscriberId={subscriberId}";
+
+    public string MailmanGroupSubscription => $"{Mailman}/GroupSubscription";
+    public string MailmanGroupSubscriptionDTID => $"{MailmanGroupSubscription}?{Query.DTID}";
 
     //
     // RTDA

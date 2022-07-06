@@ -38,7 +38,7 @@ public class AlertXlSheet : ExcelSheetBase
 public class AlertItem
 {
     #region Constants
-    const char DisplayNameSeparator = '|';
+    public const char DisplayNameSeparator = '|';
     const string RelationTypeHigh = "High";
     const string RelationTypeLow = "Low";
     const string TimeSeriesType15Min = "15 Min";
@@ -265,7 +265,7 @@ public class AlertItem
 
                     if (minDurationStrings[1].Contains("day"))
                     {
-                        var days = Convert.ToInt16(minDurationStrings.First()) * 60;
+                        var days = Convert.ToInt16(minDurationStrings.First());
                         duration = new TimeSpan(days, 0, 0, 0);
                     }
                 }
@@ -304,6 +304,11 @@ public class AlertItem
 
     [Column(10, "Recipients Group Display Name")]
     public string? RecipientsGroup { get; set; }
+
+    [Column(11, "Alert Display Name")]
+    public string? AlertDisplayName { get; set; }
+
+
     #endregion
 
     #region Overridden Methods

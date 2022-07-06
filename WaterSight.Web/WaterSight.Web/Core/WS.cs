@@ -145,8 +145,8 @@ public class WS
         {
             try
             {
-                var jsonString = await res.Content.ReadAsStringAsync();
-                t = JsonConvert.DeserializeObject<T>(jsonString);
+                t = await Request.GetJsonAsync<T>(res);
+
                 Logger.Information($"{typeName} info found {(id == null ? "" : $"for id: {id}")}, {t}.");
                 return t;
             }

@@ -18,21 +18,37 @@ public class EmailGroup: WSItem
     #endregion
 
     #region Public Methods
-    public async Task<bool> SyncSybscribers(List<Recipient> recipients)
+    public async Task<bool> AddSubscriber(int groupId, int subscriberId)
     {
-        var url = EndPoints.MailmanSysnSubscribersQDT;
-        return await WS.PostJson(url, recipients, false, "Sync Subscriber");
+        var url = EndPoints.MailmanGroupSubscriberDTIDGroupIdSubscriberId(groupId, subscriberId);
+        return await WS.PostJson(url, null, false, "Add Subscriber");
     }
-
+    public async Task<bool> RemoveSubscriber(int groupId, int subscriberId)
+    {
+        var url = EndPoints.MailmanGroupSubscriberDTIDGroupIdSubscriberId(groupId, subscriberId);
+        return await WS.DeleteAsync(null, url, "Remove Subscriber");
+    }
+    
     #region CRUD Operations
     //
+    // CREATE
+    public async Task<EmailGroupConfig> AddEmailGroupConfig(EmailGroupConfig emailGroup)
+    {
+        var url = EndPoints.MailmanSubsGroupQDT;
+        return await WS.AddAsync<EmailGroupConfig>(emailGroup, url, "Email Group");
+    }
+
+    //
     // READ
-    public async Task<EmailGroupConfig> GetEmailGroupConfig(int groupId)
+    public async Task<EmailGroupConfig?> GetEmailGroupConfig(int groupId)
     {
         var url = EndPoints.MailmanSubsGroupQDTGroupId(groupId);
-        return await WS.GetAsync<EmailGroupConfig>(url, null, "Email Group");
+        
+        // NOTE: the end-points returns array
+        var items = await WS.GetAsync<List<EmailGroupConfig>>(url, null, "Email Group");
+        return items.Any() ? items.First() : null;
     }
-    public async Task<List<EmailGroupConfig>> GetEmailGroupConfigs()
+    public async Task<List<EmailGroupConfig>> GetEmailGroupsConfig()
     {
         var url = EndPoints.MailmanSubsGroupQDTGroupId(null);
         return await WS.GetManyAsync<EmailGroupConfig>(url, "Email Groups");
@@ -55,7 +71,7 @@ public class EmailGroup: WSItem
     }
     public async Task<bool> DeleteGroups()
     {
-        var groups = await GetEmailGroupConfigs();
+        var groups = await GetEmailGroupsConfig();
         var success = true;
         foreach (var group in groups)
             success = success & await DeleteGroup(group);
@@ -75,6 +91,8 @@ public class EmailGroupConfig
     #region Constructor
     public EmailGroupConfig()
     {
+        Subscribers = new List<int>();
+        Subscriptions = new List<string>();
     }
     #endregion
 
@@ -83,8 +101,16 @@ public class EmailGroupConfig
     public int ID { get; set; } = 0;
     public string Description { get; set; } = String.Empty;
     public string Name { get; set; }
-    public List<int> Subscribers { get; set; } = new List<int>();
-    public List<string> Subscriptions { get; set; } = new List<string>();
+
+    /// <summary>
+    /// List of Connect User IDs
+    /// </summary>
+    public List<int> Subscribers { get; set; }// = new List<int>();
+
+    /// <summary>
+    /// List of Souces (Sensor, Zones, etc.) IDs
+    /// </summary>
+    public List<string> Subscriptions { get; set; }// = new List<string>();
     #endregion
 
     #region Overridden Methods

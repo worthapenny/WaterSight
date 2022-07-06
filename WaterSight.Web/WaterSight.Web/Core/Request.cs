@@ -195,9 +195,6 @@ public static class Request
         {
             try
             {
-                //var jsonOptoins = new JsonSerializerOptions();
-                //jsonOptoins.PropertyNameCaseInsensitive = true;
-
                 var jsonSerializerSettings = new JsonSerializerSettings
                 {
                     FloatFormatHandling = FloatFormatHandling.Symbol,

@@ -1,26 +1,56 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using WaterSight.Web.Core;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
+using WaterSight.Web.Core;
 
 namespace WaterSight.Web.Alerts;
+
+public enum EmailSubscriptionType
+{
+    Alerts = 0,
+    IssueResolution = 1,
+}
 
 public class Alert : WSItem
 {
     #region Constructor
     public Alert(WS ws) : base(ws)
     {
+        EmailGroup = new EmailGroup(ws);
     }
     #endregion
 
     #region Public Methods
 
-    #region CRUD Operations
+    // Update Receipients Group
+    public async Task<bool> UpdateEmailGroups(int alertId, List<int> emailGroupConfigIds, EmailSubscriptionType subscriptionType)
+    {
+        var subscriptionKey = alertId;
+
+        var sb = new StringBuilder(EndPoints.MailmanGroupSubscriptionDTID)
+            .Append("&").Append($"subscriptionType={(int)subscriptionType}")
+            .Append("&").Append($"subscriptionKey={subscriptionKey}");
+
+        var success = await WS.PostJson(
+            url: sb.ToString(),
+            payload: emailGroupConfigIds,
+            supportsLRO: false,
+            additionalInfo: "Update Email Group");
+
+        return success;
+    }
+
+    // Get available Groups
+    public async Task<List<EmailGroupConfig>> GetEmailGroupsConfig()
+    {
+        return await EmailGroup.GetEmailGroupsConfig();
+    }
+
+
+    #region CRUD Operations [ALERTS]
     //
     // CREATE
     public async Task<AlertConfig?> AddAlertConfigAsync(AlertConfig alert)
@@ -70,7 +100,7 @@ public class Alert : WSItem
     public async Task<bool> DeleteAlertConfigAsync(int alertId)
     {
         var url = EndPoints.AlertingConfigsForId(alertId);
-        return await WS.DeleteAsync(alertId, url, "Alert", true);
+        return await WS.DeleteAsync(alertId, url, "Alert", false);
     }
     public async Task<bool> DeleteAlertsConfigAsync()
     {
@@ -80,6 +110,10 @@ public class Alert : WSItem
     }
     #endregion
 
+    #endregion
+
+    #region Public Properties
+    public EmailGroup EmailGroup { get; }
     #endregion
 }
 
@@ -170,10 +204,10 @@ public class AlertOrigin
 }
 public enum AlertType
 {
-    Pattern =1,
-    Absolute=2,
-    NoData=3,
-    FlatReading=4,
+    Pattern = 1,
+    Absolute = 2,
+    NoData = 3,
+    FlatReading = 4,
 }
 public struct AlertExtremes
 {
@@ -201,6 +235,10 @@ public class AlertConfig
     public string ThresholdUnits { get; set; }
     public List<AlertOrigin> Origins { get; set; } = new List<AlertOrigin>();
     public int NumericalModelTestType { get; set; } = 0; // 0: Water, 1: Sewer
+    //public string Recipients { get; set; } = string.Empty;
+
+    [Newtonsoft.Json.JsonIgnore]
+    public string EmailGroupsName { get; set; }
 
     #region Overridden Methods
     public override string ToString()

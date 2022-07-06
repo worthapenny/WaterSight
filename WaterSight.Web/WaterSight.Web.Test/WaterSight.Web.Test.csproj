@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alerts\AlertsTest.cs" />
+    <Compile Include="Alerts\EmailGroupTest.cs" />
     <Compile Include="CustomerMeters\CustomersTest.cs" />
     <Compile Include="Custom\WaterModelTest.cs" />
     <Compile Include="DT\DigitalTwinTest.cs" />

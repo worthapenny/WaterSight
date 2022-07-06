@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Alerts;
@@ -45,6 +46,20 @@ public class AlertsTest : TestBase
         Assert.IsNotNull(alertCreated);
         Assert.IsTrue(alertCreated?.Id > 0);
         Separator("Done create testing");
+
+        // assign email group (if found)
+        var emailGroups = await Alert.GetEmailGroupsConfig();
+        Assert.That(emailGroups, Is.Not.Null);
+        if(emailGroups.Count > 0)
+        {
+            var emailGroup = emailGroups.First();
+            var added = await Alert.UpdateEmailGroups(
+                alertCreated.Id,
+                new List<int>() { emailGroup.ID },
+                EmailSubscriptionType.Alerts);
+
+            Assert.That(added, Is.True);
+        }
 
 
         // Read
