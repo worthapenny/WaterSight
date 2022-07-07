@@ -44,7 +44,8 @@ public class ExcelFileNames
         string tanksFileName = "Tanks.xlsx",
         string consumptionFileName = "ConsumptionMeter.xlsx",
         string zonesFileName = "Zones.xlsx",
-        string alertsFileName = "Alerts.xlsx")
+        string alertsFileName = "Alerts.xlsx",
+        string powerBiFileName = "Power BI.xlsx")
     {
         SetupDir = setupDir;
         SensorsExcelPath = Path.Combine(setupDir, sensorsFileName);
@@ -53,6 +54,7 @@ public class ExcelFileNames
         CustomerMeterExcelPath = Path.Combine(setupDir, consumptionFileName);
         ZonesExcelPath = Path.Combine(SetupDir, zonesFileName);
         AlertsExcelPath = Path.Combine(SetupDir, alertsFileName);
+        PowerBIExcelPath = Path.Combine(SetupDir, powerBiFileName);
     }
 
 
@@ -62,6 +64,8 @@ public class ExcelFileNames
     public string CustomerMeterExcelPath { get; }
     public string ZonesExcelPath { get; }
     public string AlertsExcelPath { get; }
+    public string PowerBIExcelPath { get; }
+
     private string SetupDir { get; }
 
 }
@@ -80,4 +84,5 @@ public struct ExcelSheetName
     public const string ZoneCharacteristics = "Zones Characteristics";
     public const string CustomerMeters = "Customer meters";
     public const string Alerts = "Alerts";
+    public const string PowerBI = "Power BI";
 }

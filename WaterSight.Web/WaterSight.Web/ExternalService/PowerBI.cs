@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -36,7 +37,7 @@ public class PowerBI : WSItem
     {
         var url = EndPoints.DTPowerBIUrlQDT;
         powerBiConfig = await WS.AddAsync<PowerBiConfig>(powerBiConfig, url, "Power BI Item");
-        
+
         return powerBiConfig;
     }
 
@@ -63,7 +64,27 @@ public class PowerBI : WSItem
         var url = EndPoints.DTPowerBIUrlQDT;
         url += $"&urlId={powerBiConfig.Id}";
 
-        return await WS.DeleteAsync(null, url, "Power BI");
+        return await WS.DeleteAsync(powerBiConfig.Id, url, "Power BI");
+    }
+
+    public async Task<bool> DeletePowerBiConfigs()
+    {
+        // get all the items
+        var powerBiConfigs = await GetPowerBiConfigsAsync();
+        var success = true;
+        if (powerBiConfigs.Any())
+        {
+            foreach (var item in powerBiConfigs)
+            {
+                success = success & await DeletePowerBiConfig(item);
+            }
+        }
+        else
+        {
+            Logger.Warning($"No Power BI configs found to delete");
+        }
+
+        return success;
     }
     #endregion
 
