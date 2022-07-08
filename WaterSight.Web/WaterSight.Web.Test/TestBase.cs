@@ -36,6 +36,7 @@ public class TestBase
 
         WS = new WS(tokenRegistryPath: registryPath, dtID, ActiveEnvironment);
         //WS.Options.EPSGCode = 26956; // Watertown DT
+        
     }
     #endregion
 

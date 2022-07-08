@@ -14,6 +14,10 @@ else:
   exit()
 
 
-from WaterSight.Web import Sensors
+from WaterSight.Web.Core import Env, WS
+env = Env.Prod
 
-print("hi")
+registry_path = r"SOFTWARE\WaterSight\BentleyProdOIDCToken" if env == Env.Prod else r"SOFTWARE\WaterSight\BentleyQaOIDCToken"
+
+
+ws = 

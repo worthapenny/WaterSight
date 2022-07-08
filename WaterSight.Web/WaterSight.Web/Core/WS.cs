@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
+using Serilog.Core;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
@@ -58,7 +59,8 @@ public class WS
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 //.MinimumLevel.Verbose()
-                .MinimumLevel.Debug()
+                //.MinimumLevel.Debug()
+                .MinimumLevel.ControlledBy(LoggingLevelSwitch) // Default's to Information 
                 .WriteTo.Debug(outputTemplate: logTemplate)
                 .WriteTo.Console(outputTemplate: logTemplate, theme: AnsiConsoleTheme.Code)
                 .WriteTo.File(
@@ -68,6 +70,9 @@ public class WS
                     flushToDiskInterval: TimeSpan.FromSeconds(5),
                     outputTemplate: logTemplate)
                 .CreateLogger();
+
+            // Set default to Debug
+            SetLoggingLevelToDebug();
         }
 
         WS.Logger = Log.Logger;
@@ -77,7 +82,24 @@ public class WS
     }
     #endregion
 
+
+
     #region Public Methods - CRUD
+
+    public void SetLoggingLevelToInfo()
+    {
+        LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Information;
+    }
+
+    public void SetLoggingLevelToDebug()
+    {
+        LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Debug;
+    }
+
+
+
+    #region CRUD Operations
+
 
     //
     // ADD / CREATE
@@ -355,12 +377,16 @@ public class WS
 
         return res.IsSuccessStatusCode;
     }
+
+    #endregion
+
     #endregion
 
     #region Public Properties
     public Options Options { get; }
     public EndPoints EndPoints { get; }
     public static ILogger Logger { get; private set; } // = new LoggerConfiguration().CreateLogger();
+    public static LoggingLevelSwitch LoggingLevelSwitch { get; } = new LoggingLevelSwitch();
 
     public DigitalTwin DigitalTwin { get; }
     public Sensors.Sensor Sensor { get; }
