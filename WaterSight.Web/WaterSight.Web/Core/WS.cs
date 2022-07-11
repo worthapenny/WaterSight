@@ -95,7 +95,10 @@ public class WS
     {
         LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Debug;
     }
-
+    public void SetLoggingLevelToVerbose()
+    {
+        LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Verbose;
+    }
 
 
     #region CRUD Operations

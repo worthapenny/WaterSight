@@ -41,7 +41,7 @@ public static class Request
         }
         catch (HttpRequestException ex)
         {
-            Logger.Error("...while performing the get request.", ex);
+            Logger.Error(ex,"...while performing the get request.");
         }
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
@@ -70,7 +70,7 @@ public static class Request
         }
         catch (HttpRequestException ex)
         {
-            Logger.Error("...while performing the put request.", ex);
+            Logger.Error(ex, "...while performing the put request.");
         }
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
@@ -111,7 +111,7 @@ public static class Request
         }
         catch (HttpRequestException ex)
         {
-            Logger.Error("...while performing the post request.", ex);
+            Logger.Error(ex, "...while performing the post request.");
         }
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
@@ -182,7 +182,7 @@ public static class Request
         }
         catch (HttpRequestException ex)
         {
-            Logger.Error($"...while performing the delete request.", ex);
+            Logger.Error(ex,$"...while performing the delete request.");
         }
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
