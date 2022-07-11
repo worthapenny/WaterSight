@@ -28,7 +28,7 @@ public class NumericalModelTest : TestBase
     #region Tests
 
     [Test, Order(102910), Category("Upload")]
-    public async Task<bool> UploadWaterModel()
+    public async Task UploadWaterModel()
     {
         var zippedModelPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown.wtg.sqlite.zip");
         Assert.IsTrue(File.Exists(zippedModelPath));
@@ -38,8 +38,6 @@ public class NumericalModelTest : TestBase
         var success = await NumericModel.UpdloadZippedWaterModel(fileInfo);
         Assert.IsTrue(success);
         Separator("Model Uploaded");
-
-        return success;
     }
 
 

@@ -31,8 +31,7 @@ public class CustomWaterModelTest : TestBase
         if(!(modelDoamin?.Where(d=>d.Type?.ToLower().Contains("gems") ?? false).Any() ?? false))
         {
             var numericalModelTest = new NumericalModelTest();
-            var uploaded = await numericalModelTest.UploadWaterModel();
-            Assert.That(uploaded, Is.True);
+            await numericalModelTest.UploadWaterModel();
         }
 
         var modelMeasuredDataList = await WaterModel.GetAllScadaElementsOutputData();
