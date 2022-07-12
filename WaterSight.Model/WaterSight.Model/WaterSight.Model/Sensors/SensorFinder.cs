@@ -123,23 +123,29 @@ public class SensorFinder
         var isActiveState = options.ActiveElementsOnly ? ElementStateType.Active : ElementStateType.Inactive;
         var tankElements = WaterModel.Network.Tanks.Elements(isActiveState);
 
+
         Sensor sensor;
-        if (options.TankLevel)
+
+        foreach (var tank in tankElements)
         {
-            foreach (var tank in tankElements)
+            var connectedScadaElements = tank.GetConnectedSCADAElements(WaterModel);
+
+
+            if (options.TankLevel)
             {
                 sensor = new Sensor(SensorType.Level, tank, tank, SCADATargetAttribute.TankLevel);
+                var tankLevelScadaElementCheck = connectedScadaElements
+                    .Where(e => e.Input?.TargetAttribute == SCADATargetAttribute.TankLevel);
+
+                if (tankLevelScadaElementCheck.Any())
+                    sensor = new Sensor(tankLevelScadaElementCheck.First(), SensorType.Level);
+
                 sensors.Add(sensor);
                 Log.Debug($"Sensor found for {tank.IdLabel(true)} = {sensor}");
             }
-        }
 
-        if (options.TankFlow)
-        {
-            tankElements.ForEach(tank =>
+            if (options.TankFlow)
             {
-                
-
                 var connectedLinks = WaterModel.Network.ConnectedElements(WaterModel, tank);
                 connectedLinks.ForEach(l =>
                 {
@@ -147,7 +153,8 @@ public class SensorFinder
                     sensors.Add(sensor);
                     Log.Debug($"Sensor found for connected link of {tank.IdLabel(true)} = {sensor}");
                 });
-            });
+            }
+
         }
 
         sw.Stop();
@@ -214,7 +221,7 @@ public class SensorFinder
                 sensor.IsDirection = true;
                 sensor.IsDirectionOutwards = true;
                 sensor.UpdateLabel();
-                sensor.UpdateTagName();
+                sensor.GetTagName();
                 sensors.Add(sensor);
                 Log.Debug($"Sensor found for {pump.IdLabel(true)} = {sensor}");
             }
@@ -236,7 +243,7 @@ public class SensorFinder
                 sensor.IsDirection = true;
                 sensor.IsDirectionOutwards = false;
                 sensor.UpdateLabel();
-                sensor.UpdateTagName();
+                sensor.GetTagName();
                 sensors.Add(sensor);
                 Log.Debug($"Sensor found for {pump.IdLabel(true)} = {sensor}");
             }
@@ -296,7 +303,7 @@ public class SensorFinder
                 sensor.IsDirection = true;
                 sensor.IsDirectionOutwards = true;
                 sensor.UpdateLabel();
-                sensor.UpdateTagName();
+                sensor.GetTagName();
                 if (valve is IPressureReducingValve)
                     sensor.TargetAttribute = SCADATargetAttribute.PressureValveSetting;
 
@@ -310,7 +317,7 @@ public class SensorFinder
                 sensor.IsDirection = true;
                 sensor.IsDirectionOutwards = false;
                 sensor.UpdateLabel();
-                sensor.UpdateTagName();
+                sensor.GetTagName();
                 if (valve is IPressureSustainingValve)
                     sensor.TargetAttribute = SCADATargetAttribute.PressureValveSetting;
 
