@@ -51,6 +51,17 @@ namespace WaterSight.Web.Support
         public static string LogSeparatorDashes { get; } = new string('-', LogSeparatorSize);
         public static string LogSeparatorPluses { get; } = new string('+', LogSeparatorSize);
         public static string LogSeparatorUpperBar { get; } = new string('‾', LogSeparatorSize);
+        public static string LogSeparatorBullet { get; } = new string(Bullet, LogSeparatorSize);
+        public static string LogSeparatorBulletPlus { get; } = new string(BulletPlus, LogSeparatorSize);
+        public static string LogSeparatorBulletInverse { get; }=        new string (BulletInverse, LogSeparatorSize);
+        public static string LogSeparatorBulletWhite { get; } = new string(BulletWhite, LogSeparatorSize);
+        public static string LogSeparatorSquare { get; } = new string(Square, LogSeparatorSize);
+        public static string LogSeparatorSquarePlus { get; } = new string(SquarePlus, LogSeparatorSize);
+        public static string LogSeparatorInfinity { get; } = new string(Infinity, LogSeparatorSize);
+
+        public static string LogSeparatorOSmall{ get; } = new string(OSmall, LogSeparatorSize);
+        public static string LogSeparatorOBig { get; } = new string(OBig, LogSeparatorSize);
+
         public static string LogSeparator(char symbol, int repeatSymbol = 100)
         {
             return $"{new string(symbol, repeatSymbol)}";
