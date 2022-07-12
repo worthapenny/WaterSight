@@ -39,7 +39,9 @@ namespace WaterSight.Excel
             Log.Debug($"About to write to an Excel sheet {SheetName}. File: {FilePath}");
             try
             {
-                await new ExcelMapper().SaveAsync(FilePath, data, SheetName);
+                var xlMapper = File.Exists(FilePath) ? new ExcelMapper(FilePath) : new ExcelMapper();
+                await xlMapper.SaveAsync(FilePath, data, SheetName);
+
                 Log.Debug($"Updated '{SheetName}' excel sheet. File: {FilePath}");
             }
             catch (Exception ex)
