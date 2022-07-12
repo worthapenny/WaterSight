@@ -37,15 +37,23 @@ public class CsvFileNames
 
 public class ExcelFileNames
 {
+    public const string SensorsFileName = "Sensors.xlsx";
+    public const string PumpsFileName = "Pumps.xlsx";
+    public const string TanksFileName = "Tanks.xlsx";
+    public const string ConsumptionFileName = "ConsumptionMeter.xlsx";
+    public const string ZonesFileName = "Zones.xlsx";
+    public const string AlertsFileName = "Alerts.xlsx";
+    public const string PowerBiFileName = "Power BI.xlsx";
+
     public ExcelFileNames(
         string setupDir,
-        string sensorsFileName = "Sensors.xlsx",
-        string pumpsFileName = "Pumps.xlsx",
-        string tanksFileName = "Tanks.xlsx",
-        string consumptionFileName = "ConsumptionMeter.xlsx",
-        string zonesFileName = "Zones.xlsx",
-        string alertsFileName = "Alerts.xlsx",
-        string powerBiFileName = "Power BI.xlsx")
+        string sensorsFileName = SensorsFileName,
+        string pumpsFileName = PumpsFileName,
+        string tanksFileName = TanksFileName,
+        string consumptionFileName = ConsumptionFileName,
+        string zonesFileName = ZonesFileName,
+        string alertsFileName = AlertsFileName,
+        string powerBiFileName = PowerBiFileName)
     {
         SetupDir = setupDir;
         SensorsExcelPath = Path.Combine(setupDir, sensorsFileName);
