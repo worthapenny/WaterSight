@@ -1,5 +1,10 @@
-﻿using OpenFlows.Water.Domain.ModelingElements.NetworkElements;
+﻿using OpenFlows.Domain.ModelingElements.NetworkElements;
+using OpenFlows.Water.Domain;
+using OpenFlows.Water.Domain.ModelingElements.NetworkElements;
+using System;
 using System.Diagnostics;
+using System.Drawing;
+using WaterSight.Model.Extensions;
 
 namespace WaterSight.Model.Domain;
 
@@ -11,40 +16,80 @@ public class Sensor
     {
         SensorType = sensorType;
     }
+    public Sensor(ISCADAElement scadaElement, SensorType type)
+        : this(type, scadaElement, scadaElement.Input.TargetElement, scadaElement.Input.TargetAttribute)
+    {
+        TagName = scadaElement.Input.HistoricalSignal?.TagForWaterSight() ?? GetTagName();
+        Label = scadaElement.Label ?? GetLabel();
+    }
+
+
+
     public Sensor(
         SensorType sensorType,
-       /* IWaterNetworkElement networkElement,
-        IWaterNetworkElement originElement,*/
-       IWaterElement networkElement,
-       IWaterElement originElement,
-        SCADATargetAttribute targetAttribute,
-        string unit = "")
+        IWaterElement networkElement,
+        IWaterElement originElement,
+        SCADATargetAttribute targetAttribute)
         : this(sensorType)
     {
         NetworkElement = networkElement;
         OriginElement = originElement;
         TargetAttribute = targetAttribute;
-        Unit = unit;
 
-        UpdateTagName();
-        UpdateLabel();
+        var point = (networkElement as IPointNodeInput).GetPoint();
+        Location = new PointF((float)point.X, (float)point.Y);
+
+        TagName = GetTagName();
+        Label = GetLabel();
     }
+
+
     #endregion
 
     #region Public Methods
-    public void UpdateTagName()
+    public string GetTagName()
     {
-        TagName = $"{OriginElement.Label}_{GetTagNameSuffix()}";
+        return $"{OriginElement.Label}_{GetTagNameSuffix()}";
+    }
+    public string GetLabel()
+    {
+        return $"{OriginElement.Label}_{GetTagLabelSuffix()}";
     }
     public void UpdateLabel()
     {
-        Label = $"{OriginElement.Label}_{GetTagLabelSuffix()}";
+        Label = GetLabel();
     }
-
     #endregion
 
     #region Private Methods
+    private string GetSensorUnit(SensorType sensorType)
+    {
+        throw new NotImplementedException();
 
+        /*switch (sensorType)
+        {
+            case SensorType.Pressure:
+                break;
+            case SensorType.Flow:
+                break;
+            case SensorType.Level:
+                break;
+            case SensorType.Power:
+                break;
+            case SensorType.Concentration:
+                break;
+            case SensorType.Status:
+                break;
+            case SensorType.HydraulicGrade:
+                break;
+            case SensorType.PumpSpeed:
+                break;
+            case SensorType.pH:
+                break;
+            default:
+                break;
+        }*/
+    }
     private string GetTagLabelSuffix()
     {
         switch (SensorType)
@@ -132,17 +177,25 @@ public class Sensor
     public override string ToString()
     {
         return $"{Label} [{SensorType}], Tgt = {TargetAttribute}";
-    }
+    }    
     #endregion
 
     #region Properties
     public SensorType SensorType { get; }
     public string TagName { get; set; }
     public string Label { get; set; }
-    public string Unit { get; set; }
+    public string Unit => GetSensorUnit(SensorType);
     public bool IsDirection { get; set; } = false;
     public bool IsDirectionOutwards { get; set; } = false;
     public SCADATargetAttribute TargetAttribute { get; set; }
+
+    public PointF Location { get; } = new PointF();
+
+    public double? ReferenceElevation => OriginElement is IPhysicalNodeElementInput
+        ? (OriginElement as IPhysicalNodeElementInput)?.Elevation
+        : null;
+
+
 
     //public IWaterNetworkElement NetworkElement { get; }
     //public IWaterNetworkElement OriginElement { get; }
