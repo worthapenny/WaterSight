@@ -272,9 +272,9 @@ public static class Request
             if (jsonData?.TryGetValue("Status", out statusCode) ?? false)
             {
                 statusCode = Convert.ToInt32(statusCode.ToString());
-                var percentDone = jsonData["PercentComplete"].ToString();
-                var message = jsonData["StatusMessage"].ToString();
-                var source = jsonData["ServiceName"].ToString();
+                var percentDone = jsonData["PercentComplete"]?.ToString();
+                var message = jsonData["StatusMessage"]?.ToString();
+                var source = jsonData["ServiceName"]?.ToString();
 
                 if ((int)statusCode == 0 || (int)statusCode == 1)
                 {
