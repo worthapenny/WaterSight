@@ -25,6 +25,8 @@ public enum CurveType
 {
     Head,
     Efficiency,
+    Power,
+    VFD_Efficiency
 }
 
 [DebuggerDisplay("{ToString()}")]
@@ -66,6 +68,8 @@ public class PumpCurveItem
 
     [Column(4, "Value")]
     public double Value { get; set; }
+
+
     #endregion
 
 
