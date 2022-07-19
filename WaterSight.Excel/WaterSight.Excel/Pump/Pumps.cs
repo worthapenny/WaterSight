@@ -65,25 +65,25 @@ public class PumpItem
     public string PumpStationDisplayName { get; set; }
 
     [Column(10, "Suction Tag")]
-    public string SuctionTag { get; set; }
+    public string? SuctionTag { get; set; }
 
     [Column(11, "Discharge Tag")]
-    public string DischargeTag { get; set; }
+    public string? DischargeTag { get; set; }
 
     [Column(12, "Flow Tag")]
-    public string FlowTag { get; set; }
+    public string? FlowTag { get; set; }
 
     [Column(13, "Power Tag")]
-    public string PowerTag { get; set; }
+    public string? PowerTag { get; set; }
 
     [Column(14, "Head Curve Name")]
     public string HeadCurveName { get; set; }
 
     [Column(15, "Efficiency Curve Name")]
-    public string EfficiencyCurveName { get; set; }
+    public string? EfficiencyCurveName { get; set; }
 
     [Column(16, "Power Curve Name")]
-    public string PowerCurveName { get; set; }
+    public string? PowerCurveName { get; set; }
 
     [Column(17, "Power Units")]
     public string PowerUnits { get; set; }
@@ -98,19 +98,19 @@ public class PumpItem
     public double? FullSpeedValue { get; set; }
 
     [Column(21, "Variable Speed Effi Curve Name")]
-    public string VariableSpeedEffiCurveName { get; set; }
+    public string? VariableSpeedEffiCurveName { get; set; }
 
     [Column(22, "Speed Tag Name")]
-    public string SpeedTagName { get; set; }
+    public string? SpeedTagName { get; set; }
 
     [Column(23, "Status Tag")]
-    public string StatusTag { get; set; }
+    public string? StatusTag { get; set; }
 
     [Column(24, "Groups")]
-    public string Groups { get; set; }
+    public string? Groups { get; set; }
 
     [Column(25, "Notes")]
-    public string Notes { get; set; }
+    public string? Notes { get; set; }
 
     #endregion
 }
