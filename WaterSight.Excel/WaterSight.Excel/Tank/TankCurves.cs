@@ -44,7 +44,7 @@ public class TankCurveItem
     public double? DepthRatio { get; set; } = null;
 
 
-    [Column(1, "Volume Ratio (%)*")]
+    [Column(3, "Volume Ratio (%)*")]
     public double? VolumeRatio { get; set; } = null;
     #endregion
 
