@@ -50,7 +50,10 @@ public class Sensor : WSItem
     public async Task<bool> PostExcelFile(FileInfo fileInfo)
     {
         Logger.Debug($"About to upload Excel file for Sensors.");
-        return await WS.PostFile(EndPoints.RtdaSignalsFileQDT, fileInfo, false, "Excel");
+        var success = await WS.PostFile(EndPoints.RtdaSignalsFileQDT, fileInfo, false, "Excel");
+
+        Logger.Debug(Util.LogSeparatorSquare);
+        return success;
     }
 
     public async Task<List<SensorConfig>> AddMissingSensorConfigAsync(List<SensorConfig> sensorConfigs)
