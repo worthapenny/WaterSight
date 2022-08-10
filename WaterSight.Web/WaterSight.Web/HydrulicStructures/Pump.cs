@@ -19,7 +19,7 @@ public class Pump : WSItem
     public async Task<bool> PostExcelFile(FileInfo fileInfo)
     {
         Logger.Debug($"About to upload Excel file for Pumps.");
-        return await WS.PostFile(EndPoints.HydStructuresPumpsQDT, fileInfo, true, "Excel");
+        return await WS.PostFile(EndPoints.HydStructuresPumpsQDT, fileInfo, false, "Excel");
     }
 
     #region CRUD Operation Pump Curve
