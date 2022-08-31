@@ -25,7 +25,6 @@ public abstract class OpenFlowsWaterTestFixtureBase
     [SetUp]
     public void Setup()
     {   
-
         ApplicationManagerBase.SetApplicationManager(new WaterApplicationManager());
 
         // By passing in false, this will suppress the primary user interface.
@@ -55,13 +54,19 @@ public abstract class OpenFlowsWaterTestFixtureBase
     {
         ProjectProperties app = ProjectProperties.Default;
         app.NominalProjectPath = filename;
-        WaterApplicationManager.GetInstance().ParentFormModel.OpenProject(app);
+        WaterAppManager.ParentFormModel.OpenProject(app);
     }
     protected virtual string BuildTestFilename(string filename)
     {
         // The defualt base path is the samples folder for WaterGEMS. You can change this to
         // whatever you want.  Remember this is the BASE path as it will be comined with the provided filename.
         return Path.Combine(@"C:\Program Files (x86)\Bentley\WaterGEMS\Samples", filename);
+    }
+    protected void SaveAs(string filePath = "")
+    {
+        ProjectProperties app = ProjectProperties.Default;
+        app.NominalProjectPath = string.IsNullOrEmpty(filePath) ? Project.FullPath : filePath;
+        WaterAppManager.ParentFormModel.SaveAsProject(app);
     }
     #endregion
 
