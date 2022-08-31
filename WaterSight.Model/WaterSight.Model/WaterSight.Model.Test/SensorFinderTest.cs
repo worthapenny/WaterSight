@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using WaterSight.Model.Sensors;
@@ -12,8 +11,8 @@ namespace WaterSight.Model.Test
         #region Setup/Teardown
         protected override void SetupImpl()
         {
-            string modelPath = @"C:\Program Files (x86)\Bentley\WaterGEMS\Samples\Example5.wtg";
-            FileAssert.Exists(modelPath);
+            string modelPath = @"C:\Program Files (x86)\Bentley\WaterGEMS\Samples\Example5.wtg";            
+            Assert.That(File.Exists(modelPath));
 
             OpenModel(modelPath);
             Assert.IsNotNull(WaterModel);
