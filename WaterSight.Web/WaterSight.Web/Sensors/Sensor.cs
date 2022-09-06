@@ -269,6 +269,29 @@ public struct SensorTypeName
 [DebuggerDisplay("{ToString()}")]
 public class SensorConfig
 {
+
+    #region Public Methods
+    public string CsvHeader()
+    {
+        var header =  $"{nameof(ID)},{nameof(TagId)},{nameof(Name)},{nameof(ParameterType)},{nameof(Units)},";
+        header += $"{nameof(CommunicationFrequency)},{nameof(RegistrationFrequency)},{nameof(UtcOffSet)},";
+        header += $"{nameof(Latitude)},{nameof(Longitude)},{nameof(ReferenceElevation)},{nameof(ReferenceElevationUnits)},";
+        header += $"{nameof(LastInstantInDatabase)},{nameof(Priority)},{nameof(Tags)},{nameof(PatternWeekId)}";
+        return header;
+    }
+
+    public string ToCsv()
+    {
+        var csv = $"{ID},{TagId},{Name},{ParameterType},{Units},";
+        csv += $"{CommunicationFrequency},{RegistrationFrequency},{UtcOffSet},";
+        csv += $"{Latitude},{Longitude},{ReferenceElevation},{ReferenceElevationUnits},";
+        csv += $"{LastInstantInDatabase},{Priority},{PatternWeekId}";
+        return csv;
+    }
+    #endregion
+
+    #region Public Properties
+
     public int ID { get; set; }
     public string TagId { get; set; } = String.Empty;
     public string Name { get; set; } = String.Empty;
@@ -289,6 +312,8 @@ public class SensorConfig
     public int? Priority { get; set; } = 1;
     public string? Tags { get; set; } = String.Empty;
     public int? PatternWeekId { get; set; } = null;
+
+    #endregion
 
     #region Overridden Methods
     public override string ToString()
