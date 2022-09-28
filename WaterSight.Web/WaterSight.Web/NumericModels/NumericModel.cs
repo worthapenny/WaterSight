@@ -109,7 +109,7 @@ public class NumericModel : WSItem
             if (id == null)
                 modelDomain = null;
             else
-                Logger.Information($"Created new ModelDoamin. {modelDomain}");
+                Logger.Information($"Created new ModelDoamin. {modelDomain}. EPSG Code: {WS.Options.EPSGCode}");
         }
 
 

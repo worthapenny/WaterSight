@@ -34,8 +34,8 @@ public class TestBase
             ? @"SOFTWARE\WaterSight\BentleyProdOIDCToken"
             : @"SOFTWARE\WaterSight\BentleyQaOIDCToken";
 
-        WS = new WS(tokenRegistryPath: registryPath, dtID, ActiveEnvironment);
-        //WS.Options.EPSGCode = 26956; // Watertown DT
+        WS = new WS(tokenRegistryPath: registryPath, dtID, -1, ActiveEnvironment);
+        WS.Options.EPSGCode = 26956; // Watertown DT
         
     }
     #endregion

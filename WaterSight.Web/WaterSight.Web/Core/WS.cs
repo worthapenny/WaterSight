@@ -27,9 +27,10 @@ public class WS
 {
 
     #region Constructor
-    public WS(string tokenRegistryPath, int digitalTwinId = -1, Env env = Env.Prod, ILogger? logger = null)
+    public WS(string tokenRegistryPath, int digitalTwinId = -1, int epsgCode = -1, Env env = Env.Prod, ILogger? logger = null)
     {
         Options = new Options(digitalTwinId, tokenRegistryPath, env);
+        Options.EPSGCode = epsgCode;
         Request.options = Options;
         EndPoints = new EndPoints(Options);
 
