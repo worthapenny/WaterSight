@@ -42,31 +42,35 @@ public class ZoneCharacteristicsItem
     public ZoneCharacteristicsItem()
     {
     }
+    public ZoneCharacteristicsItem(string displayName) : this()
+    {
+        DisplayName = displayName;
+    }
     #endregion
 
     #region Public Properties
-    [Column("Display Name*")]
+    [Column(1, "Display Name*")]
     public string DisplayName { get; set; }
 
-    [Column("Parent Zone")]
+    [Column(2, "Parent Zone")]
     public string? ParentZone { get; set; } = string.Empty;
 
-    [Column("Population Served")]
+    [Column(3, "Population Served")]
     public int? PopulationServed { get; set; }
 
-    [Column("Number of Connections")]
+    [Column(4, "Number of Connections")]
     public int? NumberOfConnections { get; set; }
 
-    [Column("Number of Customers")]
+    [Column(5, "Number of Customers")]
     public int? NumberOfCustomers { get; set; }
 
-    [Column("Percentage of MNF Consumed")]
+    [Column(6, "Percentage of MNF Consumed")]
     public double? PercentOfMnfConsumed { get; set; }
 
-    [Column("Percentage Of Authorized Unbilled Consumption")]
+    [Column(7, "Percentage Of Authorized Unbilled Consumption")]
     public double? PercentOfAuthUnbilledConsumption { get; set; }
 
-    [Column("Priority")]
+    [Column(8, "Priority")]
     public int Priority { get; set; } = 1;
 
 

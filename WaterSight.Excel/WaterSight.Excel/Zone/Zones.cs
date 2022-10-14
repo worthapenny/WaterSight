@@ -44,6 +44,12 @@ public class ZoneItem
     public ZoneItem()
     {
     }
+    public ZoneItem(string displayName, string tagId, string type)
+    {
+        DisplayName = displayName;
+        TagId = tagId;
+        Type = type;
+    }
     #endregion
 
     #region Public Properties

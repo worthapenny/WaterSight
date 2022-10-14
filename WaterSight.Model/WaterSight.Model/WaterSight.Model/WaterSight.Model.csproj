@@ -37,7 +37,8 @@
     <OutputPath>..\..\..\Output\WaterSight.Model\bin\x64\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Haestad.Calculations.Pressure, Version=10.4.0.30, Culture=neutral, PublicKeyToken=b4db808388021f6e">
+    <Reference Include="Haestad.Calculations.Pressure, Version=10.4.0.30, Culture=neutral, PublicKeyToken=b4db808388021f6e, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="Haestad.Domain">
@@ -54,6 +55,10 @@
     </Reference>
     <Reference Include="Haestad.Domain.LibraryObjects.Install">
       <HintPath>C:\Program Files (x86)\Bentley\WaterGEMS\x64\Haestad.Domain.LibraryObjects.Install.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Haestad.Domain.ModelingObjects, Version=10.4.0.30, Culture=neutral, PublicKeyToken=b4db808388021f6e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="Haestad.Domain.ModelingObjects.Water">
@@ -96,6 +101,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Bentley\WaterCAD\x64\Haestad.Network.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Haestad.SCADA.Domain, Version=10.4.0.30, Culture=neutral, PublicKeyToken=b4db808388021f6e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Bentley\WaterCAD\Haestad.SCADA.Domain.dll</HintPath>
     </Reference>
     <Reference Include="Haestad.Shapefile, Version=10.4.0.30, Culture=neutral, PublicKeyToken=b4db808388021f6e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -150,7 +159,7 @@
   <ItemGroup>
     <Compile Include="Domain\Cluster.cs" />
     <Compile Include="Domain\Curves.cs" />
-    <Compile Include="Domain\DataSourceConnectionOptions.cs" />
+    <Compile Include="Domain\ScadaDataSourceConnection.cs" />
     <Compile Include="Domain\Sensor.cs" />
     <Compile Include="Extensions\OFWExtensions.cs" />
     <Compile Include="Forms\WaterAppParentForm.cs">
