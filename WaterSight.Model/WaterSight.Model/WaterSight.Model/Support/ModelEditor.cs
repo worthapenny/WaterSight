@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Haestad.Domain.ModelingObjects;
 
 namespace WaterSight.Model.Support;
 
@@ -91,7 +91,7 @@ public class ModelEditor
 
         return true;
     }
-    public void AddConnectionToMSAccess(DataSourceConnectionOptions options)
+    /*public void AddConnectionToMSAccess(DataSourceConnectionOptions options)
     {
 
         //if (!File.Exists(options.DataSourceFilePath))
@@ -130,7 +130,9 @@ public class ModelEditor
 
         //var logWriter = new SCADALogWriter(options.LogFilePath, true);
         //var connectionManager = new ScadaConnectionManager(logWriter);
-
+        //var sourceManager = new ScadaSourceManager(logWriter, connectionManager);
+        
+        
 
         //var accessConnection = connectionManager.CreateNewAccess2007Connection(options.DataSourceFilePath, "Access2007");
         //connectionManager.Add(accessConnection);
@@ -220,17 +222,17 @@ public class ModelEditor
         //}
 
         //dataSource.Close();
-    }
+    }*/
     public void MapSCADASignals(List<string> tags)
     {
-        
+
     }
 
     public bool MapSCADASignal(IWaterElement element, SCADATargetAttribute attribute, string tag, int dataSoucrceId)
     {
         var success = true;
         var seCheck = element.GetConnectedSCADAElements(WaterModel)
-            .Where(se => se.Input.TargetElement.Id == element.Id 
+            .Where(se => se.Input.TargetElement.Id == element.Id
                 && se.Input.TargetAttribute == attribute);
         if (!seCheck.Any())
         {
