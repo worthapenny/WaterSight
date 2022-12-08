@@ -16,8 +16,8 @@ public class Sensor
     {
         SensorType = sensorType;
     }
-    public Sensor(ISCADAElement scadaElement, SensorType type)
-        : this(type, scadaElement, scadaElement.Input.TargetElement, scadaElement.Input.TargetAttribute)
+    public Sensor(ISCADAElement scadaElement, SensorType sensorType)
+        : this(sensorType, scadaElement, scadaElement.Input.TargetElement, scadaElement.Input.TargetAttribute)
     {
         TagName = scadaElement.Input.HistoricalSignal?.TagForWaterSight() ?? GetTagName();
         Label = scadaElement.Label ?? GetLabel();
@@ -36,8 +36,16 @@ public class Sensor
         OriginElement = originElement;
         TargetAttribute = targetAttribute;
 
-        var point = (networkElement as IPointNodeInput).GetPoint();
-        Location = new PointF((float)point.X, (float)point.Y);
+        if (networkElement is IPointNodeInput)
+        {
+            var point = (networkElement as IPointNodeInput).GetPoint();
+            Location = new PointF((float)point.X, (float)point.Y);
+        }
+        else if (networkElement is IBaseLinkInput)
+        {
+            var point = (networkElement as IBaseLinkInput).MidPoint();
+            Location = new PointF((float)point.X, (float)point.Y);
+        }
 
         TagName = GetTagName();
         Label = GetLabel();
@@ -53,7 +61,7 @@ public class Sensor
     }
     public string GetLabel()
     {
-        return $"{OriginElement.Label}_{GetTagLabelSuffix()}";
+        return $"{OriginElement.Label}{GetTagLabelSuffix()}";
     }
     public void UpdateLabel()
     {
@@ -92,43 +100,57 @@ public class Sensor
     }
     private string GetTagLabelSuffix()
     {
+        var label = "";
         switch (SensorType)
         {
             case SensorType.Pressure:
-                var psr = "Pressure";
-                if (IsDirection && IsDirectionOutwards)
-                    psr = "Out_Pressure";
-                if (IsDirection && !IsDirectionOutwards)
-                    psr = "In_Pressure";
-                return psr;
+                {
+                    label = "Pressure";
+                    if (IsDirectional && IsDirectionOutwards)
+                        label = "Out_Pressure";
+                    if (IsDirectional && !IsDirectionOutwards)
+                        label = "In_Pressure";
+                }
+                break;
 
             case SensorType.Flow:
-                return "Flow";
+                label = "Flow";
+                break;
 
             case SensorType.Level:
-                return "Level";
+                label = "Level";
+                break;
 
             case SensorType.Power:
-                return "Power";
+                label = "Power";
+                break;
 
             case SensorType.Concentration:
-                return "Conc.";
+                label = "Conc.";
+                break;
 
             case SensorType.Status:
-                return "Status";
+                label = "Status";
+                break;
 
             case SensorType.HydraulicGrade:
-                return "H. Grade";
+                label = "H. Grade";
+                break;
 
             case SensorType.PumpSpeed:
-                return "Speed";
+                label = "Speed";
+                break;
 
             case SensorType.pH:
-                return "PH";
+                label = "PH";
+                break;
 
             default:
-                return "Unknown";
+                label = "Unknown";
+                break;
         }
+
+        return $"_{label}";
     }
 
     private string GetTagNameSuffix()
@@ -137,9 +159,9 @@ public class Sensor
         {
             case SensorType.Pressure:
                 var psr = "PSR";
-                if (IsDirection && IsDirectionOutwards)
+                if (IsDirectional && IsDirectionOutwards)
                     psr = "OUT_PSR";
-                if (IsDirection && !IsDirectionOutwards)
+                if (IsDirectional && !IsDirectionOutwards)
                     psr = "IN_PSR";
                 return psr;
 
@@ -177,7 +199,7 @@ public class Sensor
     public override string ToString()
     {
         return $"{Label} [{SensorType}], Tgt = {TargetAttribute}";
-    }    
+    }
     #endregion
 
     #region Properties
@@ -185,8 +207,12 @@ public class Sensor
     public string TagName { get; set; }
     public string Label { get; set; }
     public string Unit => GetSensorUnit(SensorType);
-    public bool IsDirection { get; set; } = false;
-    public bool IsDirectionOutwards { get; set; } = false;
+    public bool IsDirectional { get; set; } = false;
+    public bool IsDirectionOutwards
+    {
+        get { return _IsDirectionOutwards; }
+        set { _IsDirectionOutwards = value; Label = GetLabel(); }
+    }
     public SCADATargetAttribute TargetAttribute { get; set; }
 
     public PointF Location { get; } = new PointF();
@@ -201,6 +227,10 @@ public class Sensor
     //public IWaterNetworkElement OriginElement { get; }
     public IWaterElement NetworkElement { get; }
     public IWaterElement OriginElement { get; }
+    #endregion
+
+    #region Fields
+    bool _IsDirectionOutwards = false;
     #endregion
 
 }
