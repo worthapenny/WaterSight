@@ -53,7 +53,14 @@ public class PossibleSensorItem
         SourceElementIdLabel = sourceElementIdLabel;
         TargetElementIdLabel = targetElmentIdLabel;
     }
+    public string ToCSV()
+    {
+        return $"{DisplayName},{TagName},{SensorType},{Attribute},{SourceElementIdLabel},{TargetElementIdLabel}";
+    }
+    #endregion
 
+    #region Static Property
+    public static string HeaderCSV => $"DisplayName,TagName,Type,Attribute,Source,Target";
     #endregion
 
     #region Public Properties
