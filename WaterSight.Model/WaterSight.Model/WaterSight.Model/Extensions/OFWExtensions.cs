@@ -160,6 +160,20 @@ public static class OFWExtensions
         for (int i = 0; i < links.Count; i++)
             outLinks.Add(links[i]);
     }
+    public static GeometryPoint GetMidCenterPoint(this IWaterElement element)
+    {
+        if (element is IBaseLinkInput)
+            return (element as IBaseLinkInput).MidPoint();
+
+        if (element is IBasePolygonInput)
+            return MathLibrary.CalculatePolygonCenterPoint(
+                (element as IBasePolygonInput).GetRings()[0]);
+
+        if (element is IPointNodeInput)
+            return (element as IPointNodeInput).GetPoint();
+
+        return new GeometryPoint();
+    }
     #endregion
 
     #region IBaseLinkInput
@@ -171,6 +185,15 @@ public static class OFWExtensions
         var slopeAngle = MathLibrary.CalculateAngleOfLine(firstPoint, lastPoint);
         slopeAngle = slopeAngle * Math.PI / 180;
         return slopeAngle;
+    }
+    public static GeometryPoint MidPoint(this IBaseLinkInput linkInput)
+    {
+        var points = linkInput.GetPoints();
+
+        return MathLibrary.GetPointAtDistanceIntoPolyline(
+            points: points.ToArray(),
+            distance: linkInput.Length / 2,
+            segmentNumber: out var _);
     }
     #endregion
 
