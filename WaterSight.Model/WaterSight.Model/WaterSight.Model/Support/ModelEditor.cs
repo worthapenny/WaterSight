@@ -49,7 +49,7 @@ public class ModelEditor
     #region Public Methods
     public async Task<bool> CreateSCADElementsAsync(List<Sensor> sensors, double distance)
     {
-        SCADAElments = WaterModel.Network.SCADAElements.Elements();
+        SCADAElments = WaterModel.Network.SCADAElements.Elements(ElementStateType.Active);
 
         foreach (var sensor in sensors)
         {
@@ -260,10 +260,7 @@ public class ModelEditor
         Log.Debug($"Mapped SCADA Signal. element = {element.IdLabel()} to = {se.HistoricalSignal.IdLabel()} for attribute = {attribute.ToString()}");
         return success;
     }
-    #endregion
-
-    #region Private Methods
-    private async Task<bool> CreateSCADElementAsync(Sensor sensor, IWaterElement element, double distance)
+    public async Task<ISCADAElement> CreateSCADElementAsync(Sensor sensor, IWaterElement element, double distance)
     {
         try
         {
@@ -273,14 +270,41 @@ public class ModelEditor
             targetElement: element,
             scadaTargetAttribute: sensor.TargetAttribute);
 
-            return true;
+            return newSE;
         }
         catch (Exception ex)
         {
             Log.Error(ex, $"...while creating SCADA elements for {element}. Sensor: {sensor}");
-            return false;
+            return null;
         }
     }
+    public void DeleteDuplicateSCADAElements()
+    {
+        var scadaElements = WaterModel.Network.SCADAElements.Elements(ElementStateType.Active);
+
+        var distinctSEIds = scadaElements
+            .GroupBy(se => new { se.Label, se.Input.TargetElement.Id, se.Input.TargetAttribute })
+            .Select(g => g.First())
+            .Select(se => se.Id)
+            .ToList();
+
+        Log.Information($"'{distinctSEIds.Count}' of '{scadaElements.Count}' are unique.");
+
+        var seCheck = scadaElements.Where(se => !distinctSEIds.Contains(se.Id));
+
+        if (seCheck.Any())
+        {
+            foreach (var se in seCheck)
+            {
+                se.Delete();
+                Log.Information($"{se.IdLabel()} got deleted");
+            }
+        }
+    }
+    #endregion
+
+    #region Private Methods
+
 
     //private async Task<bool> CreateSCADElementsForPointNodeAsync(Sensor sensor, IWaterNetworkElement element)
     //{
@@ -464,9 +488,9 @@ public class ModelEditor
         {
             case SensorType.Pressure:
                 var direction = Direction.N;
-                if (sensor.IsDirection && sensor.IsDirectionOutwards)
+                if (sensor.IsDirectional && sensor.IsDirectionOutwards)
                     direction = Direction.NE;
-                if (sensor.IsDirection && !sensor.IsDirectionOutwards)
+                if (sensor.IsDirectional && !sensor.IsDirectionOutwards)
                     direction = Direction.NW;
                 return direction;
 
