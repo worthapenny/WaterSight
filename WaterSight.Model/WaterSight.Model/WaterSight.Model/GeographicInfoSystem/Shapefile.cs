@@ -118,7 +118,7 @@ public class Shapefile
 
         if (typeof(T) is IPipe)
         {
-            WaterModel.Network.Pipes.Elements().ForEach(l =>
+            WaterModel.Network.Pipes.Elements(ElementStateType.Active).ForEach(l =>
             {
                 bool isInside = true;
                 l.Input.GetPoints().ForEach(p =>
@@ -133,7 +133,7 @@ public class Shapefile
 
         if (typeof(T) is ILateral)
         {
-            WaterModel.Network.Laterals.Elements().ForEach(l =>
+            WaterModel.Network.Laterals.Elements(ElementStateType.Active).ForEach(l =>
             {
                 bool isInside = true;
                 l.Input.GetPoints().ForEach(p =>
@@ -154,7 +154,7 @@ public class Shapefile
 
         if (typeof(T) is IPumpStation)
         {
-            WaterModel.Network.PumpStations.Elements().ForEach(pumpStation =>
+            WaterModel.Network.PumpStations.Elements(ElementStateType.Active).ForEach(pumpStation =>
             {
                 bool isInside = true;
                 var rings = pumpStation.Input.GetRings();
