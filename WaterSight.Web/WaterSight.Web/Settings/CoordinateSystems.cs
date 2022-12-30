@@ -55,7 +55,7 @@ public class CoordinateSystems : WSItem
         var url = EndPoints.DTCoordinateSystemQDTSet("Customers", epsg);
         return await WS.PutAsync(url, null, "Customers", additionalInfo: $"Epsg: {epsg}");
     }
-    public async Task<bool> SetSmartMeter(int epsg)
+    public async Task<bool> SetSmartMeters(int epsg)
     {
         var url = EndPoints.DTCoordinateSystemQDTSet("Smart Meters", epsg);
         return await WS.PutAsync(url, null, "SmartMeters", additionalInfo: $"Epsg: {epsg}");
