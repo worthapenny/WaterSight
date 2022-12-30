@@ -60,7 +60,7 @@ public class SensorFinder
         if (!isDuplicateOK)
         {
             var count = sensors.Count();
-            sensors = sensors.GroupBy(s => new { s.NetworkElement.Id, s.SensorType, s.IsDirection, s.IsDirectionOutwards })
+            sensors = sensors.GroupBy(s => new { s.NetworkElement.Id, s.SensorType, s.IsDirectional, s.IsDirectionOutwards })
                             .Select(s => s.FirstOrDefault()).ToList();
             Log.Information($"Duplicate sensors values are dropped, before count {count}, after coulnt {sensors.Count}");
         }
@@ -78,7 +78,7 @@ public class SensorFinder
         var sw = new Stopwatch();
         sw.Start();
 
-        var tankElements = WaterModel.Network.Tanks.Elements();
+        var tankElements = WaterModel.Network.Tanks.Elements(ElementStateType.Active);
         Sensor sensor;
         if (options.TankLevel)
         {
@@ -218,7 +218,7 @@ public class SensorFinder
             if (options.PumpDischargeNodePressure)
             {
                 sensor = new Sensor(SensorType.Pressure, (downstreamLink as IPipeInput).StopNode as IWaterElement, pump, SCADATargetAttribute.Pressure);
-                sensor.IsDirection = true;
+                sensor.IsDirectional = true;
                 sensor.IsDirectionOutwards = true;
                 sensor.UpdateLabel();
                 sensor.GetTagName();
@@ -240,7 +240,7 @@ public class SensorFinder
 
                 var upstreamLink = inLinksCheck.First();
                 sensor = new Sensor(SensorType.Pressure, (upstreamLink as IPipeInput).StartNode as IWaterElement, pump, SCADATargetAttribute.Pressure);
-                sensor.IsDirection = true;
+                sensor.IsDirectional = true;
                 sensor.IsDirectionOutwards = false;
                 sensor.UpdateLabel();
                 sensor.GetTagName();
@@ -300,7 +300,7 @@ public class SensorFinder
             {
                 sensor = new Sensor(SensorType.Pressure, valve, valve, SCADATargetAttribute.PressureOut);
                 sensors.Add(sensor);
-                sensor.IsDirection = true;
+                sensor.IsDirectional = true;
                 sensor.IsDirectionOutwards = true;
                 sensor.UpdateLabel();
                 sensor.GetTagName();
@@ -314,7 +314,7 @@ public class SensorFinder
             {
                 sensor = new Sensor(SensorType.Pressure, valve, valve, SCADATargetAttribute.PressureIn);
                 sensors.Add(sensor);
-                sensor.IsDirection = true;
+                sensor.IsDirectional = true;
                 sensor.IsDirectionOutwards = false;
                 sensor.UpdateLabel();
                 sensor.GetTagName();
