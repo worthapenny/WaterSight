@@ -108,6 +108,7 @@
     <Compile Include="Settings\TimeZone.cs" />
     <Compile Include="Settings\Units.cs" />
     <Compile Include="Setup\Setup.cs" />
+    <Compile Include="SmartMeters\SmartMeter.cs" />
     <Compile Include="Support\Util.cs" />
     <Compile Include="User\TimeWatch.cs" />
     <Compile Include="User\UserInfo.cs" />
