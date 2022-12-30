@@ -47,9 +47,9 @@ public class TimeZoneConfig
     public TimeZoneConfig()
     {
     }    
-    public TimeZoneConfig(string timeZone)
+    public TimeZoneConfig(string timeZoneId)
     {
-       TimeZoneId = timeZone;
+       TimeZoneId = timeZoneId;
     }
     #endregion
         
