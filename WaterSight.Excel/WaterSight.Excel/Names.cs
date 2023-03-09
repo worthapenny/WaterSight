@@ -5,10 +5,10 @@ namespace WaterSight.Excel;
 public class FileNames
 {
     #region Constructor
-    public FileNames(string setupDir)
+    public FileNames(string waterSightDir)
     {
-        ExcelFileNames = new ExcelFileNames(setupDir: setupDir);
-        CsvFileNames = new CsvFileNames(setupDir: setupDir);
+        ExcelFileNames = new ExcelFileNames(waterSightDir);
+        CsvFileNames = new CsvFileNames(waterSightDir);
     }
     public FileNames(ExcelFileNames excelFileName, CsvFileNames csvFileName)
     {
@@ -23,20 +23,24 @@ public class FileNames
 
 public class CsvFileNames
 {
+    public const string ConsumptionDirName = "03_Consumption";
+
     public CsvFileNames(
-        string setupDir,
+        string configDirWS,
         string consumption = "Consumptions.csv")
     {
-        SetupDir = setupDir;
-        Consumptions = Path.Combine(SetupDir, consumption);
+        ConfigDirWS = configDirWS;
+        Consumptions = Path.Combine(ConfigDirWS, ConsumptionDirName, consumption);
     }
 
-    public string SetupDir { get; set; }
+    public string ConfigDirWS { get; set; }
     public string Consumptions { get; set; }
 }
 
 public class ExcelFileNames
 {
+    public const string ConfigWSDirName = "00_Settings_Config";
+
     public const string SensorsFileName = "Sensors.xlsx";
     public const string PumpsFileName = "Pumps.xlsx";
     public const string TanksFileName = "Tanks.xlsx";
@@ -46,7 +50,7 @@ public class ExcelFileNames
     public const string PowerBiFileName = "Power BI.xlsx";
 
     public ExcelFileNames(
-        string setupDir,
+        string waterSightDir,
         string sensorsFileName = SensorsFileName,
         string pumpsFileName = PumpsFileName,
         string tanksFileName = TanksFileName,
@@ -55,14 +59,15 @@ public class ExcelFileNames
         string alertsFileName = AlertsFileName,
         string powerBiFileName = PowerBiFileName)
     {
-        SetupDir = setupDir;
-        SensorsExcelPath = Path.Combine(setupDir, sensorsFileName);
-        PumpsExcelPath = Path.Combine(setupDir, pumpsFileName);
-        TanksExcelPath = Path.Combine(setupDir, tanksFileName);
-        CustomerMeterExcelPath = Path.Combine(setupDir, consumptionFileName);
-        ZonesExcelPath = Path.Combine(SetupDir, zonesFileName);
-        AlertsExcelPath = Path.Combine(SetupDir, alertsFileName);
-        PowerBIExcelPath = Path.Combine(SetupDir, powerBiFileName);
+        var configDirWS = Path.Combine(waterSightDir, ConfigWSDirName);
+
+        SensorsExcelPath = Path.Combine(configDirWS, sensorsFileName);
+        PumpsExcelPath = Path.Combine(configDirWS, pumpsFileName);
+        TanksExcelPath = Path.Combine(configDirWS, tanksFileName);
+        CustomerMeterExcelPath = Path.Combine(configDirWS, consumptionFileName);
+        ZonesExcelPath = Path.Combine(configDirWS, zonesFileName);
+        AlertsExcelPath = Path.Combine(configDirWS, alertsFileName);
+        PowerBIExcelPath = Path.Combine(configDirWS, powerBiFileName);
     }
 
 
@@ -74,7 +79,6 @@ public class ExcelFileNames
     public string AlertsExcelPath { get; }
     public string PowerBIExcelPath { get; }
 
-    private string SetupDir { get; }
 
 }
 
