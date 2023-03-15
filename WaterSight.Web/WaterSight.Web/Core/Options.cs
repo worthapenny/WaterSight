@@ -11,19 +11,22 @@ public class Options
         int digitalTwinId,
         //IConfiguration config, 
         string tokenRegistryPath,
-        Env env = Env.Prod)
+        Env env = Env.Prod,
+        string subDomainSuffix = "" // for EU = "-weu"
+        )
     {
         DigitalTwinId = digitalTwinId;
         //Configuration  = config;
         TokenRegistryPath = tokenRegistryPath;
         Env = env;
-
+        SubDomainSuffix = subDomainSuffix;
 
         //Logger.Information("Options initialized");
     }
     #endregion
 
     #region Public Properties
+    public string SubDomainSuffix{ get; set; } = string.Empty;
     public Env Env { get; private set; } = Env.Prod;
     public int DigitalTwinId { get; set; }
     public int? EPSGCode { get; set; }

@@ -28,7 +28,7 @@ public class EndPoints
         Query = new Query(options);
         ApiVersion = apiVersion;
 
-        Root = $"{Schema}://{EnvironmentPrefix}{SubDomain}.{Domain}";
+        Root = $"{Schema}://{EnvironmentPrefix}{SubDomain}{options.SubDomainSuffix}.{Domain}";
         RootApiVersion = $"{Root}/{Api}/{apiVersion}";
 
         RootIMS = $"{Schema}://{EnvironmentPrefix}{ImsSubDomain}.{Domain}";
@@ -181,6 +181,8 @@ public class EndPoints
     public string NumModelingModelDomainTimeInstanceLastModelRun => $"{NumModelingModelDomain}/TimeInstantsLatestModelRun";
 
     public string NumModelingModelDomainUploadOpModelDomain => $"{NumModelingModelDomain}/UploadOperationalModelDomain";
+    public string NumModelingModelDomainUploadOpModelDomainViaBlobStorage => $"{NumModelingModelDomain}/UploadOperationalModelDomainViaBlobStorage";
+
     public string NumModelingModelElements => $"{NumModeling}/IModelElements";
     public string NumModelingModelElementsAllElements => $"{NumModelingModelElements}/AllElements";
     public string NumModelingParam => $"{NumModeling}/Parameter";
@@ -188,6 +190,12 @@ public class EndPoints
     public string NumModelingParamResultAttribInfo => $"{NumModelingParam}/ResultAttributeInfos";
     public string NumModelingModelTSD => $"{NumModeling}/ModelTimeSeriesValues";
 
+    //
+    // Blob Storage
+    public string BlobStorage => $"{DT}/BlobStorage";
+    public string BlobStorageSas => $"{BlobStorage}/sas";
+    public string BlobStorageSasUpload => $"{BlobStorageSas}/upload";
+    public string BlobStorageSasUploadQDT => $"{BlobStorageSasUpload}?{Query.DTID}";
 
 
     //
@@ -236,9 +244,13 @@ public class EndPoints
     public string DTServiceExpectationsMaxPressure => $"{DTServiceExpectations}/MaxPressure";
     public string DTServiceExpectationsMinPressure => $"{DTServiceExpectations}/MinPressure";
     public string DTServiceExpectationsMinPumpEfficiency => $"{DTServiceExpectations}/MinPumpEfficiency";
+    public string DTServiceExpectationsEnergyFromRenewableSources => $"{DTServiceExpectations}/RenewableEnergy";
+    public string DTServiceExpectationsCarbonFootprint => $"{DTServiceExpectations}/CarbonFootprint";
     public string DTServiceExpectationsMaxPressureSet(double pressure) => $"{DTServiceExpectationsMaxPressure}?{Query.Value(pressure)}";
     public string DTServiceExpectationsMinPressureSet(double pressure) => $"{DTServiceExpectationsMinPressure}?{Query.Value(pressure)}";
     public string DTServiceExpectationsTargetPumpEfficiencySet(double efficiency) => $"{DTServiceExpectationsMinPumpEfficiency}?{Query.Value(efficiency)}";
+    public string DTServiceExpectationsEnergyFromRenewableSourcesSet(double renewableEnergy) => $"{DTServiceExpectationsEnergyFromRenewableSources}?{Query.Value(renewableEnergy)}";
+    public string DTServiceExpectationsCarbonFootprintSet(double carbonFootprint) => $"{DTServiceExpectationsCarbonFootprint}?{Query.Value(carbonFootprint)}";
 
     //
     // Costs
