@@ -138,10 +138,13 @@ public class Sensor : WSItem
         return tsd15M;
     }
 
-    public async Task<bool> PostSensorTSDAsync(int sensorId, List<TSDValue> data)
+    public async Task<bool> PostSensorTSDAsync(int sensorId, List<TSDValue> data, string tagNameForLogging = "")
     {
         var url = EndPoints.RtdaTsValuesFor(sensorId);
         var success = true;
+
+        // Make sure data are sorted chronologically
+        data = data.OrderBy(d => d.Instant).ToList();
 
         var maxItemCount = 30000;
         var stopwatch = Util.StartTimer();
@@ -159,21 +162,21 @@ public class Sensor : WSItem
 
                 if (res.IsSuccessStatusCode)
                 {
-                    Logger.Debug($"[{counter}/{groups.Count()}] Sensor TSD posted for {sensorId}, Object Length: {data.Count}");
+                    Logger.Debug($"[{counter}/{groups.Count()}] Sensor TSD posted for {sensorId}: '{tagNameForLogging}', Object Length: {data.Count}. Date range: [{subset.First().Instant:d}, {subset.Last().Instant:d}]");
                     counter++;
                     continue;
                 }
                 else
                 {
                     success = false;
-                    Logger.Error($"[{counter}/{groups.Count()}] Failed to post sensor TSD for {sensorId}, Object Length: {data.Count} Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+                    Logger.Error($"[{counter}/{groups.Count()}] Failed to post sensor TSD for {sensorId}: '{tagNameForLogging}', Object Length: {data.Count}, Date range: [{subset.First().Instant:d}, {subset.Last().Instant:d}] Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
                     break;
                 }
             }
         }
         catch (Exception ex)
         {
-            Logger.Error(ex, $"...while posting sensor TSD value. Message:\n{ex.Message}");
+            Logger.Error(ex, $"...while posting sensor TSD value for {sensorId}: '{tagNameForLogging}'. Message:\n{ex.Message}");
             success = false;
         }
         finally
