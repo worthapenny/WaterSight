@@ -9,6 +9,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using WaterSight.Web.BlobStorages;
 using WaterSight.Web.Custom;
 using WaterSight.Web.DT;
 using WaterSight.Web.ExternalService;
@@ -27,9 +28,9 @@ public class WS
 {
 
     #region Constructor
-    public WS(string tokenRegistryPath, int digitalTwinId = -1, int epsgCode = -1, Env env = Env.Prod, ILogger? logger = null)
+    public WS(string tokenRegistryPath, int digitalTwinId = -1, int epsgCode = -1, Env env = Env.Prod, ILogger? logger = null, string subDomainSuffix = "")
     {
-        Options = new Options(digitalTwinId, tokenRegistryPath, env);
+        Options = new Options(digitalTwinId, tokenRegistryPath, env:env, subDomainSuffix: subDomainSuffix);
         Options.EPSGCode = epsgCode;
         Request.options = Options;
         EndPoints = new EndPoints(Options);
@@ -45,7 +46,7 @@ public class WS
         Alert = new Alerts.Alert(this);
         GIS = new GIS.GIS(this);
         HydStructure = new HydStructure(this);
-        Zone = new Zones.Zone(this);
+        Zone = new Zone(this);
         NumericModel = new NumericModel(this);
         Customers = new Customers.Customers(this);
         PowerBI = new PowerBI(this);
@@ -53,6 +54,7 @@ public class WS
         UserInfo = new UserInfo(this);
         Setup = new Setup.Setup(this);
         CustomWaterModel = new WaterModel(this);
+        BlobStorage = new BlobStorage(this);
 
         if (logger == null)
         {
@@ -405,5 +407,6 @@ public class WS
     public UserInfo UserInfo { get; }
     public Setup.Setup Setup { get; }
     public WaterModel CustomWaterModel { get; }
+    public BlobStorage BlobStorage { get; }
     #endregion
 }
