@@ -2,10 +2,10 @@
 
 namespace WaterSight.Web.Customers;
 
-public class Customers : WSItem
+public class Users : WSItem
 {
     #region Constructor
-    public Customers(WS ws) : base(ws)
+    public Users(WS ws) : base(ws)
     {
         Billings = new Billings(ws);
         Meters = new Meters(ws);

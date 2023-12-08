@@ -1,19 +1,21 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
 using Serilog.Core;
-using Serilog.Sinks.SystemConsole.Themes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using WaterSight.Web.BlobStorages;
 using WaterSight.Web.Custom;
+using WaterSight.Web.Customers;
 using WaterSight.Web.DT;
 using WaterSight.Web.ExternalService;
 using WaterSight.Web.HydrulicStructures;
+using WaterSight.Web.Landings;
 using WaterSight.Web.NumericModels;
 using WaterSight.Web.Support;
 using WaterSight.Web.User;
@@ -28,79 +30,67 @@ public class WS
 {
 
     #region Constructor
-    public WS(string tokenRegistryPath, int digitalTwinId = -1, int epsgCode = -1, Env env = Env.Prod, ILogger? logger = null, string subDomainSuffix = "")
+    public WS(
+        string tokenRegistryPath,
+        int digitalTwinId = -1,
+        int epsgCode = -1,
+        Env env = Env.Prod,
+        ILogger? logger = null,
+        string subDomainSuffix = "",
+        string? restToken = null)
     {
-        Options = new Options(digitalTwinId, tokenRegistryPath, env:env, subDomainSuffix: subDomainSuffix);
+        Options = new Options(
+            digitalTwinId,
+            tokenRegistryPath,
+            env: env,
+            subDomainSuffix: subDomainSuffix,
+            restToken: restToken);
+
         Options.EPSGCode = epsgCode;
         Request.options = Options;
         EndPoints = new EndPoints(Options);
-
-        var logFileFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Log\WS.Base_.log");
-
-        var fileInfo = new FileInfo(logFileFile);
-        if (!(fileInfo.Directory?.Exists ?? false))
-            fileInfo.Directory?.Create();
-
+                
+        
         DigitalTwin = new DigitalTwin(this);
         Sensor = new Sensors.Sensor(this);
+        SmartMeter = new SmartMeters.SmartMeter(this);
         Alert = new Alerts.Alert(this);
         GIS = new GIS.GIS(this);
         HydStructure = new HydStructure(this);
         Zone = new Zone(this);
         NumericModel = new NumericModel(this);
-        Customers = new Customers.Customers(this);
+        Customers = new Users(this);
         PowerBI = new PowerBI(this);
         Settings = new Settings.Settings(this);
         UserInfo = new UserInfo(this);
         Setup = new Setup.Setup(this);
         CustomWaterModel = new WaterModel(this);
         BlobStorage = new BlobStorage(this);
+        Home = new Home(this);
 
         if (logger == null)
         {
             var logTemplate = "{Timestamp:HH:mm:ss.ff} | {Level:u3} | {Message}{NewLine}{Exception}";
-            Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                //.MinimumLevel.Verbose()
-                //.MinimumLevel.Debug()
-                .MinimumLevel.ControlledBy(LoggingLevelSwitch) // Default's to Information 
-                .WriteTo.Debug(outputTemplate: logTemplate)
-                .WriteTo.Console(outputTemplate: logTemplate, theme: AnsiConsoleTheme.Code)
-                .WriteTo.File(
-                    logFileFile,
-                    rollingInterval: RollingInterval.Day,
-                    retainedFileCountLimit: 7,
-                    flushToDiskInterval: TimeSpan.FromSeconds(5),
-                    outputTemplate: logTemplate)
-                .CreateLogger();
-
-            // Set default to Debug
-            SetLoggingLevelToDebug();
+            Logging.SetupLogger(appName: "WaterSightAPI", logTemplate: logTemplate, logEventLevel: Serilog.Events.LogEventLevel.Debug);
         }
 
-        WS.Logger = Log.Logger;
+        Logger = Log.Logger;
+
+        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
         Log.Debug("");
-        Log.Debug($"Logging is ready. Path: {logFileFile}");
     }
     #endregion
 
 
 
-    #region Public Methods - CRUD
+    #region Public Methods 
 
-    public void SetLoggingLevelToInfo()
+    public void UpdateAttributes(int id, Env env)
     {
-        LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Information;
-    }
-
-    public void SetLoggingLevelToDebug()
-    {
-        LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Debug;
-    }
-    public void SetLoggingLevelToVerbose()
-    {
-        LoggingLevelSwitch.MinimumLevel = Serilog.Events.LogEventLevel.Verbose;
+        Options.DigitalTwinId = id;
+        Options.Env = env;
+        EndPoints.Update(Options);
     }
 
 
@@ -122,10 +112,10 @@ public class WS
             //id = Convert.ToInt32(content.Replace("\"", ""));
             t = JsonConvert.DeserializeObject<T>(content);
 
-            Logger.Information($"{typeName} added, '{t}'.");
+            Logger.Information($"✅ {typeName} added, '{t}'.");
         }
         else
-            Logger.Error($"Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"💀 Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
         return t;
     }
@@ -137,10 +127,10 @@ public class WS
         {
             var responseString = await res.Content.ReadAsStringAsync();
             retValue = JsonConvert.DeserializeObject<T>(responseString);
-            Logger.Information($"{typeName} added. {retValue}");
+            Logger.Information($"✅ {typeName} added. {retValue}");
         }
         else
-            Logger.Error($"Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"💀 Failed to add {typeName}. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
         return retValue;
     }
@@ -165,7 +155,7 @@ public class WS
         if (!res.IsSuccessStatusCode)
         {
             var resContentText = res.Content == null ? "" : await res.Content?.ReadAsStringAsync();
-            Logger.Error($"Failed to get {typeName} data for id: {id}. Reason: {res.ReasonPhrase}. Text: {resContentText}. URL: {url}");
+            Logger.Error($"💀 Failed to get {typeName} data for id: {id}. Reason: {res.ReasonPhrase}. Text: {resContentText}. URL: {url}");
             return t;
         }
 
@@ -175,7 +165,7 @@ public class WS
             {
                 t = await Request.GetJsonAsync<T>(res);
 
-                Logger.Information($"{typeName} info found {(id == null ? "" : $"for id: {id}")}, {t}.");
+                Logger.Information($"✅ {typeName} info found {(id == null ? "" : $"for id: {id}")}, {t}.");
                 return t;
             }
             catch (Exception ex)
@@ -205,10 +195,10 @@ public class WS
         if (res.IsSuccessStatusCode)
         {
             t = await Request.GetJsonAsync<List<T?>>(res) ?? t;
-            Logger.Information($"Number of {typeName} received. Count = {t.Count}.");
+            Logger.Information($"✅ Number of {typeName} received. Count = {t.Count}.");
         }
         else
-            Logger.Error($"Failed to get {typeName} data. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"💀 Failed to get {typeName} data. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
         return t;
     }
@@ -241,10 +231,10 @@ public class WS
             res = await Request.PostJsonString(url, JsonConvert.SerializeObject(t));
 
         if (res?.IsSuccessStatusCode ?? false)
-            Logger.Information($"{typeName} updated successfully.");
+            Logger.Information($"✅ {typeName} updated successfully.");
 
         else
-            Logger.Error($"Failed to update {typeName} with id: {id} ({t}). Reason: {res?.ReasonPhrase}. Text: {await res?.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"💀 Failed to update {typeName} with id: {id} ({t}). Reason: {res?.ReasonPhrase}. Text: {await res?.Content.ReadAsStringAsync()}. URL: {url}");
 
         return res.IsSuccessStatusCode;
     }
@@ -265,13 +255,13 @@ public class WS
         var res = await Request.Delete(url);
         if (res.IsSuccessStatusCode)
         {
-            Logger.Information($"{typeName}'s delete request was successful for id: {id}");
+            Logger.Information($"✅ {typeName}'s delete request was successful for id: {id}");
             if (supportsLRO)
                 _ = await Request.WaitForLRO(res);
         }
         else
         {
-            Logger.Warning($"{typeName}'s delete request failed for id: {id}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Warning($"⚠️ {typeName}'s delete request failed for id: {id}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
         }
 
         return res.IsSuccessStatusCode;
@@ -285,13 +275,13 @@ public class WS
         var res = await Request.Delete(url);
         if (res.IsSuccessStatusCode)
         {
-            Logger.Information($"{typeName}'s delete request for  was successful");
+            Logger.Information($"✅ {typeName}'s delete request for  was successful");
             if (supportsLRO)
                 _ = await Request.WaitForLRO(res);
         }
         else
         {
-            Logger.Warning($"{typeName}'s delete request failed. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Warning($"⚠️ {typeName}'s delete request failed. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
         }
 
         return res.IsSuccessStatusCode;
@@ -305,17 +295,19 @@ public class WS
         var res = await Request.Post(url, content);
         if (res.IsSuccessStatusCode)
         {
-            Logger.Information($"{typeName}'s post request for  was successful. {additionalInfo}");
+            Logger.Information($"✅ {typeName}'s post request for  was successful. {additionalInfo}");
             if (supportsLRO)
                 _ = await Request.WaitForLRO(res);
         }
         else
         {
-            Logger.Warning($"{typeName}'s post request failed. {additionalInfo} Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Warning($"⚠️ {typeName}'s post request failed. {additionalInfo} Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
         }
 
         return res.IsSuccessStatusCode;
     }
+
+
 
     //
     // POST (JSON)
@@ -341,7 +333,7 @@ public class WS
     {
         if (!fileInfo.Exists)
         {
-            Logger.Error($"Given {fileTypeName} file path is not valid. Path: {fileInfo.FullName}");
+            Logger.Error($"💀 Given {fileTypeName} file path is not valid. Path: {fileInfo.FullName}");
             return false;
         }
 
@@ -351,7 +343,7 @@ public class WS
         var res = await Request.PostFile(url, fileInfo);
         if (res.IsSuccessStatusCode)
         {
-            Logger.Information($"{fileTypeName} file uploaded successfully. Path: {fileInfo.FullName}");
+            Logger.Information($"✅ {fileTypeName} file uploaded successfully. Path: {fileInfo.FullName}");
             if (supportsLRO)
                 return await Request.WaitForLRO(res);
 
@@ -359,7 +351,7 @@ public class WS
         }
         else
         {
-            Logger.Error($"Failed to upload the {fileTypeName} file. Path: {fileInfo.FullName} Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"💀 Failed to upload the {fileTypeName} file. Path: {fileInfo.FullName} Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
             return false;
         }
     }
@@ -372,16 +364,53 @@ public class WS
         var res = await Request.Put(url, content);
         if (res.IsSuccessStatusCode)
         {
-            Logger.Information($"{typeName}'s put request for  was successful. {additionalInfo}");
+            Logger.Information($"✅ {typeName}'s put request was successful. {additionalInfo}");
             if (supportsLRO)
                 _ = await Request.WaitForLRO(res);
         }
         else
         {
-            Logger.Warning($"{typeName}'s put request failed. {additionalInfo} Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Warning($"⚠️ {typeName}'s put request failed. {additionalInfo} Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
         }
 
         return res.IsSuccessStatusCode;
+    }
+    public async Task<T> PutAsync<T>(string url, object payload, string typeName, bool supportsLRO = false, string additionalInfo = "")
+    {
+        T t = default;
+
+        var res = await Request.PutJsonString(url, JsonConvert.SerializeObject(payload));
+        if (!res.IsSuccessStatusCode)
+        {
+            var resContentText = res.Content == null ? "" : await res.Content?.ReadAsStringAsync();
+            Logger.Error($"💀 Failed to get {typeName} data. Reason: {res.ReasonPhrase}. Text: {resContentText}. URL: {url}");
+            return t;
+        }
+        
+
+        if (!supportsLRO)
+        {
+            try
+            {
+                t = await Request.GetJsonAsync<T>(res);
+
+                Logger.Information($"✅ {typeName} info found, {t}.");
+                return t;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"...💀...while getting {typeName} \nMessage:{ex.Message}");
+                return t;
+            }
+
+        }
+        else // isLRO = true
+        {
+            var completed = await Request.WaitForLRO(res);
+
+            t = (T)(object)completed;
+            return t;
+        }
     }
 
     #endregion
@@ -396,17 +425,19 @@ public class WS
 
     public DigitalTwin DigitalTwin { get; }
     public Sensors.Sensor Sensor { get; }
+    public SmartMeters.SmartMeter SmartMeter { get; }
     public Alerts.Alert Alert { get; }
     public GIS.GIS GIS { get; }
     public HydStructure HydStructure { get; }
     public Zone Zone { get; }
     public NumericModel NumericModel { get; }
-    public Customers.Customers Customers { get; }
+    public Users Customers { get; }
     public PowerBI PowerBI { get; }
     public Settings.Settings Settings { get; }
     public UserInfo UserInfo { get; }
     public Setup.Setup Setup { get; }
     public WaterModel CustomWaterModel { get; }
     public BlobStorage BlobStorage { get; }
+    public Home Home { get; }
     #endregion
 }

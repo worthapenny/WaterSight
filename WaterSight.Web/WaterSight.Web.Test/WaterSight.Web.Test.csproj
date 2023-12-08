@@ -42,12 +42,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\Output\WaterSight.Web.Test\bin\x64\Debug\</OutputPath>
+    <OutputPath>..\..\..\Output\WaterSight.Web.Test\bin\x64\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>10.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -71,6 +73,7 @@
     <Compile Include="DT\DigitalTwinTest.cs" />
     <Compile Include="ExternalService\PowerBITest.cs" />
     <Compile Include="GIS\GisTest.cs" />
+    <Compile Include="Landings\HomeTests.cs" />
     <Compile Include="NumericalModel\NumericalModelTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sensors\SensorsTest.cs" />
@@ -84,6 +87,7 @@
     <Compile Include="Setup\SetupTest.cs" />
     <Compile Include="NumericalModel\TankCurvesTest.cs" />
     <Compile Include="NumericalModel\TanksTest.cs" />
+    <Compile Include="SmartMeters\SmartMetersTest.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="Zones\ZoneTest.cs" />
   </ItemGroup>
@@ -115,14 +119,14 @@
     <Content Include="TestFiles\Images\TestMtEverest.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestOrder.txt" />
+    <Content Include="TestOrders.txt" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NUnit">
       <Version>3.13.3</Version>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter">
-      <Version>4.2.1</Version>
+      <Version>4.4.2</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.11.0</Version>

@@ -13,7 +13,7 @@ public class NumericalModelTest : TestBase
 {
     #region Constructor
     public NumericalModelTest()
-    //: base(4549, Env.Qa) // Akshaya
+    : base(TestBase.TEST_DT_Akshaya_4736, Env.Qa)
     //: base(3377, Env.Qa) // Watertown
     //: base(179, Env.Prod)
     {
@@ -26,6 +26,55 @@ public class NumericalModelTest : TestBase
     #endregion
 
     #region Tests
+    [Test, Category("ModelDomain")]
+    public async Task ModelDomainCRUDTests()
+    {
+        ModelDomainConfig modelDomain;
+
+        //
+        // GET 
+        var modelDomains = await WS.NumericModel.GetModelDomainsWaterType();
+        Assert.That(modelDomains, Is.Not.Null );
+        if(!modelDomains.Any() )
+        {
+            // CREATE
+            modelDomain = new ModelDomainConfig(
+                digitalTwinId: WS.Options.DigitalTwinId,
+                epsgCode: WS.Options.EPSGCode.ToString() ?? throw new InvalidDataException("ESPG code cannot be null"),
+                name: $"Water_{WS.Options.DigitalTwinId}_{DateTime.Now:yyyyMMddHmmss}"
+                );
+
+            var modelDomainId = await WS.NumericModel.AddWaterModelDomain(modelDomain);
+            Assert.That(modelDomainId, Is.Not.Null );
+        }
+
+        // GET
+        modelDomains = await WS.NumericModel.GetModelDomainsWaterType();
+        Assert.That(modelDomains, Is.Not.Null);
+        Assert.That(modelDomains, Is.Not.Empty);
+        Assert.That(modelDomains.Count, Is.EqualTo(1));
+        modelDomain = modelDomains.First();
+
+        // UPDATE
+        modelDomain.HindcastHours = 10;
+        var updated  = await WS.NumericModel.UpdateWaterModelDomain(modelDomain);
+        Assert.That(updated, Is.True);
+
+        // GET
+        modelDomains = await WS.NumericModel.GetModelDomainsWaterType();
+        Assert.That(modelDomains, Is.Not.Null);
+        Assert.That(modelDomains, Is.Not.Empty);
+        Assert.That(modelDomains.Count, Is.EqualTo(1));
+        modelDomain = modelDomains.First();
+
+        // Check if Update was really successful
+        Assert.That(modelDomain.HindcastHours, Is.EqualTo(10));
+
+        // DELETE
+        var deleted = await WS.NumericModel.DeleteWaterModelDomain(modelDomain.Id);
+        Assert.That(deleted, Is.True);
+
+    }
 
     [Test, Order(102910), Category("Upload")]
     public async Task UploadWaterModel()

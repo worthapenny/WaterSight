@@ -4,6 +4,7 @@ using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,6 +18,10 @@ namespace WaterSight.Web.Core;
 
 public static class Request
 {
+
+    #region Public Static Methods
+
+    #region CRUD Operation
     public static async Task<HttpResponseMessage> Get(string url)
     {
         Logger.Debug($"GET request, URL: {url}");
@@ -33,6 +38,12 @@ public static class Request
             var sw = Util.StartTimer();
             var res = await HttpClient.GetAsync(uri);
 
+            if ((int)res.StatusCode >= 400)
+            {
+                Logger.Error($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
+                Debugger.Break();
+            }
+
             Logger.Debug($"Get request time-taken: {sw.Elapsed}. {url}");
             Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
             sw.Stop();
@@ -41,7 +52,7 @@ public static class Request
         }
         catch (HttpRequestException ex)
         {
-            Logger.Error(ex,"...while performing the get request.");
+            Logger.Error(ex, "...while performing the get request.");
         }
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
@@ -61,6 +72,11 @@ public static class Request
 
             var sw = Util.StartTimer();
             var res = await HttpClient.PutAsync(uri, content);
+
+            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                Debugger.Break();
+            }
 
             Logger.Debug($"Put request time-taken: {sw.Elapsed}. {url}");
             Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
@@ -92,7 +108,7 @@ public static class Request
             // Set the timeout to given value
             // and to do so, we must start a new HttpClient instance
             var httpClient = HttpClient;
-            if(timeout.HasValue)
+            if (timeout.HasValue)
             {
                 httpClient = new HttpClient();
                 // add the bearer token
@@ -102,6 +118,11 @@ public static class Request
             }
 
             var res = await httpClient.PostAsync(uri, content);
+
+            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                Debugger.Break();
+            }
 
             Logger.Debug($"Post request time-taken: {sw.Elapsed}. {url}");
             Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
@@ -116,50 +137,6 @@ public static class Request
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
     }
-    public static async Task<HttpResponseMessage> PostJsonString(string url, string jsonString)
-    {
-        return await Post(
-            url,
-            new StringContent(jsonString, Encoding.UTF8, "application/json"));
-    }
-    public static async Task<HttpResponseMessage> PutJsonString(string url, string jsonString)
-    {
-        return await Put(
-            url,
-            new StringContent(jsonString, Encoding.UTF8, "application/json"));
-    }
-
-
-    public static async Task<HttpResponseMessage> PostFile(string url, FileInfo fileInfo, TimeSpan? timeout = null)
-    {
-        if (!fileInfo.Exists)
-            throw new FileNotFoundException(fileInfo.FullName);
-
-        WS.Logger.Debug($"About to upload a file... Path: {fileInfo.FullName}");
-
-        try
-        {
-            var content = new StreamContent(File.OpenRead(fileInfo.FullName));
-            content.Headers.ContentType = new MediaTypeHeaderValue(System.Web.MimeMapping.GetMimeMapping(fileInfo.Name)); //fcontent.Headers.Add("Content-Type", "application/octet-stream");
-            content.Headers.Add("Content-Disposition", "form-data; name=\"file\"; filename=\"" + fileInfo.Name + "\"");
-            
-            var formContent = new MultipartFormDataContent();
-            formContent.Add(content, "file", fileInfo.Name);
-
-            var res = await Post(url, formContent, timeout);
-
-            formContent.Dispose();
-            return res;
-        }
-        catch (IOException ex)
-        {
-            Logger.Error(ex, $"...while trying to prepare the file for upload. Path: {fileInfo.FullName}");
-            return new HttpResponseMessage(HttpStatusCode.Conflict);
-        }
-    }
-
-
-
     public static async Task<HttpResponseMessage> Delete(string url)
     {
         WS.Logger?.Debug($"Delete request, URL: {url}");
@@ -174,6 +151,11 @@ public static class Request
             var sw = Util.StartTimer();
             var res = await HttpClient.DeleteAsync(uri);
 
+            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                Debugger.Break();
+            }
+
             Logger.Debug($"Delete request time-taken: {sw.Elapsed}. {url}");
             Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
             sw.Stop();
@@ -182,11 +164,13 @@ public static class Request
         }
         catch (HttpRequestException ex)
         {
-            Logger.Error(ex,$"...while performing the delete request.");
+            Logger.Error(ex, $"...while performing the delete request.");
         }
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
     }
+
+    #endregion
 
     public static async Task<T?> GetJsonAsync<T>(HttpResponseMessage response)
     {
@@ -226,6 +210,48 @@ public static class Request
 
         return retValue;
     }
+    public static async Task<HttpResponseMessage> PostJsonString(string url, string jsonString)
+    {
+        return await Post(
+            url,
+            new StringContent(jsonString, Encoding.UTF8, "application/json"));
+    }
+
+
+    public static async Task<HttpResponseMessage> PostFile(string url, FileInfo fileInfo, TimeSpan? timeout = null)
+    {
+        if (!fileInfo.Exists)
+            throw new FileNotFoundException(fileInfo.FullName);
+
+        WS.Logger.Debug($"🆙 About to upload a file... Path: {fileInfo.FullName}");
+
+        try
+        {
+            var content = new StreamContent(File.OpenRead(fileInfo.FullName));
+            content.Headers.ContentType = new MediaTypeHeaderValue(System.Web.MimeMapping.GetMimeMapping(fileInfo.Name)); //fcontent.Headers.Add("Content-Type", "application/octet-stream");
+            content.Headers.Add("Content-Disposition", "form-data; name=\"file\"; filename=\"" + fileInfo.Name + "\"");
+
+            var formContent = new MultipartFormDataContent();
+            formContent.Add(content, "file", fileInfo.Name);
+
+            var res = await Post(url, formContent, timeout);
+
+            formContent.Dispose();
+            return res;
+        }
+        catch (IOException ex)
+        {
+            Logger.Error(ex, $"...while trying to prepare the file for upload. Path: {fileInfo.FullName}");
+            return new HttpResponseMessage(HttpStatusCode.Conflict);
+        }
+    }
+    public static async Task<HttpResponseMessage> PutJsonString(string url, string jsonString)
+    {
+        return await Put(
+            url,
+            new StringContent(jsonString, Encoding.UTF8, "application/json"));
+    }
+
 
     public static async Task<bool> WaitForLRO(HttpResponseMessage res, int checkIntervalSeconds = 5)
     {
@@ -254,7 +280,7 @@ public static class Request
             return false;
         }
 
-        Logger.Debug(Util.LogSeparator("LRO Started", Util.BulletPlus));
+        Logger.Debug(Util.LogSeparator("LRO Started", Util.Star));
 
         var stopwatch = Util.StartTimer();
         var completed = false;
@@ -298,17 +324,21 @@ public static class Request
         var timeTaken = stopwatch.Elapsed;
         stopwatch.Stop();
 
-        Logger.Debug(Util.LogSeparator("LRO Ended", Util.BulletPlus));
         WS.Logger.Information($"Time-taken by LRO: {timeTaken}");
+        Logger.Debug(Util.LogSeparator("LRO Ended", Util.XSmall));
 
         return isLroSuccessful;
     }
 
+    #endregion
 
     #region Private Static Methods
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
     private static string WaterSightAccessToken()
     {
+        if (!string.IsNullOrEmpty(Options.RestToken))
+            return Options.RestToken;
+
+
         var token = string.Empty;
         RegistryKey? key = null;
         try
@@ -341,11 +371,15 @@ public static class Request
             if (key == null)
             {
                 Logger.Fatal($"Could not open up the registry path: {registryPathRoot}, key: {key}");
+                Debugger.Break();
             }
             else
             {
                 token = key.GetValue(name)?.ToString();
-                Logger.Verbose($"Value obtained from registry has a length of {token?.Length}, key: {key}");
+                if(string.IsNullOrEmpty(token) ) 
+                    Debugger.Break();
+
+                Logger.Verbose($"StatQueryValue obtained from registry has a length of {token?.Length}, key: {key}");
             }
         }
         catch (Exception ex)
@@ -377,12 +411,10 @@ public static class Request
     private static HttpClient HttpClient => httpClient ??= new HttpClient();
     private static ILogger Logger => WS.Logger;
 
-    
+
     #endregion
 
     #region Private Static Fields
     private static HttpClient? httpClient;
     #endregion
 }
-
-

@@ -17,28 +17,28 @@ public class ServiceExpectations : WSItem
     #region Public Methods
 
     #region Get All Supported
-    public async Task<List<ServiceExpectationsConfig?>> GetAll()
+    public async Task<List<ServiceExpectationItemConfig?>> GetAll()
     {
         var url = EndPoints.DTServiceExpectations;
-        return await WS.GetManyAsync<ServiceExpectationsConfig>(url, "Service Expectation");
+        return await WS.GetManyAsync<ServiceExpectationItemConfig>(url, "Service Expectation");
     }
     #endregion
 
     #region Get 
-    public async Task<ServiceExpectationsConfig?> GetMaxPressure()
+    public async Task<ServiceExpectationItemConfig?> GetMaxPressure()
     {
         var url = EndPoints.DTServiceExpectationsMaxPressure;
-        return await WS.GetAsync<ServiceExpectationsConfig>(url, null, "SE Max Pressure");
+        return await WS.GetAsync<ServiceExpectationItemConfig>(url, null, "SE Max Pressure");
     }
-    public async Task<ServiceExpectationsConfig?> GetMinPressure()
+    public async Task<ServiceExpectationItemConfig?> GetMinPressure()
     {
         var url = EndPoints.DTServiceExpectationsMaxPressure;
-        return await WS.GetAsync<ServiceExpectationsConfig>(url, null, "SE Min Pressure");
+        return await WS.GetAsync<ServiceExpectationItemConfig>(url, null, "SE Min Pressure");
     }
-    public async Task<ServiceExpectationsConfig?> GetTargetPumpEffi()
+    public async Task<ServiceExpectationItemConfig?> GetTargetPumpEffi()
     {
         var url = EndPoints.DTServiceExpectationsMaxPressure;
-        return await WS.GetAsync<ServiceExpectationsConfig>(url, null, "SE Target Pump Effi");
+        return await WS.GetAsync<ServiceExpectationItemConfig>(url, null, "SE Target Pump Effi");
     }
 
     #endregion
@@ -60,6 +60,16 @@ public class ServiceExpectations : WSItem
         var url = EndPoints.DTServiceExpectationsTargetPumpEfficiencySet(effi);
         return await WS.PostAsync(url, null, "SE Target Pump Effi.", additionalInfo: $"{effi}");
     }
+    public async Task<bool> SetEnergyFromRenewableSources(double energy)
+    {
+        var url = EndPoints.DTServiceExpectationsEnergyFromRenewableSourcesSet(energy);
+        return await WS.PostAsync(url, null, "SE Energy from Renewable Sources.", additionalInfo: $"{energy}");
+    }
+    public async Task<bool> SetCO2EmissionFactor(double carbonFootprint, string unit)
+    {
+        var url = EndPoints.DTServiceExpectationsCO2EmissionFactorSet(carbonFootprint, unit);
+        return await WS.PostAsync(url, null, "SE Carbon Footprint.", additionalInfo: $"{carbonFootprint}");
+    }
     #endregion
 
     #endregion
@@ -68,7 +78,7 @@ public class ServiceExpectations : WSItem
 
 #region Model
 [DebuggerDisplay("{ToString()}")]
-public class ServiceExpectationsConfig
+public class ServiceExpectationItemConfig
 {
     public string? Name { get; set; }
     public string? Description { get; set; }

@@ -1,13 +1,16 @@
 ﻿using Haestad.Calculations.Pressure;
 using Haestad.Domain;
 using Haestad.Domain.ModelingObjects.Water.Support.PumpDefinitions;
+using Haestad.Support.Library;
 using Haestad.Support.Support;
 using Haestad.Support.Units;
 using Haestad.Water.Forms.Support.Components.Curves.PumpDefinitions;
+using OpenFlows.Domain.DataObjects;
 using OpenFlows.Water.Domain;
 using OpenFlows.Water.Domain.ModelingElements.Components;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using WaterSight.Model.Extensions;
 
@@ -59,7 +62,7 @@ public class Curves
     /// Flow and Head curve. Flow is in X value, Head is in Y value
     /// </summary>
     /// <returns></returns>
-    public List<GeometryPoint> PumpHeadCurve(IPumpDefinition pumpDef, bool includeIdInLabel = false, bool generateBasedonCoefficientABC = false)
+    public List<GeometryPoint> PumpHeadCurve(IPumpDefinition pumpDef, bool generateBasedOnCoefficientABC = true)
     {
         var head = pumpDef.Head;
         switch (pumpDef.Head.PumpDefinitionType)
@@ -74,7 +77,7 @@ public class Curves
                 return head.PumpCurve.Get().Select(p => new GeometryPoint(p.Flow, p.Head)).ToList();
 
             case PumpDefinitionType.CustomExtended:
-                if (!generateBasedonCoefficientABC)
+                if (!generateBasedOnCoefficientABC)
                 {
                     return new List<GeometryPoint>()
                         {
@@ -89,7 +92,7 @@ public class Curves
 
             case PumpDefinitionType.StandardExtended:
             case PumpDefinitionType.Standard:
-                if (!generateBasedonCoefficientABC)
+                if (!generateBasedOnCoefficientABC)
                 {
                     return new List<GeometryPoint>()
                         {
@@ -102,7 +105,7 @@ public class Curves
                     return GetPumpHeadCurveBasedOnCoefficients(pumpDef);
 
             case PumpDefinitionType.DesignPoint:
-                if (!generateBasedonCoefficientABC)
+                if (!generateBasedOnCoefficientABC)
                 {
                     var designPointMngr = new PumpDesignPointElementManager(
                     domainDataSet: this.WaterModel.DomainDataSet,
@@ -141,14 +144,15 @@ public class Curves
     /// Flow and Head curve. Flow is in X value, Head is in Y value
     /// </summary>
     /// <returns></returns>
-    public Dictionary<string, List<GeometryPoint>> PumpHeadCurves(bool includeIdInLabel = false, bool generateCurveBasedonCoefficientABC = false)
+    public Dictionary<string, List<GeometryPoint>> PumpHeadCurves(/*bool includeIdInLabel = false,*/bool generateCurveBasedOnCoefficientABC = false)
     {
         var curves = new Dictionary<string, List<GeometryPoint>>();
 
         foreach (var pumpDef in WaterModel.Components.PumpDefinitions.Elements())
         {
-            var key = includeIdInLabel ? pumpDef.IdLabel() : pumpDef.Label;
-            curves.Add(key, PumpHeadCurve(pumpDef, includeIdInLabel, generateCurveBasedonCoefficientABC));
+            //var key = includeIdInLabel ? pumpDef.IdLabel() : pumpDef.Label;
+            var key = pumpDef.Label;
+            curves.Add(key, PumpHeadCurve(pumpDef, generateCurveBasedOnCoefficientABC));
         }
 
         return curves;
@@ -159,71 +163,52 @@ public class Curves
     /// Flow Efficiency curve, Flow is in X value, Efficiency is in Y value
     /// </summary>
     /// <returns></returns>
-    public Dictionary<string, List<GeometryPoint>> PumpFlowEfficiencyCurves(bool includeIdInLabel = false, bool generateBasedonCoefficientABC = false)
+    public Dictionary<string, List<GeometryPoint>> PumpFlowEfficiencyCurves(/*bool includeIdInLabel = false,*/ bool generateBasedonCoefficientABC = false)
     {
         var curves = new Dictionary<string, List<GeometryPoint>>();
 
         foreach (var pumpDef in WaterModel.Components.PumpDefinitions.Elements())
         {
-            var key = includeIdInLabel ? pumpDef.IdLabel() : pumpDef.Label;
+            //var key = includeIdInLabel ? pumpDef.IdLabel() : pumpDef.Label;
+            var key = pumpDef.Label;
 
             switch (pumpDef.Efficiency.PumpEfficiencyType)
             {
                 case PumpEfficiencyTypeEnum.ConstantEfficiencyType:
                     var efficiency = pumpDef.Efficiency.ConstantEfficiency;
-                    var pumpHeadCurve = PumpHeadCurve(pumpDef, includeIdInLabel, generateBasedonCoefficientABC);
+                    var pumpHeadCurve = PumpHeadCurve(pumpDef, /*includeIdInLabel,*/ generateBasedonCoefficientABC);
                     curves.Add(key, pumpHeadCurve.Select(c => new GeometryPoint(c.X, efficiency)).ToList());
                     break;
 
                 case PumpEfficiencyTypeEnum.BestEfficiencyPointType:
-                    pumpHeadCurve = PumpHeadCurve(pumpDef, includeIdInLabel, generateBasedonCoefficientABC);
+                    pumpHeadCurve = PumpHeadCurve(pumpDef, /*includeIdInLabel,*/ generateBasedonCoefficientABC);
+
+                    var woPumpDefManager = WaterModel.DomainDataSet.SupportElementManager((int)SupportElementType.IdahoPumpDefinitionElementManager);                    
+
+                    IEfficiencyCurveCalculator effiCalculator = EfficiencyCurveCalculatorBase.NewEfficiencyCalculator(pumpDef.Efficiency.PumpEfficiencyType, woPumpDefManager);
+                    var minFlow = pumpHeadCurve.First().X;
+                    var maxFlow = pumpHeadCurve.Last().X;
+                    var success = effiCalculator.Compute(pumpDef.Id, minFlow, maxFlow);
+                    var effiValues = effiCalculator.GetEfficiencyField().GetEfficiency();
+                    var flowValues = effiCalculator.GetEfficiencyFlowField().GetFlow();
+
+
                     var flowEfficiencyPoints = new List<GeometryPoint>();
 
-                    var pumpEffi = pumpDef.Efficiency;
-                    var bepQ = pumpEffi.BEPFlow;
-                    var bepEffi = pumpEffi.BEPEfficiency;
-                    double A = 0.0;
-                    double B = 0.0;
-                    double C = 0.0;
+                    // Get the first value
+                    flowEfficiencyPoints.Add(new GeometryPoint(flowValues[0], Math.Round(effiValues[0]*100, 3)));
 
-                    if (pumpEffi.DefineBEPMaximumFlow) // double/skewed parabola
+                    // Get the middle values
+                    var interval = flowValues.Length / 9;
+                    for (int i = 1; i < 9; i++)
                     {
-                        var constants = GetEfficiencyConstants(bepEffi, bepQ, bepQ * 2);
-                        A = constants.Item1;
-                        B = constants.Item2;
-                        C = constants.Item3;
-
-                        var constantsPrime = GetEfficiencyConstants(bepEffi, bepQ, pumpEffi.UserDefinedBEPMaximumFlow);
-                        var Aprime = constantsPrime.Item1;
-                        var Bprime = constantsPrime.Item2;
-                        var Cprime = constantsPrime.Item3;
-
-                        foreach (var point in pumpHeadCurve)
-                        {
-                            if (point.X > bepQ) // On the other half of the parabola change the constants
-                            {
-                                A = Aprime;
-                                B = Bprime;
-                                C = Cprime;
-                            }
-
-                            var effi = A * point.X * point.X + B * point.X + C;
-                            flowEfficiencyPoints.Add(new GeometryPoint(point.X, Math.Round(effi, 3)));
-                        }
+                        int index = i * interval;
+                        flowEfficiencyPoints.Add(new GeometryPoint(flowValues[index], Math.Round(effiValues[index] *100, 3)));
                     }
-                    else // single parabola
-                    {
-                        var constants = GetEfficiencyConstants(bepEffi, bepQ, 0);
-                        A = constants.Item1;
-                        B = constants.Item2;
-                        C = constants.Item3;
 
-                        foreach (var point in pumpHeadCurve)
-                        {
-                            var effi = A * point.X * point.X + B * point.X + C;
-                            flowEfficiencyPoints.Add(new GeometryPoint(point.X, Math.Round(effi, 3)));
-                        }
-                    }
+                    // Get the last value
+                    flowEfficiencyPoints.Add(new GeometryPoint(flowValues[flowValues.Length-1], Math.Round(effiValues[flowValues.Length-1]*100, 3)));
+
 
                     curves.Add(key, flowEfficiencyPoints);
                     break;
@@ -277,6 +262,7 @@ public class Curves
         var A = -1 * bepEfficiency / (bepFlow * bepFlow + maxFlow * maxFlow - 2 * bepFlow * maxFlow);
         var B = 2 * bepEfficiency * bepFlow / Math.Pow(maxFlow - bepFlow, 2);
         var C = bepEfficiency - bepEfficiency * bepFlow * bepFlow / Math.Pow(maxFlow - bepFlow, 2);
+                
 
         return new Tuple<double, double, double>(A, B, C);
     }
@@ -287,18 +273,18 @@ public class Curves
         var headUnit = pumpDef.Units.HeadUnit;
         var flowUnit = pumpDef.Units.FlowUnit;
         var originalFlowUnit = flowUnit.GetUnit();
-        var flowConverstionFactor = 1.0;
+        var flowConversionFactor = 1.0;
 
 
         if (headUnit.GetUnit() == Unit.Feet)
         {
-            flowConverstionFactor = flowUnit.ConvertTo(flowConverstionFactor, Unit.CFS);
+            flowConversionFactor = flowUnit.ConvertTo(flowConversionFactor, Unit.CFS);
             pumpDef.Units.FlowUnit.SetUnit(Unit.CFS);
         }
         else if (headUnit.GetUnit() == Unit.MeterMeters)
         {
             pumpDef.Units.FlowUnit.SetUnit(Unit.CubicMetersPerSecond);
-            flowConverstionFactor = flowUnit.ConvertTo(flowConverstionFactor, Unit.CubicMetersPerSecond);
+            flowConversionFactor = flowUnit.ConvertTo(flowConversionFactor, Unit.CubicMetersPerSecond);
         }
         else
             throw new InvalidOperationException("The head unit must either be 'ft' or 'm'.");
@@ -316,14 +302,14 @@ public class Curves
         var maxFlow = Math.Pow(A / B, 1 / C);
 
 
-        var numberOfPointsOntheCurve = 10; // one extra, last point, will be added in the loop. Total count will be 10 + 1
-        var flowInterval = maxFlow / numberOfPointsOntheCurve; // to create 10 points along the curve
+        var numberOfPointsOnTheCurve = 10; // one extra, last point, will be added in the loop. Total count will be 10 + 1
+        var flowInterval = maxFlow / numberOfPointsOnTheCurve; // to create 10 points along the curve
 
-        for (int i = 0; i <= numberOfPointsOntheCurve; i++)
+        for (int i = 0; i <= numberOfPointsOnTheCurve; i++)
         {
             var flow = i * flowInterval;
             var head = A - (B * Math.Pow(flow, C));
-            pumpCurvePoints.Add(new GeometryPoint(Math.Round(flow / flowConverstionFactor, 3), Math.Round(head, 3)));
+            pumpCurvePoints.Add(new GeometryPoint(Math.Round(flow / flowConversionFactor, 3), Math.Round(head, 3)));
         }
 
 
@@ -331,6 +317,34 @@ public class Curves
         pumpDef.Units.FlowUnit.SetUnit(originalFlowUnit);
 
         return pumpCurvePoints;
+    }
+    #endregion
+
+    #region Private Methods
+    private IPumpDefinitionCalculator NewPumpDefinitionCalculator(PumpDefinitionType pumpDefinitionType)
+    {
+        ISupportElementManager pumpDefinitionManager =WaterModel.DomainDataSet.SupportElementManager((int)SupportElementType.IdahoPumpDefinitionElementManager);
+        switch (pumpDefinitionType)
+        {
+            case PumpDefinitionType.ConstantPower:
+                return new PumpDefinitionConstantPowerCalculator(pumpDefinitionManager);
+            case PumpDefinitionType.DesignPoint:
+            case PumpDefinitionType.Standard:
+                return new PumpDefinitionDesignPointCalculator(pumpDefinitionManager);
+            case PumpDefinitionType.StandardExtended:
+                return new PumpDefinitionDesignPointExtendedCalculator(pumpDefinitionManager,
+                    ExtendedPumpDefinitionType.Standard);
+            case PumpDefinitionType.CustomExtended:
+                return new PumpDefinitionDesignPointExtendedCalculator(pumpDefinitionManager,
+                    ExtendedPumpDefinitionType.Custom);
+            case PumpDefinitionType.MultiplePoint:
+                return new PumpDefinitionMultiplePointCalculator(pumpDefinitionManager);
+            
+            default:
+                throw new ArgumentException();
+        }
+
+        return null;
     }
     #endregion
 

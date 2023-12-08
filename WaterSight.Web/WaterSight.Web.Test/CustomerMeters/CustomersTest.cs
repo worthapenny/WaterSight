@@ -52,7 +52,7 @@ public class CustomersTest : TestBase
 
         // CSV Upload
         var csvData = "" +
-            "ID,Billing month,Value,Units\n" +
+            "ID,Billing month,StatQueryValue,Units\n" +
             "C-5-28,2020-May-01,1,hft³\n" +
             "C-5-29,2020-May-02,4,hft³";
 

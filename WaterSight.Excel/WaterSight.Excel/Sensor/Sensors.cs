@@ -78,6 +78,16 @@ public class SensorItem
 
     [Column(13, "Tags/Groups")]
     public string? Tags { get; set; }
+
+    [Column(14, "TimeZone")]
+    public string? TimeZoneId { get; set; }
+
+
+
+    [Column(15, "Notes")]
+    public string? Notes { get; set; } = null;
+
+
     #endregion
 
     #region Overridden Methods

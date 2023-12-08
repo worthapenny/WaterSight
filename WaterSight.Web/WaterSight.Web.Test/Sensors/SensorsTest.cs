@@ -135,7 +135,7 @@ public class SensorsTest : TestBase
         if (rawSensorTSD != null)
         {
             Assert.AreEqual(sensorsConfig[0]?.Name, rawSensorTSD?.Name);
-            Assert.IsTrue(rawSensorTSD?.UnifiedTSD.Count > 0);
+            Assert.IsTrue(rawSensorTSD?.UnifiedTSDs.Count > 0);
         }
     }
 

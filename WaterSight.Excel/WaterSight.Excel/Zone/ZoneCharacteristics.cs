@@ -64,14 +64,20 @@ public class ZoneCharacteristicsItem
     [Column(5, "Number of Customers")]
     public int? NumberOfCustomers { get; set; }
 
-    [Column(6, "Percentage of MNF Consumed")]
-    public double? PercentOfMnfConsumed { get; set; }
+    [Column(6, "Water Losses Method")]
+    public string WaterLossesMethod { get; set; }
 
-    [Column(7, "Percentage Of Authorized Unbilled Consumption")]
+    [Column(7, "Percentage of MNF Consumed")]
+    public double? PercentOfMnfConsumed { get; set; } = 80;
+
+    [Column(8, "Percentage Of Authorized Unbilled Consumption")]
     public double? PercentOfAuthUnbilledConsumption { get; set; }
 
-    [Column(8, "Priority")]
+    [Column(9, "Priority")]
     public int Priority { get; set; } = 1;
+
+    [Column(10, "Tags")]
+    public string Tags { get; set; } = string.Empty;
 
 
     [Ignore]

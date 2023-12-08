@@ -37,7 +37,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\Output\WaterSight.Excel\bin\x64\Debug\</OutputPath>
+    <OutputPath>..\..\..\Output\WaterSight.Excel\bin\x64\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -67,7 +67,9 @@
     <Compile Include="Alert\Alerts.cs" />
     <Compile Include="Customer\Consumptions.cs" />
     <Compile Include="Customer\CustomerMeters.cs" />
+    <Compile Include="ExcelBase.cs" />
     <Compile Include="ExcelSheetBase.cs" />
+    <Compile Include="Extensions\TasksExtensions.cs" />
     <Compile Include="PowerBI\PowerBiXlSheet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Pump\PumpCurves.cs" />
@@ -76,6 +78,7 @@
     <Compile Include="Pump\PumpStations.cs" />
     <Compile Include="Sensor\PossibleSensors.cs" />
     <Compile Include="Sensor\Sensors.cs" />
+    <Compile Include="Support\ExtractTimeSeriesData.cs" />
     <Compile Include="Tank\TankCurves.cs" />
     <Compile Include="Tank\Tanks.cs" />
     <Compile Include="Zone\ZoneCharacteristics.cs" />
@@ -86,7 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper">
-      <Version>27.2.1</Version>
+      <Version>30.0.1</Version>
     </PackageReference>
     <PackageReference Include="ExcelMapper">
       <Version>5.2.390</Version>

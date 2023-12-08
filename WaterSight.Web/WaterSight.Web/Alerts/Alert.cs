@@ -218,24 +218,25 @@ public struct AlertExtremes
 [DebuggerDisplay("{ToString()}")]
 public class AlertConfig
 {
-    public int Id { get; set; }
-    public object? Name { get; set; }
-    public AlertType Type { get; set; }
-    public bool FromManualAlert { get; set; }
-    public bool DisplayOnTank { get; set; }
-    public double ThresholdValue { get; set; }
-    public string RelationType { get; set; } // high/low
-    public string MinDuration { get; set; } // PT30M
     public bool Active { get; set; }
-    public string ResamplingInterval { get; set; } // PT5M
-    public int? IntegrationPercentile { get; set; }
+    public bool DisplayOnTank { get; set; }
+    public int Id { get; set; }
+    public string MinDuration { get; set; } // PT30M
+    public object? Name { get; set; }
+    public int NumericalModelTestType { get; set; } = 0; // 0: Water, 1: Sewer
+    public List<AlertOrigin> Origins { get; set; } = new List<AlertOrigin>();
     public string PatternConfidenceHistoricalRange { get; set; } // P60D
     public int? PatternPercentileToFireEvent { get; set; } // 95
     public int? PatternPercentileToStopEvent { get; set; } // 80
-    public string ThresholdUnits { get; set; }
-    public List<AlertOrigin> Origins { get; set; } = new List<AlertOrigin>();
-    public int NumericalModelTestType { get; set; } = 0; // 0: Water, 1: Sewer
-    //public string Recipients { get; set; } = string.Empty;
+    public string Recipients { get; set; } = string.Empty;
+    public string RelationType { get; set; } // high/low
+    public string ResamplingInterval { get; set; } // PT5M
+    public bool SendEmail { get; set; } = false;
+    public double ThresholdValue { get; set; }
+    public AlertType Type { get; set; } = AlertType.Pattern;
+    //public string ThresholdUnits { get; set; }
+    //public int? IntegrationPercentile { get; set; }
+    //public bool FromManualAlert { get; set; }
 
     [Newtonsoft.Json.JsonIgnore]
     public string EmailGroupsName { get; set; }

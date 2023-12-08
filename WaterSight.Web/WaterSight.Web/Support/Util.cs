@@ -105,7 +105,7 @@ namespace WaterSight.Web.Support
                                 var value = item.Value;
                                 try
                                 {
-                                    if (value == null || emptyValues.Contains(value))
+                                    if (value == null || emptyValues.Contains(value) || string.IsNullOrEmpty(value.ToString()))
                                         value = null;
 
                                     else
@@ -189,22 +189,23 @@ namespace WaterSight.Web.Support
             return columns;
         }*/
 
-        public static List<string> GetCsvHeader(
-            string filePath)
-        {
-            var headerRow = new List<string>();
-            using (var reader = new StreamReader(filePath))
-            {
-                using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
-                {
-                    csv.Read();
-                    csv.ReadHeader();
-                    headerRow.AddRange(csv.Context.Reader.HeaderRecord);
-                }
 
-                return headerRow;
-            }
-        }
+        //public static List<string> GetCsvHeader(
+        //    string filePath)
+        //{
+        //    var headerRow = new List<string>();
+        //    using (var reader = new StreamReader(filePath))
+        //    {
+        //        using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
+        //        {
+        //            csv.Read();
+        //            csv.ReadHeader();
+        //            headerRow.AddRange(csv.Context.Reader.HeaderRecord);
+        //        }
+
+        //        return headerRow;
+        //    }
+        //}
 
 
         public static bool IsAdministrator()

@@ -131,7 +131,7 @@ public class Sensor : WSItem
         var tsd15M = await Request.GetJsonAsync<SensorTsdWeb>(res) ?? new SensorTsdWeb();
 
         if (res.StatusCode == HttpStatusCode.OK)
-            Logger.Debug($"Sensor TSD received for {id} [{startAt:u},{endAt:u}]. Count = {tsd15M?.UnifiedTSD?.Count}");
+            Logger.Debug($"Sensor TSD received for {id} [{startAt:u},{endAt:u}]. Count = {tsd15M?.UnifiedTSDs?.Count}");
         else
             Logger.Error($"Failed to get sensor TSD for {id} [{startAt:u},{endAt:u}]. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
@@ -169,7 +169,7 @@ public class Sensor : WSItem
                 else
                 {
                     success = false;
-                    Logger.Error($"[{counter}/{groups.Count()}] Failed to post sensor TSD for {sensorId}: '{tagNameForLogging}', Object Length: {data.Count}, Date range: [{subset.First().Instant:d}, {subset.Last().Instant:d}] Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+                    Logger.Error($"[{counter}/{groups.Count()}] Failed to post sensor TSD for {sensorId}: '{tagNameForLogging}', Object Length: {data.Count}, Date range: [{subset.First().Instant:d}, {subset.Last().Instant:d}] Reason: {res.ReasonPhrase}. Text: {await res.Content?.ReadAsStringAsync()}. URL: {url}");
                     break;
                 }
             }
@@ -274,6 +274,11 @@ public class SensorConfig
 {
 
     #region Public Methods
+    public SensorConfig Copy()
+    {
+        string json = JsonConvert.SerializeObject(this);
+        return JsonConvert.DeserializeObject<SensorConfig>(json);
+    }
     public string CsvHeader()
     {
         var header =  $"{nameof(ID)},{nameof(TagId)},{nameof(Name)},{nameof(ParameterType)},{nameof(Units)},";
@@ -291,31 +296,37 @@ public class SensorConfig
         csv += $"{LastInstantInDatabase},{Priority},{PatternWeekId}";
         return csv;
     }
+    public string ToJsonString()
+    {
+        return JsonConvert.SerializeObject(this);
+    }
     #endregion
 
     #region Public Properties
 
-    public int ID { get; set; }
-    public string TagId { get; set; } = String.Empty;
-    public string Name { get; set; } = String.Empty;
-    public string ParameterType { get; set; } = String.Empty;
-    public string? Units { get; set; } = String.Empty;
     public int? CommunicationFrequency { get; set; } = 5;
-    public int? RegistrationFrequency { get; set; } = 5;
-    public string? UtcOffSet { get; set; } = "00:00";
-    public double? Latitude { get; set; } = 0.0;
-    public double? Longitude { get; set; } = 0.0;
-    public double? ReferenceElevation { get; set; }
-    public string? ReferenceElevationUnits { get; set; }
+    public int ID { get; set; }
 
-    // Column(CustomFormat = "yyyy-MM-dd")
-    //[Column(CustomFormat="yyyy-MM-dd hh:mm:ss")]
     [Column("LastInstanceDB"), DataFormat("yyyy-MM-dd hh:mm:ss")]
     public DateTimeOffset? LastInstantInDatabase { get; set; }
-    public int? Priority { get; set; } = 1;
-    public string? Tags { get; set; } = String.Empty;
+    public double? Latitude { get; set; } = 0.0;
+    public double? Longitude { get; set; } = 0.0;
+    public string Name { get; set; } = String.Empty;
+    public string Notes { get; set; } = String.Empty;
+    public bool Offline { get; set; } = false;
+    public string ParameterType { get; set; } = String.Empty;
+    public object[] PatternSpecialPeriodIds { get; set; } = new object[0];
     public int? PatternWeekId { get; set; } = null;
+    public int? Priority { get; set; } = 1;
+    public double? ReferenceElevation { get; set; }
+    public string? ReferenceElevationUnits { get; set; }
+    public int? RegistrationFrequency { get; set; } = 5;
 
+    public string TagId { get; set; } = String.Empty;
+    public string? Tags { get; set; } = String.Empty;
+    public string? TimeZoneId { get; set; } = string.Empty;
+    public string? Units { get; set; } = String.Empty;
+    public string? UtcOffSet { get; set; } = "00:00";
     #endregion
 
     #region Overridden Methods
@@ -333,23 +344,23 @@ public class SensorTsdWeb
     #region Public Methods
     public DataTable PointsToDataTable(string tagName)
     {
-        if (UnifiedTSD.Count == 0)
+        if (UnifiedTSDs.Count == 0)
             return new DataTable();
 
         var dt = new DataTable();
         dt.Columns.Add("Tag", typeof(string));
         dt.Columns.Add("DateTime", typeof(DateTimeOffset));
 
-        var valueCol = dt.Columns.Add("Value", typeof(double));
+        var valueCol = dt.Columns.Add("StatQueryValue", typeof(double));
         valueCol.AllowDBNull = true;
 
 
-        foreach (var tsd in UnifiedTSD)
+        foreach (var tsd in UnifiedTSDs)
         {
             var row = dt.NewRow();
             row["Tag"] = tagName;
             row["DateTime"] = tsd.Instant;
-            row["Value"] = tsd.UnifiedValue;
+            row["StatQueryValue"] = tsd.UnifiedValue;
 
             dt.Rows.Add(row);
         }
@@ -374,7 +385,7 @@ public class SensorTsdWeb
     // Points / Values/ TSD
     public List<SensorTSDWebPoint>? Points { get; set; }
     public List<SensorTSDWebPoint>? Values { get; set; }
-    public List<SensorTSDWebPoint> UnifiedTSD => Points ?? Values ?? new List<SensorTSDWebPoint>();
+    public List<SensorTSDWebPoint> UnifiedTSDs => Points ?? Values ?? new List<SensorTSDWebPoint>();
 
     public int SensorID { get; set; }
 
@@ -382,7 +393,7 @@ public class SensorTsdWeb
     #region Overridden Methods
     public override string ToString()
     {
-        return $"{Name}, Count = {UnifiedTSD.Count}";
+        return $"{Name}, Count = {UnifiedTSDs.Count}";
     }
     #endregion
 }
@@ -396,7 +407,7 @@ public class SensorTSDWebPoint : TSDValue
     public double? ValuePercentiles { get; set; }
 }
 
-[DebuggerDisplay("{ID}: {Value}@{Instant}")]
+[DebuggerDisplay("{ID}: {Value} @ {Instant}")]
 public class TSDValue
 {
     #region Constructor

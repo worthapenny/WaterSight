@@ -2,8 +2,11 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using WaterSight.Excel.Extensions;
 
 namespace WaterSight.Excel
 {
@@ -20,18 +23,40 @@ namespace WaterSight.Excel
         #endregion
 
         #region Public Methods
+        public bool SheetExists(string name)
+        {
+            var exists = this.Xl.FetchSheetNames().Where(n => n == name).Any();
+            return exists; 
+        }
         public List<T> Read<T>()
         {
+            if (!SheetExists(this.SheetName))
+            {
+                Log.Error($"Given sheet '{this.SheetName}' does not exists in the give file. Path: {this.FilePath}");
+                Debugger.Break();
+            }
+
             var items = this.Xl.Fetch<T>(this.FilePath, SheetName);
             return new List<T>(items);
         }
 
-        public void Save<T>(List<T> data)
+        public bool Save<T>(List<T> data)
         {
-            Log.Debug($"About to write to an Excel sheet {SheetName}. File: {FilePath}");
-            Xl.Save(FilePath, data, SheetName);
+            var success = true;
+            try
+            {
+                Log.Debug($"About to write to an Excel sheet {SheetName}. File: {FilePath}");
+                Xl.Save(FilePath, data, SheetName);
 
-            Log.Information($"Updated '{SheetName}' excel sheet. File: {FilePath}");
+                Log.Information($"Updated '{SheetName}' excel sheet. File: {FilePath}");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"...while writing to the Excel file. {FilePath}");
+                success = false;
+            }
+
+            return success;
         }
         public async Task<bool> SaveAsync<T>(List<T> data)
         {
@@ -39,10 +64,11 @@ namespace WaterSight.Excel
             Log.Debug($"About to write to an Excel sheet {SheetName}. File: {FilePath}");
             try
             {
-                var xlMapper = File.Exists(FilePath) ? new ExcelMapper(FilePath) : new ExcelMapper();
-                await xlMapper.SaveAsync(FilePath, data, SheetName);
+                var xlMapper = File.Exists(FilePath) ? new ExcelMapper(FilePath) : new ExcelMapper();                
+                await xlMapper.SaveAsync(FilePath, data, SheetName).TimeoutAfter(new TimeSpan(0, 0, 30), "save to Excel");
 
-                Log.Debug($"Updated '{SheetName}' excel sheet. File: {FilePath}");
+                Log.Debug($"Wrote to an Excel sheet {SheetName}. File: {FilePath}");
+
             }
             catch (Exception ex)
             {
@@ -51,7 +77,7 @@ namespace WaterSight.Excel
             }
 
             return success;
-        }
+        }       
 
         #endregion
 

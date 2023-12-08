@@ -10,26 +10,27 @@ public class SensorFinderOptions
     #endregion
 
     #region Public Properties
+
     public bool ActiveElementsOnly { get; set; } = true;
-    public bool TankLevel { get; set; } = true;
-    public bool TankFlow { get; set; } = true;
+    public bool IncludeTankLevel { get; set; } = true;
+    public bool IncludeTankFlow { get; set; } = true;
 
-    public bool PumpStatus { get; set; } = true;
-    public bool PumpSpeedFactor { get; set; } = true;
-    public bool PumpSuctionNodePressure { get; set; } = true;
-    public bool PumpDischargeNodePressure { get; set; } = true;
-    public bool PumpDischargePipeFlow { get; set; } = true;
-    public bool PumpPower { get; set; } = true;
-    public bool PumpCommonDischargePipeFlow { get; set; } = true;
+    public bool IncludePumpStatus { get; set; } = true;
+    public bool IncludePumpSpeedFactor { get; set; } = true;
+    public bool IncludePumpSuctionNodePressure { get; set; } = true;
+    public bool IncludePumpDischargeNodePressure { get; set; } = true;
+    public bool IncludePumpDischargePipeFlow { get; set; } = true;
+    public bool IncludePumpPower { get; set; } = true;
+    public bool IncludePumpCommonDischargePipeFlow { get; set; } = true;
 
-    public bool ValveFlow { get; set; } = true;
-    public bool ValveStatus { get; set; } = true;
-    public bool ValveDownstreamPressure { get; set; } = true;
-    public bool ValveUpstreamPressure { get; set; } = true;
-    public bool TCVs { get; set; } = false;
-    public bool GPVs { get; set; } = false;
+    public bool IncludeValveFlow { get; set; } = true;
+    public bool IncludeValveStatus { get; set; } = true;
+    public bool IncludeValveDownstreamPressure { get; set; } = true;
+    public bool IncludeValveUpstreamPressure { get; set; } = true;
+    public bool IncludeTCVs { get; set; } = false;
+    public bool IncludeGPVs { get; set; } = false;
 
-    public bool ReservoirHead { get; set; } = true;
-    public bool ReservoirFlow { get; set; } = true;
+    public bool IncludeReservoirHead { get; set; } = true;
+    public bool IncludeReservoirFlow { get; set; } = true;
     #endregion
 }

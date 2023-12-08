@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Zones;
@@ -34,7 +35,7 @@ public class Pump : WSItem
         var url = EndPoints.HydStructuresPumpQDT;
         int? id = await WS.AddAsync<int?>(pumpConfig, url, "Pump");
         if (id.HasValue)
-{
+        {
             pumpConfig.Id = id.Value;
             return pumpConfig;
         }
@@ -65,11 +66,27 @@ public class Pump : WSItem
 
     //
     // DELETE
-    public async Task<bool> DeletePumpsConfigAsync()
+    public async Task<bool> DeletePumpsConfigAsync(List<string> onlyDeleteDisplayNames)
     {
-        Logger.Debug($"About to delete all the pumps...");
-        var url = EndPoints.HydStructuresPumpQDT;
-        var success = await WS.DeleteManyAsync(url, "Pumps", true);
+        var pumpsConfig = await GetPumpsConfigAsync();
+        Logger.Debug($"Total number of pumps configured = {pumpsConfig.Count}");
+        if (onlyDeleteDisplayNames.Any())
+        {
+            pumpsConfig = pumpsConfig.Where(p => onlyDeleteDisplayNames.Contains(p.Name)).ToList();
+            Logger.Debug($"Total number of pumps configured after dropping the given pumps = {pumpsConfig.Count}");
+
+        }
+
+        var success = true;
+        foreach (var pumpConfig in pumpsConfig)
+        {
+            var url = EndPoints.HydStructuresPumpForQDT(pumpConfig.Id);
+            success = success && await WS.DeleteAsync(pumpConfig.Id, url, "Pump config");
+        }
+
+        //Logger.Debug($"About to delete the pumps...");
+        //var url = EndPoints.HydStructuresPumpQDT;
+        //var success = await WS.DeleteManyAsync(url, "Pumps", true);
 
         Logger.Debug($"Deleted.");
         return success;
@@ -93,30 +110,30 @@ public class PumpConfig
     #region Properties
     public int Id { get; set; }
     public string Name { get; set; }
-    public double DesignFlow { get; set; }
-    public double DesignHead { get; set; }
-    public double EfficiencyFlow { get; set; }
-    public double EfficiencyHead { get; set; }
-    public double Efficiency { get; set; }
+    public double? DesignFlow { get; set; }
+    public double? DesignHead { get; set; }
+    public double? EfficiencyFlow { get; set; }
+    public double? EfficiencyHead { get; set; }
+    public double? Efficiency { get; set; }
     public string FlowUnits { get; set; }
     public string HeadUnits { get; set; }
     public string PumpingStationName { get; set; }
-    public int PumpingStationId { get; set; }
+    public int? PumpingStationId { get; set; }
     public string SuctionSignalName { get; set; }
     public string DischargeSignalName { get; set; }
     public string FlowSignalName { get; set; }
     public string WirePowerSignalName { get; set; }
     public string HeadCurveName { get; set; }
-    public int HeadCurveId { get; set; }
+    public int? HeadCurveId { get; set; }
     public string EfficiencyCurveName { get; set; }
-    public int EfficiencyCurveId { get; set; }
+    public int? EfficiencyCurveId { get; set; }
     public string PowerCurveName { get; set; }
-    public int PowerCurveId { get; set; }
+    public int? PowerCurveId { get; set; }
     public string PowerUnits { get; set; }
-    public int MotorEfficiency { get; set; }
+    public double? MotorEfficiency { get; set; }
     public string IsVariableSpeedAsString { get; set; }
     public bool IsVariableSpeed { get; set; }
-    public int? FullSpeedValue { get; set; }
+    public double? FullSpeedValue { get; set; }
     public string SpeedEfficiencyCurveName { get; set; }
     public int? SpeedEfficiencyCurveId { get; set; }
     public string SpeedSignalName { get; set; }

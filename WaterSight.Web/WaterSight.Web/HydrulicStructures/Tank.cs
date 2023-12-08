@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 
@@ -59,10 +60,27 @@ public class Tank : WSItem
     }
     public async Task<bool> DeleteTanksConfigAsync()
     {
-        throw new NotSupportedException("WaterSight API doesn't provide an end-point for this. Delete one by one calling GetTanksConfigAsync()");
+        //throw new NotSupportedException("WaterSight API doesn't provide an end-point for this. Delete one by one calling GetTanksConfigAsync()");
+
         //WS.Logger.Verbose("About to delete all the tanks...");
         //var url = ws.EndPoints.RtdaSignalsLROQDT + $"&{ws.EndPoints.Query.ActionIdSignalsDelete("delete")}"; ;
         //return await ws.DeleteManyAsync(url, "Tanks", true);
+
+        Logger.Warning($"WaterSigh API doesn't provide an end-point for deleting all at once... So, deleting individually.");
+
+        var tanks = await GetTanksConfigAsync();
+        var deleteTask = new List<Task<bool>>();
+        foreach (var tank in tanks)
+        {
+            deleteTask.Add(DeleteTankConfigAsync(tank.Id.Value));
+            await Task.Delay(400);
+        }
+
+        var successes = await Task.WhenAll(deleteTask);
+
+        Logger.Information($"Deleted all Tanks individually.");
+        
+        return successes.All(s => s);
 
     }
     #endregion

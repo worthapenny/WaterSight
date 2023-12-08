@@ -16,7 +16,7 @@ public class ZoneTest : TestBase
     #region Constructor
     public ZoneTest()
     //: base(4549, Env.Qa)
-    //: base(235, Env.Prod)
+    : base(179, Env.Prod)
     {
         Logger.Debug($"----+----+---- Performing Zones Related Tests ----+----+----");
     }
@@ -27,6 +27,25 @@ public class ZoneTest : TestBase
     #endregion
 
     #region Tests
+    [Test]
+    public async Task Zone_Usage()
+    {
+        // Read Many
+        var zones = await Zone.GetZonesConfigAsync();
+        Assert.IsNotNull(zones);
+        Assert.IsTrue(zones.Count > 0); // System zone will always be there so it should be true 
+        Logger.Debug("Read many tested");
+
+        var zone = zones.Where(z => z.Name.Contains("System"));
+        Assert.That(zone.Any(), Is.True);
+
+        Newtonsoft.Json.JsonConvert.SerializeObject(zone);
+
+        var data = await WS.Zone.GetZoneUsageWithoutPatternAsync(zone.First().Id, DateTime.Now.AddMonths(-2), DateTime.Now);
+        Assert.That(data, Is.Not.Null);
+    }
+
+
     [Test, Category("CRUD")]
     public async Task Zone_CRUD()
     {
@@ -85,7 +104,7 @@ public class ZoneTest : TestBase
         Separator("Delete tested");
 
         // Delete All
-        deleted = await Zone.DeleteZonesConfigAsync();
+        deleted = await Zone.DeleteZonesConfigAsync(onlyDeleteZoneNames: new List<string>());
         Assert.IsTrue(deleted);
         var allZones = await Zone.GetZonesConfigAsync();
         Assert.AreEqual(1, allZones.Count); // System zone cannot be deleted hence count = 1
@@ -93,6 +112,8 @@ public class ZoneTest : TestBase
 
         Logger.Debug(Util.LogSeparatorDashes);
     }
+
+
 
     private ZoneConfig NewZoneConfig()
     {

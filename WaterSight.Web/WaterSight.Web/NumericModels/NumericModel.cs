@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
@@ -75,7 +77,7 @@ public class NumericModel : WSItem
     #region Public Methods
 
     #region Upload Files
-    public async Task<bool> UpdloadZippedWaterModel(FileInfo fileInfo, TimeSpan? timeout = null)
+    public async Task<bool> UpdloadZippedWaterModel(FileInfo fileInfo, TimeSpan? timeout = null, double? spinUpHours =0)
     {
         if (!File.Exists(fileInfo.FullName))
         {
@@ -96,7 +98,7 @@ public class NumericModel : WSItem
         if (modelDomains.Count > 0)
         {
             modelDomain = modelDomains.First();
-            Logger.Information($"Found existing ModelDoamin. {modelDomain}");
+            Logger.Information($"Found existing ModelDomain. {modelDomain}");
         }
         else
         {
@@ -105,11 +107,13 @@ public class NumericModel : WSItem
                 epsgCode: WS.Options.EPSGCode.ToString() ?? throw new InvalidDataException("ESPG code cannot be null"),
                 name: GetNewWaterModelDomainName(WS.Options.DigitalTwinId)
                 );
+            modelDomain.SpinUpHours = spinUpHours;
+
             var id = await AddWaterModelDomain(modelDomain);
             if (id == null)
                 modelDomain = null;
             else
-                Logger.Information($"Created new ModelDoamin. {modelDomain}. EPSG Code: {WS.Options.EPSGCode}");
+                Logger.Information($"Created new ModelDomain. {modelDomain}. EPSG Code: {WS.Options.EPSGCode}");
         }
 
 
@@ -122,12 +126,32 @@ public class NumericModel : WSItem
         // upload the model
         var userName = "CSharpAPI"; // TODO: find a way to get the right username
         var query = EndPoints.Query;
-        var url = EndPoints.NumModelingModelDomainUploadOpModelDomain +
-            $"?{query.DTID}&{query.Username(userName)}&{query.ModelDomainName(modelDomain.Name)}" +
-            $"&{query.EpsgCode(modelDomain.EpsgCode)}" +
-            $"&{query.Frequency(modelDomain.Interval)}&{query.Duration(modelDomain.ForecastHours.Value)}" +
-            $"&{query.SpinupHours(modelDomain.SpinUpHours.Value)}&{query.HindcastHours(modelDomain.HindcastHours.Value)}" +
-            $"&actionId=http%3A%2F%2Fwatersight.bentley.com%2Fadministration%2Fmodel%3Fmodelid%3D{modelDomain.Id}%23upload";
+
+        // // [OLD METHOD]
+        //var url = EndPoints.NumModelingModelDomainUploadOpModelDomain +
+        //    $"?{query.DTID}&{query.Username(userName)}&{query.ModelDomainName(modelDomain.Name)}" +
+        //    $"&{query.EpsgCode(modelDomain.EpsgCode)}" +
+        //    $"&{query.Frequency(modelDomain.Interval)}&{query.Duration(modelDomain.ForecastHours.StatQueryValue)}" +
+        //    $"&{query.SpinupHours(modelDomain.SpinUpHours.StatQueryValue)}&{query.HindcastHours(modelDomain.HindcastHours.StatQueryValue)}" +
+        //    $"&actionId=http%3A%2F%2Fwatersight.bentley.com%2Fadministration%2Fmodel%3Fmodelid%3D{modelDomain.Id}%23upload";
+
+        var uploadTokenUrl = await WS.BlobStorage.GetStorageTokenUrlAsync();
+
+        // NOT sure exactly what happens here but we need to do a PUT request
+        var httpContent = new StringContent(string.Empty);
+        httpContent.Headers.Add( "sas-token", "application/json" );
+        var isPutSuccessful = await WS.PutAsync(uploadTokenUrl, httpContent, "Upload Token URL");
+        if (!isPutSuccessful)
+        {
+            Logger.Error($"PUT request on upload token failed.");
+            return false;
+        }
+
+        var url = EndPoints.NumModelingModelDomainUploadOpModelDomainViaBlobStorage +
+            $"?{query.ModelDomainName(modelDomain.Name)}" +
+            $"&{query.DTID}" +
+            $"&{query.EpsgCode(modelDomain.EpsgCode)}";
+
 
         var res = await Request.PostFile(url: url, fileInfo: fileInfo, timeout: timeout);
         if (res.IsSuccessStatusCode)
@@ -530,6 +554,10 @@ public class ModelDomainConfig
     public int bridgedVersion { get; set; }
     public List<object> AdjustmentSignals { get; set; } = new List<object>();
     public List<object> AdjustmentZones { get; set; } = new List<object>();
+
+    public bool UpdateValveStatus { get; set; }
+    public int GpvType { get; set; }
+    public int TcvType { get; set; }
 
     public override string ToString()
     {

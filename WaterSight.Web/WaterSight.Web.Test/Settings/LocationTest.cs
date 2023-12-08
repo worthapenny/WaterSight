@@ -6,7 +6,7 @@ using WaterSight.Web.Settings;
 namespace WaterSight.Web.Test;
 
 
-[TestFixture, Order(100500), Category("Settings"), Category("Location")]
+[TestFixture, Order(100600), Category("Settings"), Category("Location")]
 public class LocationTest : TestBase
 {
     #region Constructor
@@ -35,9 +35,9 @@ public class LocationTest : TestBase
 
         // Get
         var location = await Location.GetLocation();
-        Assert.IsNotNull(location);
-        Assert.AreEqual(1234.1234, location?.Latitude, 0.001);
-        Assert.AreEqual(-4321.4321, location?.Longitude, 0.001);
+        Assert.That(location, Is.Not.Null);
+        Assert.That(location.Latitude, Is.EqualTo(1234.1234).Within(0.001));
+        Assert.That(location.Longitude, Is.EqualTo(-4321.4321).Within(0.001));
         Separator("Location GET");
 
     }

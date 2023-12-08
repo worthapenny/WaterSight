@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 
@@ -17,20 +20,22 @@ public class Units : WSItem
     public async Task<bool> SetToUSUnitsAsync()
     {
         _ = await SetPressureUnit(Pressure.psi);
-        _ = await SetLengthUnit(Length.ft);
-        _ = await SetVolumeUnit(Volume.Mgal_US);
-        _ = await SetEnergyUnit(Energy.kWh);
-        _ = await SetDurationUnit(Duration.h);
-        _ = await SetTemperatureUnit(Temperature.degree_F);
-        _ = await SetCurrencyUnit(Currency.USDoller);
-
         _ = await SetFlowUnit(VolumeFlow.gal_US_per_min);
+        _ = await SetLengthUnit(Length.ft);
+        _ = await SetDiameterUnit(Length.inch);
         _ = await SetAreaUnit(Area.ft_squared);
-        _ = await SetPowerUnit(Power.kW);
-        _ = await SetSpeedUnit(Speed.ft_per_s);
-        _ = await SetMassConcentrationUnit(MassConcentration.mg_per_L);
-        _ = await SetRatioUnit(Ratio.percent);
+        _ = await SetVolumeUnit(Volume.Mgal_US, 2);
+        _ = await SetPowerUnit(Power.kW, 1);
+        _ = await SetEnergyUnit(Energy.kWh, 1);
+        _ = await SetVelocityUnit(Speed.ft_per_s, 1);
+        _ = await SetWaterAgeUnit(Duration.h, 1);
+        _ = await SetMassConcentrationUnit(MassConcentration.mg_per_L, 2);
+        _ = await SetTemperatureUnit(Temperature.degree_F);
+        _ = await SetRatioUnit(Ratio.percent, 1);
+        _ = await SetCurrencyUnit(Currency.USDoller, 2);
         _ = await SetWatherUnit(Weather.Imperial);
+        _ = await SetCarbonFootprintUnit(CarbonFootprint.kg);
+        _ = await SetCO2EmissionFactorUnit(CO2EmissionFactor.ton_per_kWh, 2);
 
         return true;
     }
@@ -41,71 +46,87 @@ public class Units : WSItem
     #region Get / Update
     public async Task<List<UnitsConfig?>> GetAllUnits()
     {
-        var url = EndPoints.DTQuantsQDT;
-        return await WS.GetManyAsync<UnitsConfig>(url, "Units");
+        var url = EndPoints.DTIdDisplayUnitsOptionsIsTrue;
+        var units = await WS.GetManyAsync<UnitsConfig>(url, "Units");
+        return units;
     }
-    public async Task<bool> SetUnit(string unitTypeName, string unitValue)
+    public async Task<bool> SetUnit(string unitTypeName, string unitValue, int precision = 0)
     {
-        var url = EndPoints.DTQuantitiesUnitQDTQQuant(unitTypeName, unitValue);
-        return await WS.PostAsync(url, null, "Unit info", additionalInfo: $"{unitTypeName} = {unitValue}");
+        var url = EndPoints.DTIdDisplayUnits;
+        var payload = new { Name = unitTypeName, Units = unitValue, Precision = precision };
+        var payloads = new List<object> { payload };
+        var httpContent = new StringContent(JsonConvert.SerializeObject(payloads), Encoding.UTF8, "application/json");
+        return await WS.PutAsync(url, httpContent, $"{unitTypeName}: {unitValue}", false, "SetUnit");
     }
-    public async Task<bool> SetPressureUnit(string unitValue)
+    public async Task<bool> SetPressureUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Pressure", unitValue);
+        return await SetUnit("Pressure", unitValue, precision);
     }
-    public async Task<bool> SetLengthUnit(string unitValue)
+    public async Task<bool> SetLengthUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Length", unitValue);
+        return await SetUnit("Length", unitValue, precision);
     }
-    public async Task<bool> SetVolumeUnit(string unitValue)
+    public async Task<bool> SetDiameterUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Volume", unitValue);
+        return await SetUnit("Diameter", unitValue, precision);
     }
-    public async Task<bool> SetEnergyUnit(string unitValue)
+    public async Task<bool> SetVolumeUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Energy", unitValue);
+        return await SetUnit("Volume", unitValue, precision);
+    }
+    public async Task<bool> SetEnergyUnit(string unitValue, int precision = 0)
+    {
+        return await SetUnit("Energy", unitValue, precision);
     }
 
 
-    public async Task<bool> SetDurationUnit(string unitValue)
+    public async Task<bool> SetWaterAgeUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Duration", unitValue);
+        return await SetUnit("Duration", unitValue, precision);
     }
-    public async Task<bool> SetTemperatureUnit(string unitValue)
+    public async Task<bool> SetTemperatureUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Temperature", unitValue);
+        return await SetUnit("Temperature", unitValue, precision);
     }
-    public async Task<bool> SetCurrencyUnit(string unitValue)
+    public async Task<bool> SetCurrencyUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Currency", unitValue);
+        return await SetUnit("Currency", unitValue, precision);
     }
-    public async Task<bool> SetFlowUnit(string unitValue)
+    public async Task<bool> SetFlowUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("VolumeFlow", unitValue);
+        return await SetUnit("VolumeFlow", unitValue, precision);
     }
-    public async Task<bool> SetAreaUnit(string unitValue)
+    public async Task<bool> SetAreaUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Area", unitValue);
+        return await SetUnit("Area", unitValue, precision);
     }
-    public async Task<bool> SetPowerUnit(string unitValue)
+    public async Task<bool> SetPowerUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Power", unitValue);
+        return await SetUnit("Power", unitValue, precision);
     }
-    public async Task<bool> SetSpeedUnit(string unitValue)
+    public async Task<bool> SetVelocityUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Speed", unitValue);
+        return await SetUnit("Speed", unitValue, precision);
     }
-    public async Task<bool> SetMassConcentrationUnit(string unitValue)
+    public async Task<bool> SetMassConcentrationUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("MassConcentration", unitValue);
+        return await SetUnit("MassConcentration", unitValue, precision);
     }
-    public async Task<bool> SetRatioUnit(string unitValue)
+    public async Task<bool> SetRatioUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Ratio", unitValue);
+        return await SetUnit("Ratio", unitValue, precision);
     }
-    public async Task<bool> SetWatherUnit(string unitValue)
+    public async Task<bool> SetWatherUnit(string unitValue, int precision = 0)
     {
-        return await SetUnit("Weather", unitValue);
+        return await SetUnit("Weather", unitValue, precision);
+    }
+    public async Task<bool> SetCO2EmissionFactorUnit(string unitValue, int precision = 0)
+    {
+        return await SetUnit("CO2EmissionFactor", unitValue, precision);
+    }
+    public async Task<bool> SetCarbonFootprintUnit(string unitValue, int precision = 0)
+    {
+        return await SetUnit("CarbonFootprint", unitValue, precision);
     }
     #endregion
 
@@ -117,13 +138,19 @@ public class Units : WSItem
 [DebuggerDisplay("{ToString()}")]
 public class UnitsConfig
 {
+    public string Description { get; set; }
+    public string Format { get; set; }
     public string? Name { get; set; }
-    public string? CurrentUnits { get; set; }
+    public int Precision { get; set; } = 2;
+    public string PrettyPrintName { get; set; }
+    public string? Units { get; set; }
+
+    [JsonIgnore]
     public List<string> UnitsList { get; set; } = new List<string>();
 
     public override string ToString()
     {
-        return $"{Name}: {CurrentUnits}";
+        return $"{Name}: {Units}:{Precision}";
     }
 }
 
@@ -580,6 +607,22 @@ public static class Weather
 
 }
 
+#endregion
+
+#region Carbon EmissionFactor / Footprint
+public static class CO2EmissionFactor
+{
+    public static string kg_per_kWh => "kg/kWh";
+    public static string lbs_per_kWh => "lbs/kWh";
+    public static string ton_per_kWh => "ton/kWh";
+    public static string tonne_per_kWh => "tonne/kWh";
+
+
+}
+public static class CarbonFootprint
+{
+    public static string kg => "kg";
+}
 #endregion
 
 #endregion

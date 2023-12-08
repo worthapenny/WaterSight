@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\Output\WaterSight.DigitalTwinsHealth.Service\bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\Output\WaterSight.DigitalTwinsHealth.Service\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -131,7 +131,12 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\WaterSight.Web\WaterSight.Web\WaterSight.Web.csproj">
+      <Project>{3219d583-b78a-4fcc-b625-33ab9c30fbc9}</Project>
+      <Name>WaterSight.Web</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <LangVersion>10.0</LangVersion>

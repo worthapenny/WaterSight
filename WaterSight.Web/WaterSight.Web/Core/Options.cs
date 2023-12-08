@@ -12,7 +12,8 @@ public class Options
         //IConfiguration config, 
         string tokenRegistryPath,
         Env env = Env.Prod,
-        string subDomainSuffix = "" // for EU = "-weu"
+        string subDomainSuffix = "", // for EU = "-weu"
+        string? restToken = null
         )
     {
         DigitalTwinId = digitalTwinId;
@@ -20,14 +21,15 @@ public class Options
         TokenRegistryPath = tokenRegistryPath;
         Env = env;
         SubDomainSuffix = subDomainSuffix;
-
+        RestToken = restToken;
         //Logger.Information("Options initialized");
     }
+    
     #endregion
 
     #region Public Properties
     public string SubDomainSuffix{ get; set; } = string.Empty;
-    public Env Env { get; private set; } = Env.Prod;
+    public Env Env { get;  set; } = Env.Prod;
     public int DigitalTwinId { get; set; }
     public int? EPSGCode { get; set; }
     public DateTimeOffset StartAt { get; set; } = DateTimeOffset.UtcNow.AddDays(-30);
@@ -38,13 +40,15 @@ public class Options
     public string EndMonth { get; set; } = DateTimeOffset.UtcNow.ToString("yyyy-MM");
     public TimeZoneInfo LocalTimeZone { get; set; } = TimeZoneInfo.Local;
 
+    public string? RestToken { get; set; }
+    public string TokenRegistryPath { get; private set; } = "";
     #endregion
 
     #region Public Static Properties
     //public static string TokenRegistryPath { get; private set; } = "";
-    public string TokenRegistryPath { get; private set; } = "";
     //public static ILogger Logger { get; private set; }
     //public static IConfiguration Configuration { get; private set; }
+    
     #endregion
 
     #region Overridden Methods

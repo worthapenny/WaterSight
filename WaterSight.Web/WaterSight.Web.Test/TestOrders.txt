@@ -1,0 +1,23 @@
+﻿UnitsTest: 100100
+TimezoneTest: 100200
+PatternWeeksTest: 100300
+ServiceExpectationsTest: 100300
+CoordinateSystemsTest:100400
+CostsTest:100500
+LocationTest: 100600
+
+SensorsTest:101000
+SmartSensorsTest:101500
+TanksTest:102000
+TankCurvesTest:102100
+NumericalModelTest: 102900
+GisTest: 103000
+ZoneTest:104000
+AlertsTest: 105000
+EmailGroupTest: 105100
+CustomersTest: 106000
+DigitalTwinTest: 107000
+CustomWaterModelTest:
+PowerBITest:
+HomeTests:
+SetupTest:

@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Haestad.Domain.ModelingObjects;
+using WaterSight.Model.Sensors;
 
 namespace WaterSight.Model.Support;
 
@@ -231,7 +232,7 @@ public class ModelEditor
     public bool MapSCADASignal(IWaterElement element, SCADATargetAttribute attribute, string tag, int dataSoucrceId)
     {
         var success = true;
-        var seCheck = element.GetConnectedSCADAElements(WaterModel)
+        var seCheck = element.ConnectedSCADAElements(WaterModel)
             .Where(se => se.Input.TargetElement.Id == element.Id
                 && se.Input.TargetAttribute == attribute);
         if (!seCheck.Any())
@@ -320,13 +321,13 @@ public class ModelEditor
 
     private async Task<GeometryPoint> GetLocationAsync(Sensor sensor, IWaterElement element, double distance)
     {
-        return await Task.Run(() =>
-        {
+        //var point =  await Task.Run(() =>
+        //{
             // Calculate Slope
             var slope = 0.0;
             if (element is IBaseLinkInput)
             {
-                slope = (element as IBaseLinkInput).SlopeAngle();
+                slope = (element as IBaseLinkInput).SlopeAngle(out _);
             }
             else if (element is ITank || element is IReservoir)
             {
@@ -334,12 +335,12 @@ public class ModelEditor
             }
             else if (element is IPointNodeInput)
             {
-                var connectedLinks = WaterModel.Network.ConnectedElements(WaterModel, element);
+                var connectedLinks = element.ConnectedAdjacentElements(WaterModel);
                 if (connectedLinks.Any())
                 {
 
-                    var slopeFirst = (connectedLinks.First() as IBaseLinkInput).SlopeAngle();
-                    var slopeSecond = (connectedLinks.Last() as IBaseLinkInput).SlopeAngle();
+                    var slopeFirst = (connectedLinks.First() as IBaseLinkInput).SlopeAngle(out _);
+                    var slopeSecond = (connectedLinks.Last() as IBaseLinkInput).SlopeAngle(out _);
                     slope = (slopeFirst + slopeSecond) / 2;
                 }
             }
@@ -372,7 +373,9 @@ public class ModelEditor
 
             Log.Debug($"Location for {sensor} is: {location}");
             return location;
-        });
+        //});
+
+        //return point;
     }
 
 
@@ -488,9 +491,9 @@ public class ModelEditor
         {
             case SensorType.Pressure:
                 var direction = Direction.N;
-                if (sensor.IsDirectional && sensor.IsDirectionOutwards)
+                if (sensor.IsDirectional && sensor.IsDirectionOutward)
                     direction = Direction.NE;
-                if (sensor.IsDirectional && !sensor.IsDirectionOutwards)
+                if (sensor.IsDirectional && !sensor.IsDirectionOutward)
                     direction = Direction.NW;
                 return direction;
 

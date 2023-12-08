@@ -20,9 +20,16 @@ public class EndPoints
     #region Constructor
     public EndPoints(Options options, string apiVersion = "v1")
     {
-        if (options.Env == Env.Prod) EnvironmentPrefix = ProdPrefix;
-        if (options.Env == Env.Qa) EnvironmentPrefix = QaPrefix;
+        Update(options, apiVersion);
+    }
+    #endregion
+
+    #region Public Methods
+    public void Update(Options options, string apiVersion = "v1")
+    {
         if (options.Env == Env.Dev) EnvironmentPrefix = DevPrefix;
+        if (options.Env == Env.Qa) EnvironmentPrefix = QaPrefix;
+        if (options.Env == Env.Prod) EnvironmentPrefix = ProdPrefix;
 
         DTID = options.DigitalTwinId;
         Query = new Query(options);
@@ -32,6 +39,7 @@ public class EndPoints
         RootApiVersion = $"{Root}/{Api}/{apiVersion}";
 
         RootIMS = $"{Schema}://{EnvironmentPrefix}{ImsSubDomain}.{Domain}";
+
     }
     #endregion
 
@@ -43,16 +51,16 @@ public class EndPoints
     #endregion
 
     #region Public ReadOnly Properties
-    public int DTID { get; }
-    public Query Query { get; }
-    public string EnvironmentPrefix { get; } = "";
-    public string ApiVersion { get; }
-    public string Root { get; }
-    public string RootApiVersion { get; }
+    public int DTID { get; set; }
+    public Query Query { get; private set; }
+    public string EnvironmentPrefix { get; private set; } = "";
+    public string ApiVersion { get; private set; }
+    public string Root { get; private set; }
+    public string RootApiVersion { get; private set; }
 
 
     // IMS
-    public string RootIMS { get; }
+    public string RootIMS { get; private set; }
     public string ImsConnect => $"{RootIMS}/connect";
     public string ImsUserInfo => $"{ImsConnect}/userinfo";
 
@@ -60,6 +68,7 @@ public class EndPoints
     //
     // User
     public string UserInfo => $"{RootApiVersion}";
+
 
     //
     // Alerting
@@ -69,6 +78,19 @@ public class EndPoints
     public string AlertingConfigsQDT => $"{AlertingConfigs}?{Query.DTID}";
     public string AlertingConfigsForId(int id) => $"{AlertingConfigs}/{id}?{Query.DTID}";
 
+
+    //
+    // Smart Meters
+    public string SmartMeters => $"{RootApiVersion}/SmartMeter";
+    public string SmartMetersSmartMeters => $"{SmartMeters}/SmartMeter";
+    public string SmartMetersSmartMetersQDT => $"{SmartMetersSmartMeters}?{Query.DTID}";
+    public string SmartMetersSmartMetersForId(int id) => $"{SmartMetersSmartMeters}/{id}?{Query.DTID}";
+    public string SmartMetersSmartMetersFromFile => $"{SmartMeters}/SmartMetersFromFile";
+    public string SmartMetersSmartMetersFromFileQDT => $"{SmartMetersSmartMetersFromFile}?{Query.DTID}&actionId=http://watersight.bentley.com/administration/smart-meters#smartMetersImport";
+
+
+
+    //
     // Mailman
     public string Mailman => $"{RootApiVersion}/Mailman";
     public string MailmanSubsGroup => $"{Mailman}/SubscriberGroup";
@@ -132,9 +154,11 @@ public class EndPoints
     public string HydStructuresZones => $"{HydStructures}/Zones";
     public string HydStructuresZonesQDT => $"{HydStructuresZones}?{Query.DTID}";
     public string HydStructuresZonesForQDT(int id) => $"{HydStructuresZones}/{id}?{Query.DTID}";
+    public string HydStructuresZonesConfidenceRangeForQDT(int id) => $"{HydStructuresZones}/{id}/ConfidenceRange?{Query.DTID}";
+
     public string HydStructuresPump => $"{HydStructures}/Pump";
     public string HydStructuresPumpQDT => $"{HydStructuresPump}?{Query.DTID}";
-    public string HydStructuresPumpForQDT(int id) => $"{HydStructuresPump}/{Query.PumpId(id)}&{Query.DTID}";
+    public string HydStructuresPumpForQDT(int id) => $"{HydStructuresPump}?{Query.PumpId(id)}&{Query.DTID}";
     public string HydStructuresPumps => $"{HydStructures}/Pumps";
     public string HydStructuresPumpsQDT => $"{HydStructuresPumps}?{Query.DTID}";
 
@@ -159,6 +183,9 @@ public class EndPoints
     public string HydStructureConsumptionPointsQDT => $"{HydStructureConsumptionPoints}?{Query.DTID}";
     public string HydStructureMonthlyBilling => $"{HydStructures}/MonthlyBilling";
     public string HydStructureMonthlyBillingQDT => $"{HydStructureMonthlyBilling}?{Query.DTID}";
+
+
+
 
     //
     // Numerical Modeling
@@ -199,16 +226,27 @@ public class EndPoints
 
 
     //
+    // Digital Twin System Metrics
+    public string DTSysMetrics => $"{RootApiVersion}/DigitalTwinSystemMetrics";
+    public string DTSysMetricsQueries => $"{DTSysMetrics}/Queries";
+    public string DTSysMetricsQueriesQDT => $"{DTSysMetrics}/Queries?{Query.DTID}";
+
+
+    //
     // Digital Twins
     public string DT => $"{RootApiVersion}/DigitalTwin";
+    public string DTSlashId => $"{DT}/{DTID}";
     public string DTConnected => $"{DT}/DigitalTwinsConnected";
     public string DTConnectedQDT => $"{DTConnected}?{Query.DTID}";
     public string DTConnectedQDtName(string name) => $"{DTConnected}?{Query.DTName(name)}";
     public string DTConnectedQDtNameQDtType(string name, int digitalTwinType) => $"{DTConnectedQDtName(name)}&{Query.DTType(digitalTwinType)}";
-    
+
     public string DTConnectedUser => $"{DTConnected}/User";
     public string DTQuants => $"{DT}/Quantities";
     public string DTQuantsQDT => $"{DTQuants}?{Query.DTID}";
+
+    public string DTIdDisplayUnits => $"{DTSlashId}/DisplayUnits";
+    public string DTIdDisplayUnitsOptionsIsTrue => $"{DTIdDisplayUnits}?options=true";
 
     public string DTGuid => $"{DT}/GUID";
     public string DTGoals(int dtId) => $"{DT}/{dtId}/Goals";
@@ -218,10 +256,10 @@ public class EndPoints
 
     public string DTDigitalTwins => $"{DT}/DigitalTwins";
     public string DTDigitalTwinsQDT => $"{DTDigitalTwins}?{Query.DTID}";
-    
+
     public string DTMetaDeta => $"{DT}/Metadata";
     public string DTDigitalTwinsGuid => $"{DTDigitalTwins}/GUID";
-    
+
     public string DTPowerBI => $"{DT}/PowerBI";
     public string DTPowerBIUrl => $"{DTPowerBI}/Url";
     public string DTPowerBIUrlQDT => $"{DTPowerBI}/Url?{Query.DTID}";
@@ -245,12 +283,12 @@ public class EndPoints
     public string DTServiceExpectationsMinPressure => $"{DTServiceExpectations}/MinPressure";
     public string DTServiceExpectationsMinPumpEfficiency => $"{DTServiceExpectations}/MinPumpEfficiency";
     public string DTServiceExpectationsEnergyFromRenewableSources => $"{DTServiceExpectations}/RenewableEnergy";
-    public string DTServiceExpectationsCarbonFootprint => $"{DTServiceExpectations}/CarbonFootprint";
+    public string DTServiceExpectationsCO2EmissionFactor => $"{DTServiceExpectations}/CO2EmissionFactor";
     public string DTServiceExpectationsMaxPressureSet(double pressure) => $"{DTServiceExpectationsMaxPressure}?{Query.Value(pressure)}";
     public string DTServiceExpectationsMinPressureSet(double pressure) => $"{DTServiceExpectationsMinPressure}?{Query.Value(pressure)}";
     public string DTServiceExpectationsTargetPumpEfficiencySet(double efficiency) => $"{DTServiceExpectationsMinPumpEfficiency}?{Query.Value(efficiency)}";
     public string DTServiceExpectationsEnergyFromRenewableSourcesSet(double renewableEnergy) => $"{DTServiceExpectationsEnergyFromRenewableSources}?{Query.Value(renewableEnergy)}";
-    public string DTServiceExpectationsCarbonFootprintSet(double carbonFootprint) => $"{DTServiceExpectationsCarbonFootprint}?{Query.Value(carbonFootprint)}";
+    public string DTServiceExpectationsCO2EmissionFactorSet(double emissionFactor, string unit) => $"{DTServiceExpectationsCO2EmissionFactor}?{Query.Value(emissionFactor)}&{Query.ValueUnit(unit)}";
 
     //
     // Costs
@@ -279,6 +317,6 @@ public class EndPoints
     public string DTCoordinates => $"{DT}/{DTID}/Coordinates";
     public string DTCoordinatesQDT => $"{DTCoordinates}?{Query.DTID}";
     public string DTCoordinatesQDTSet(double lat, double lng) => $"{DTCoordinatesQDT}&{Query.Latitude(lat)}&{Query.Longitude(lng)}";
-    
+
     #endregion
 }

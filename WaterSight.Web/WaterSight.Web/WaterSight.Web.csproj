@@ -37,13 +37,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\Output\WaterSight.Web\bin\x64\Debug\</OutputPath>
+    <OutputPath>..\..\..\Output\WaterSight.Web\bin\x64\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>10.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>..\..\Output\WaterSight.Web\bin\x64\Debug\WaterSight.Web.xml</DocumentationFile>
+    <DocumentationFile>..\..\..\Output\WaterSight.Web\bin\x64\Debug\WaterSight.Web.xml</DocumentationFile>
     <NoWarn>CS1591,CS8632</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -71,9 +71,11 @@
   <ItemGroup>
     <Compile Include="Alerts\Alert.cs" />
     <Compile Include="Alerts\EmailGroup.cs" />
+    <Compile Include="BlobStorages\BlobStorage.cs" />
     <Compile Include="Core\CRUDBase.cs" />
     <Compile Include="Core\EndPoints.cs" />
     <Compile Include="Core\enums.cs" />
+    <Compile Include="Core\Logging.cs" />
     <Compile Include="Core\Options.cs" />
     <Compile Include="Core\Payload.cs" />
     <Compile Include="Core\Query.cs" />
@@ -81,7 +83,7 @@
     <Compile Include="Core\WS.cs" />
     <Compile Include="Core\WSItem.cs" />
     <Compile Include="Customers\Billings.cs" />
-    <Compile Include="Customers\Customers.cs" />
+    <Compile Include="Customers\Users.cs" />
     <Compile Include="Customers\Meters.cs" />
     <Compile Include="Custom\WaterModel.cs" />
     <Compile Include="DT\DigitalTwin.cs" />
@@ -95,6 +97,7 @@
     <Compile Include="HydrulicStructures\PumpStation.cs" />
     <Compile Include="HydrulicStructures\Tank.cs" />
     <Compile Include="HydrulicStructures\TankCurve.cs" />
+    <Compile Include="Landings\Home.cs" />
     <Compile Include="NumericModels\NumericModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sensors\Sensor.cs" />
@@ -119,7 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper">
-      <Version>27.2.1</Version>
+      <Version>30.0.1</Version>
     </PackageReference>
     <PackageReference Include="ExcelMapper">
       <Version>5.2.403</Version>
@@ -139,6 +142,12 @@
     <PackageReference Include="Serilog.Sinks.File">
       <Version>5.0.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\WaterSight.Excel\WaterSight.Excel\WaterSight.Excel.csproj">
+      <Project>{318ea411-2400-4183-9dbb-7439179b00fa}</Project>
+      <Name>WaterSight.Excel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

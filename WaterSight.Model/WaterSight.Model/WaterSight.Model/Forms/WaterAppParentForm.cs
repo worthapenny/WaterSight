@@ -16,8 +16,8 @@ public partial class WaterAppParentForm : HaestadParentForm, IParentFormSurrogat
     }
     #endregion
 
-    #region Public Methods
-    public void SetParentWindowHandle(long handle)
+    #region Public Methods   
+    public void SetParentWindowHandle(IntPtr handle)
     {
         //no-op
     }

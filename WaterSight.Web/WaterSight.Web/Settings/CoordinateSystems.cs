@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
@@ -7,6 +8,13 @@ using WaterSight.Web.Core;
 namespace WaterSight.Web.Settings;
 public class CoordinateSystems : WSItem
 {
+    #region Constants
+    public const string NameSensors = "Sensors";
+    public const string NameCustomers = "Customers";
+    public const string NameSmartMeters = "Smart Meters";
+    public const string NameWorkOrders= "Work Orders";
+    #endregion
+
     #region Constructor
     public CoordinateSystems(WS ws) : base(ws)
     {
@@ -47,23 +55,23 @@ public class CoordinateSystems : WSItem
     // When invalid code is supplied, exception is thrown by the server
     public async Task<bool> SetSensors(int epsg)
     {
-        var url = EndPoints.DTCoordinateSystemQDTSet("Sensors", epsg);
-        return await WS.PutAsync(url, null, "Sensors", additionalInfo: $"Epsg: {epsg}");
+        var url = EndPoints.DTCoordinateSystemQDTSet(NameSensors, epsg);
+        return await WS.PutAsync(url, null, NameSensors, additionalInfo: $"Epsg: {epsg}");
     }
     public async Task<bool> SetCustomers(int epsg)
     {
-        var url = EndPoints.DTCoordinateSystemQDTSet("Customers", epsg);
-        return await WS.PutAsync(url, null, "Customers", additionalInfo: $"Epsg: {epsg}");
+        var url = EndPoints.DTCoordinateSystemQDTSet(NameCustomers, epsg);
+        return await WS.PutAsync(url, null, NameCustomers, additionalInfo: $"Epsg: {epsg}");
     }
     public async Task<bool> SetSmartMeters(int epsg)
     {
-        var url = EndPoints.DTCoordinateSystemQDTSet("Smart Meters", epsg);
-        return await WS.PutAsync(url, null, "SmartMeters", additionalInfo: $"Epsg: {epsg}");
+        var url = EndPoints.DTCoordinateSystemQDTSet(NameSmartMeters, epsg);
+        return await WS.PutAsync(url, null, NameSmartMeters, additionalInfo: $"Epsg: {epsg}");
     }
     public async Task<bool> SetWorkOrders(int epsg)
     {
-        var url = EndPoints.DTCoordinateSystemQDTSet("Work Orders", epsg);
-        return await WS.PutAsync(url, null, "WorkOrders", additionalInfo: $"Epsg: {epsg}");
+        var url = EndPoints.DTCoordinateSystemQDTSet(NameWorkOrders, epsg);
+        return await WS.PutAsync(url, null, NameWorkOrders, additionalInfo: $"Epsg: {epsg}");
     }
     #endregion
 
