@@ -11,6 +11,8 @@ using WaterSight.Web.Core;
 using WaterSight.Web.Extensions;
 using WaterSight.Web.Support;
 using Ganss.Excel;
+using Serilog;
+using WaterSight.Web.Support.IO;
 
 namespace WaterSight.Web.Sensors;
 
@@ -29,7 +31,7 @@ public class Sensor : WSItem
     // CREATE
     public async Task<SensorConfig?> AddSensorConfigAsync(SensorConfig sensor)
     {
-        var url = EndPoints.RtdaSignalsConfigQDT;
+        var url = EndPoints.RtdaSignalsQDT;
 
         if(sensor.PatternWeekId == null || sensor.PatternWeekId == 0)
         {
@@ -89,8 +91,7 @@ public class Sensor : WSItem
     }
     public async Task<List<SensorConfig?>> GetSensorsConfigAsync()
     {
-
-        var url = EndPoints.RtdaSignalsConfigQDT;
+        var url = EndPoints.RtdaSignalsQDT;
         return await WS.GetManyAsync<SensorConfig>(url, "Sensors");
     }
 
@@ -131,11 +132,137 @@ public class Sensor : WSItem
         var tsd15M = await Request.GetJsonAsync<SensorTsdWeb>(res) ?? new SensorTsdWeb();
 
         if (res.StatusCode == HttpStatusCode.OK)
-            Logger.Debug($"Sensor TSD received for {id} [{startAt:u},{endAt:u}]. Count = {tsd15M?.UnifiedTSDs?.Count}");
+            Logger.Debug($"✅ Sensor TSD received for {id} [{startAt:u},{endAt:u}]. Count = {tsd15M?.UnifiedTSDs?.Count}");
         else
-            Logger.Error($"Failed to get sensor TSD for {id} [{startAt:u},{endAt:u}]. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"💀 Failed to get sensor TSD for {id} [{startAt:u},{endAt:u}]. Reason: {res.ReasonPhrase}. Text: {await res.Content.ReadAsStringAsync()}. URL: {url}");
 
         return tsd15M;
+    }
+
+    public async Task<bool> PostJsonFileAsync(
+        string jsonFilePath,
+        List<string>? tagIds, // to filter to tags of interest
+        bool onlyNoDataSensors = false,
+        bool useLastInstanceFromServer = true
+        )
+    {
+        if(!File.Exists( jsonFilePath ))
+            throw new FileNotFoundException( jsonFilePath );
+
+        var tsdValues = JsonIO.LoadFromFile<List<TSDValue>>(jsonFilePath);
+        if (tsdValues == null)
+            throw new DataException($"Json data is not in expected format.");
+
+        Log.Debug($"Data loaded from JSON. Count: {tsdValues.Count}");
+        var success = await PostTsdDataAsync(
+            tsdValues: tsdValues,
+            tagIds: tagIds,
+            onlyNoDataSensors: onlyNoDataSensors,
+            useLastInstanceFromServer: useLastInstanceFromServer);
+
+        Log.Debug($"Done posting TSD Data.");
+        return success;
+    }
+
+    public async Task<bool> PostTsdDataAsync(
+        List<TSDValue> tsdValues,
+        List<string>? tagIds, // to filter to tags of interest
+        bool onlyNoDataSensors = false,
+        bool useLastInstanceFromServer = true)
+    {
+        // Pull all the sensor configs from WaterSight
+        // and select to tags of interest
+        var sensorsConfig = await GetSensorsConfigAsync();
+
+        if (tagIds?.Any() ?? false)
+        {
+            sensorsConfig = sensorsConfig
+                .Where(s => tagIds.Contains(s.TagId))
+                .ToList();
+
+            Log.Debug($"Due to given 'tasIds', number of sensors to work with: {sensorsConfig.Count}");
+        }
+
+        // filter to sensors that have no data at all on WaterSight
+        if (onlyNoDataSensors)
+        {
+            sensorsConfig = sensorsConfig
+                .Where(s => s.LastInstantInDatabase == null)
+                .ToList();
+            
+            Log.Debug($"Number of sensors with no data: {sensorsConfig.Count}. Data for these sensors will be pushed.");
+        }
+
+        // Work on pushing the data
+        var pushedAll = true;
+
+        var counter = 0;
+        var totalSensors = sensorsConfig.Count;
+        foreach (var sensorConfig in sensorsConfig)
+        {
+            try
+            {
+                var wsTag = sensorConfig.TagId;
+
+                var filteredData = tsdValues
+                   .Where(d => d.ID?.ToString() == wsTag && d.Value.HasValue)
+                   .ToList();
+
+                Log.Debug($"Number of data row to push against the '{wsTag}', name '{sensorConfig.Name}' tag is: {filteredData.Count}");
+                if(!filteredData.Any() )
+                {
+                    Log.Information($"No data found for tag '{wsTag}', name '{sensorConfig.Name}' to push.");
+                    continue;
+                }
+
+                var lastInstance = sensorConfig.LastInstantInDatabase;
+                if (useLastInstanceFromServer && lastInstance != null)
+                {
+                    filteredData = filteredData
+                        .Where(d => d.Instant > lastInstance.Value)
+                        .ToList();
+
+                    Log.Debug($"Number of data row after '{lastInstance}' to push against the '{wsTag}', name '{sensorConfig.Name}' tag is: {filteredData.Count}");
+                    if (!filteredData.Any())
+                    {
+                        Log.Information($"No data found after '{lastInstance}' for tag '{wsTag}', name '{sensorConfig.Name}' to push.");
+                        continue;
+                    }
+                }
+
+                // Replace the ID with 0 (per WaterSight requirements)
+                filteredData.ForEach(d => d.ID = 0);
+
+                Logger.Information($"About to push TSD from '{lastInstance:d}'. Tag = '{wsTag}', Count = '{filteredData.Count}'");
+                if (filteredData.Any())
+                {
+                    var success = await PostSensorTSDAsync(
+                        sensorId: sensorConfig.ID,
+                        data: filteredData,
+                        tagNameForLogging: sensorConfig.TagId);
+
+                    pushedAll = pushedAll & success;
+
+                    counter++;
+                    Logger.Information($"✅ [{counter}/{totalSensors}] Pushed data for tag = {sensorConfig.TagId}, name = {sensorConfig.Name}. Count = {filteredData.Count}");
+                }
+                else
+                {
+                    Logger.Warning($"⚠️ No data to push. tag = {sensorConfig.TagId}, name = {sensorConfig.Name}. Count = {filteredData.Count}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"💀...while pushing data,  tag = {sensorConfig.TagId}, name = {sensorConfig.Name}.");
+                Debugger.Break();
+            }
+
+            Logger.Information($"Done posting data for {sensorConfig.Name}");
+            Logger.Debug(new string('•', 100));
+        }
+
+        return pushedAll;
+
     }
 
     public async Task<bool> PostSensorTSDAsync(int sensorId, List<TSDValue> data, string tagNameForLogging = "")
@@ -342,7 +469,7 @@ public class SensorConfig
 public class SensorTsdWeb
 {
     #region Public Methods
-    public DataTable PointsToDataTable(string tagName)
+    public DataTable PointsToDataTable(string tagName, string valueFieldName = "Value")
     {
         if (UnifiedTSDs.Count == 0)
             return new DataTable();
@@ -351,7 +478,7 @@ public class SensorTsdWeb
         dt.Columns.Add("Tag", typeof(string));
         dt.Columns.Add("DateTime", typeof(DateTimeOffset));
 
-        var valueCol = dt.Columns.Add("StatQueryValue", typeof(double));
+        var valueCol = dt.Columns.Add(valueFieldName, typeof(double));
         valueCol.AllowDBNull = true;
 
 

@@ -29,10 +29,11 @@ public class Program
         string logTemplate = "{Timestamp:dd HH:mm:ss.fff} [{Level:u3}] {Message:lj} {Properties}{NewLine}{Exception}";
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
-            .WriteTo.Console(outputTemplate:logTemplate)
+            .WriteTo.Console(outputTemplate: logTemplate)
             .CreateLogger();
 
         Log.Information("Logging started for console");
+        Log.Information("Arguments: " + string.Join(",", args));
 
         //
         // Make sure Admin rights are there
@@ -40,6 +41,8 @@ public class Program
         {
             Log.Information("Restarting as admin");
             var runningWithAdmin = StartAsAdmin(Assembly.GetExecutingAssembly().Location.Replace(".dll", ".exe"), args);
+
+            Log.Information("Arguments: " + string.Join(",", args));
 
             if (runningWithAdmin)
             {
@@ -56,6 +59,7 @@ public class Program
         // User Options
         //
         var intervalInMinutes = ParseArguments(args, out Env env);
+        Log.Information($"Env: {env}");
 
 
         // Apply user options
@@ -124,25 +128,29 @@ public class Program
         var intervalInMinutes = 30; // ever 30 minutes a new token will be generated
         env = Env.Prod;
 
-        var argsLength = args.Length;
-        Log.Debug($"Length of arguments = {args.Length} and args are: {string.Join(", ", args)}");
+        var argsLength = args?.Length ?? 0;
+        Log.Debug($"Length of arguments = {argsLength} and args are: {string.Join(", ", args)}");
 
-        if (argsLength > 0)
+        if (argsLength == 0)
         {
-            var firstArgs = args.Length == 1 ? args[1] : "30";
-            var secondArgs = args.Length == 2 ? args[2] : "prod";
-
-            try
-            {
-                intervalInMinutes = Convert.ToInt16(firstArgs);
-                if (secondArgs.ToLower() == "qa" || secondArgs.ToLower() == "dev")
-                    env = Env.Qa;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"...while parsing the arguments");
-            }
+            args = args.Append("prod").Append("30").ToArray();
         }
+        else if (argsLength == 1)
+            args = args.Append("30").ToArray();
+
+        var firstArg = args[0];
+        var secondArg = args[1];
+        try
+        {
+            intervalInMinutes = Convert.ToInt16(secondArg);
+            if (firstArg.ToLower() == "qa" || firstArg.ToLower() == "dev")
+                env = Env.Qa;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"...while parsing the arguments");
+        }
+
 
         return intervalInMinutes;
     }

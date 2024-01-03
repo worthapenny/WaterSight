@@ -79,7 +79,7 @@ public class Tank : WSItem
         var successes = await Task.WhenAll(deleteTask);
 
         Logger.Information($"Deleted all Tanks individually.");
-        
+
         return successes.All(s => s);
 
     }

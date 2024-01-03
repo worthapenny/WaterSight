@@ -112,9 +112,11 @@
     <Compile Include="Settings\Units.cs" />
     <Compile Include="Setup\Setup.cs" />
     <Compile Include="SmartMeters\SmartMeter.cs" />
+    <Compile Include="Support\IO\JsonIO.cs" />
     <Compile Include="Support\Util.cs" />
     <Compile Include="User\TimeWatch.cs" />
     <Compile Include="User\UserInfo.cs" />
+    <Compile Include="Watchdog\WatchDog.cs" />
     <Compile Include="Zones\Zone.cs" />
   </ItemGroup>
   <ItemGroup>

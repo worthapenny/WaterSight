@@ -20,22 +20,23 @@ public class EndPoints
     #region Constructor
     public EndPoints(Options options, string apiVersion = "v1")
     {
-        Update(options, apiVersion);
+        Options = options;
+        Update(apiVersion);
     }
     #endregion
 
     #region Public Methods
-    public void Update(Options options, string apiVersion = "v1")
+    public void Update(string apiVersion = "v1")
     {
-        if (options.Env == Env.Dev) EnvironmentPrefix = DevPrefix;
-        if (options.Env == Env.Qa) EnvironmentPrefix = QaPrefix;
-        if (options.Env == Env.Prod) EnvironmentPrefix = ProdPrefix;
+        if (Options.Env == Env.Dev) EnvironmentPrefix = DevPrefix;
+        if (Options.Env == Env.Qa) EnvironmentPrefix = QaPrefix;
+        if (Options.Env == Env.Prod) EnvironmentPrefix = ProdPrefix;
 
-        DTID = options.DigitalTwinId;
-        Query = new Query(options);
+        DTID = Options.DigitalTwinId;
+        Query = new Query(Options);
         ApiVersion = apiVersion;
 
-        Root = $"{Schema}://{EnvironmentPrefix}{SubDomain}{options.SubDomainSuffix}.{Domain}";
+        Root = $"{Schema}://{EnvironmentPrefix}{SubDomain}{Options.SubDomainSuffix}.{Domain}";
         RootApiVersion = $"{Root}/{Api}/{apiVersion}";
 
         RootIMS = $"{Schema}://{EnvironmentPrefix}{ImsSubDomain}.{Domain}";
@@ -57,7 +58,8 @@ public class EndPoints
     public string ApiVersion { get; private set; }
     public string Root { get; private set; }
     public string RootApiVersion { get; private set; }
-
+    public Options Options { get; private set; }
+    public bool HasPAT => !string.IsNullOrEmpty(Options.PAT);
 
     // IMS
     public string RootIMS { get; private set; }
@@ -111,17 +113,17 @@ public class EndPoints
     // RTDA
     public string Rtda => $"{RootApiVersion}/RealTimeDataAcquisition";
     public string RtdaTsValues => $"{Rtda}/TimeSeriesValues";
-    public string RtdaTsValuesFor(int sensorId) => $"{RtdaTsValues}/{sensorId}?{Query.DTID}";
+    public string RtdaTsValuesFor(int sensorId) => HasPAT ? $"{RtdaTsValues}/{sensorId}?{Query.UseToken}&{Query.DTID}" : $"{RtdaTsValues}/{sensorId}?{Query.DTID}";
     public string RtdaTsValuesPurge => $"{RtdaTsValues}/LRO?{Query.DTID}&actionId=http%3A%2F%2Fwatersight.bentley.com%2Fadministration%2Fsignals%3Fsensorid%3D22571%23purge&beforeDate=&afterDate=";
     public string RtdaTsValuesPurgeFor(int sensorId) => $"{RtdaTsValues}/{sensorId}/LRO?{Query.DTID}&actionId=http%3A%2F%2Fwatersight.bentley.com%2Fadministration%2Fsignals%3Fsensorid%3D22571%23purge&beforeDate=&afterDate=";
     public string RtdaTsValuesWithin(int sensorId, DateTimeOffset startAt, DateTimeOffset endAt, IntegrationType integrationType) => $"{RtdaTsValues}/{sensorId}?{Query.DTID}&{Query.GetStartDateTime(startAt)}&{Query.GetEndDateTime(endAt)}&integrationType={(int)integrationType}";
     public string RtdaTsValuesLatest => $"{RtdaTsValues}/Latest";
     public string RtdaTsValuesMonthlyVolumes => $"{RtdaTsValues}/MonthlyVolumes";
     public string RtdaTsValuesDailyMins => $"{RtdaTsValues}/DailyMinimums";
-    public string RtdaSignals => $"{Rtda}/Signals";
+    public string RtdaSignals => HasPAT ? $"{Rtda}/Signals?{Query.UseToken}" :  $"{Rtda}/Signals";
     public string RtdaSignalsLROQDT => $"{RtdaSignals}/LRO?{Query.DTID}";
     public string RtdaSignalsForQDT(int id, bool LRO = false) => $"{RtdaSignals}/{id}{(LRO ? "/LRO" : "")}?{Query.DTID}";
-    public string RtdaSignalsConfigQDT => $"{RtdaSignals}?{Query.DTID}";
+    public string RtdaSignalsQDT => HasPAT ? $"{RtdaSignals}&{Query.DTID}" : $"{RtdaSignals}?{Query.DTID}";
     public string RtdaSignalsFile => $"{RtdaSignals}/File";
     public string RtdaSignalsFileQDT => $"{RtdaSignalsFile}?{Query.DTID}";
     public string RtdaSettingsTile => $"{Rtda}/SettingsTile";
@@ -318,5 +320,27 @@ public class EndPoints
     public string DTCoordinatesQDT => $"{DTCoordinates}?{Query.DTID}";
     public string DTCoordinatesQDTSet(double lat, double lng) => $"{DTCoordinatesQDT}&{Query.Latitude(lat)}&{Query.Longitude(lng)}";
 
+
+    // 
+    // Watchdog
+    public string Watchdog => $"{RootApiVersion}/Watchdog";
+    public string WatchdogHealthChecks => $"{Watchdog}/HealthChecks";
+    public string WatchdogHealthChecksWSServiceFab => $"{WatchdogHealthChecks}/WaterSightServiceFabric";
+    public string WatchdogStatus => $"{Watchdog}/status";
+    public string WatchdogStatusOnSiteCoord => $"{WatchdogStatus}/onSiteCoord";
+    public string WatchdogStatusOnSiteCoordQDT => $"{WatchdogStatus}/onSiteCoord?{Query.DTID}";
+    //public string WatchdogStatusOnSiteCoordQDTPeriod(string period = "P7D") => $"{WatchdogStatusOnSiteCoordQDT}&timePeriod={period}";
+
+    public string WatchdogStatusScadaPusher=> $"{WatchdogStatus}/scadaPusher";
+    public string WatchdogStatusScadaPusherSummary=> $"{WatchdogStatusScadaPusher}/summary";
+    public string WatchdogStatusScadaPusherSummaryQDT => $"{WatchdogStatusScadaPusherSummary}?{Query.DTID}";
+    public string WatchdogStatusScadaPusherSummaryQDTPeriod(string period="PT30M") => $"{WatchdogStatusScadaPusherSummary}?{Query.DTID}&timePeriod={period}";
+    public string WatchdogStatusScadaPusherLatest => $"{WatchdogStatusScadaPusher}/latest";
+    public string WatchdogStatusScadaPusherLatestQDT => $"{WatchdogStatusScadaPusher}/latest?{Query.DTID}";
+    public string WatchdogStatusScadaPusherLatestPeriod(string period = "P7D") => $"{WatchdogStatusScadaPusherLatestQDT}&timePeriod={period}";
+
+    public string WatchdogStatusOverview => $"{WatchdogStatus}/overview";
+    public string WatchdogStatusOverviewOnSiteCoord => $"{WatchdogStatusOverview}/onSiteCoord";
+    public string WatchdogStatusOverviewScadaPusher => $"{WatchdogStatusOverview}/scadaPusher";
     #endregion
 }

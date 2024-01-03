@@ -192,7 +192,6 @@ public class Zone : WSItem
                 zoneItems.Add(new ZoneItem()
                 {
                     DisplayName = zc.Name,
-                    SensorId = signalId,
                     TagId = signalConfig.TagId,
                     Type = ZoneFlowType.Inflow.ToString(),
                 });
@@ -204,7 +203,6 @@ public class Zone : WSItem
                 zoneItems.Add(new ZoneItem()
                 {
                     DisplayName = zc.Name,
-                    SensorId = signalId,
                     TagId = signalConfig.TagId,
                     Type = ZoneFlowType.Inflow.ToString(),
                 });
@@ -216,7 +214,6 @@ public class Zone : WSItem
                 zoneItems.Add(new ZoneItem()
                 {
                     DisplayName = zc.Name,
-                    SensorId = signalId,
                     TagId = signalConfig.TagId,
                     Type = ZoneFlowType.Inflow.ToString(),
                 });

@@ -71,6 +71,7 @@ public class Query
     public string TimeStep(DateTimeOffset at) => $"timeStep={at.UtcDateTime:O}";
     public string Timezone(string timezoneName) => $"timeZoneId={Uri.EscapeDataString(timezoneName)}";
     public string Username(string name) => $"username={Uri.EscapeDataString(name)}";
+    public string UseToken => $"useToken=True";
     public string Value(object value) => $"value={value}";
     public string ValueUnit(string unit) => $"valueUnit={unit}";
     public string VectorType(string dataTypeName) => $"vectorType={Uri.EscapeDataString(dataTypeName)}";

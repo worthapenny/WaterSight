@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WaterSight.WaterSightDataCollector": {
+      "commandName": "Project",
+      "commandLineArgs": "prod 139"
+    }
+  }
+}

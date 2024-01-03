@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WaterSight.Web.Support;
 
@@ -18,25 +19,36 @@ namespace WaterSight.Web.Core;
 
 public static class Request
 {
+    #region Constants
+    private const string WaterSightAuthenticatorName = "WaterSight.Authenticator";
+    #endregion
 
     #region Public Static Methods
 
     #region CRUD Operation
-    public static async Task<HttpResponseMessage> Get(string url)
+    public static async Task<HttpResponseMessage> Get(string url, bool firstTry = true)
     {
         Logger.Debug($"GET request, URL: {url}");
 
         // URL to get the list of DTs
         var uri = new Uri(url);
 
-        // add the bearer token
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
-
+        // client
+        var httpClient = new HttpClientFactory().CreateClient();
 
         try
         {
             var sw = Util.StartTimer();
-            var res = await HttpClient.GetAsync(uri);
+            var res = await httpClient.GetAsync(uri);
+
+            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                var isProd = url.StartsWith("https://connect");
+                var env = isProd ? "prod" : "qa";
+                if (RunWaterSightAuthenticator(env, forceStart: !firstTry))
+                    return await Get(url, firstTry: false);
+
+            }
 
             if ((int)res.StatusCode >= 400)
             {
@@ -52,7 +64,16 @@ public static class Request
         }
         catch (HttpRequestException ex)
         {
-            Logger.Error(ex, "...while performing the get request.");
+            if ((ex.InnerException?.Message.Contains("An existing connection was forcibly closed") ?? false)
+                || ex.Message.Contains("No such host is known"))
+            {
+                await Task.Delay(TimeSpan.FromMinutes(1));
+            }
+            else
+            {
+                Logger.Error(ex, "...while performing the get request.");
+                Debugger.Break();
+            }
         }
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
@@ -64,14 +85,15 @@ public static class Request
         // URL to get the list of DTs
         var uri = new Uri(url);
 
-        // add the bearer token
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
+        // client
+        var httpClient = new HttpClientFactory().CreateClient();
+
 
         try
         {
 
             var sw = Util.StartTimer();
-            var res = await HttpClient.PutAsync(uri, content);
+            var res = await httpClient.PutAsync(uri, content);
 
             if (res.StatusCode == HttpStatusCode.Unauthorized)
             {
@@ -97,25 +119,17 @@ public static class Request
 
         var uri = new Uri(url);
 
-        // add the bearer token
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
+        // client
+        var httpClient = new HttpClientFactory().CreateClient();
+
 
         try
         {
             var sw = Util.StartTimer();
 
-
             // Set the timeout to given value
-            // and to do so, we must start a new HttpClient instance
-            var httpClient = HttpClient;
             if (timeout.HasValue)
-            {
-                httpClient = new HttpClient();
-                // add the bearer token
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
-
                 httpClient.Timeout = timeout.Value;
-            }
 
             var res = await httpClient.PostAsync(uri, content);
 
@@ -143,13 +157,13 @@ public static class Request
 
         var uri = new Uri(url);
 
-        // add the bearer token
-        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
+        // client
+        var httpClient = new HttpClientFactory().CreateClient();
 
         try
         {
             var sw = Util.StartTimer();
-            var res = await HttpClient.DeleteAsync(uri);
+            var res = await httpClient.DeleteAsync(uri);
 
             if (res.StatusCode == HttpStatusCode.Unauthorized)
             {
@@ -335,6 +349,9 @@ public static class Request
     #region Private Static Methods
     private static string WaterSightAccessToken()
     {
+        if (!string.IsNullOrEmpty(Options.PAT))
+            return string.Empty;
+
         if (!string.IsNullOrEmpty(Options.RestToken))
             return Options.RestToken;
 
@@ -345,7 +362,10 @@ public static class Request
         {
             Logger.Verbose($"About to pull token from registry. {Options.TokenRegistryPath}");
             if (string.IsNullOrWhiteSpace(Options.TokenRegistryPath))
+            {
+                Debugger.Break();
                 throw new InvalidOperationException($"Given {nameof(Options.TokenRegistryPath)} is invalid: '{Options.TokenRegistryPath}'");
+            }
 
             var registryPathParts = Options.TokenRegistryPath.Split(Path.DirectorySeparatorChar);
 
@@ -376,7 +396,7 @@ public static class Request
             else
             {
                 token = key.GetValue(name)?.ToString();
-                if(string.IsNullOrEmpty(token) ) 
+                if (string.IsNullOrEmpty(token))
                     Debugger.Break();
 
                 Logger.Verbose($"StatQueryValue obtained from registry has a length of {token?.Length}, key: {key}");
@@ -396,19 +416,75 @@ public static class Request
 
         return token ?? "";
     }
+    private static bool RunWaterSightAuthenticator(string env, bool forceStart)
+    {
+        var wsAuthProcess = GetWaterSightAuthenticator();
 
+        // It's not running, start it
+        if (wsAuthProcess == null)
+        {
+            Log.Information($"'{WaterSightAuthenticatorName}' is NOT started, so starting it...");
+            try
+            {
+                var assemblyPath = @"D:\Development\DotNet\WaterSight\Output\WaterSight.Authenticator\bin\Debug\net6.0\WaterSight.Authenticator.exe";
+                var process = new Process();
+                process.StartInfo.FileName = assemblyPath;
+                process.StartInfo.Arguments = $"{env} 30";
+
+                Log.Information($"About to start WS Authenticator. Env: {env}, ForceStart: {forceStart}");
+                var isStarted = process.Start();
+
+                // wait for 30 seconds for user interaction
+                Log.Debug($"Waiting 30 seconds for user interaction...");
+                Thread.Sleep(30 * 1000);
+
+                if (!isStarted)
+                {
+                    Log.Error($"Failed to start the {WaterSightAuthenticatorName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                var message = $"..while starting '{WaterSightAuthenticatorName}' process. Error: {ex.Message}";
+                Log.Error(ex, message);
+                Debugger.Break();
+            }
+        }
+
+        // it's running, restart it
+        else if (forceStart)
+        {
+            Log.Information($"Killing process '{WaterSightAuthenticatorName}' as it's already running. ForceStart: {forceStart} ID: {wsAuthProcess.Id}");
+            wsAuthProcess.Kill();
+            RunWaterSightAuthenticator(env, false);
+        }
+
+
+        // Check if it's running
+        var processes = Process.GetProcessesByName(WaterSightAuthenticatorName);
+        return processes.Any();
+    }
+    private static Process? GetWaterSightAuthenticator()
+    {
+        var processes = Process.GetProcessesByName(WaterSightAuthenticatorName);
+        var wsAuthProcess = processes?.FirstOrDefault() ?? null;
+
+        return wsAuthProcess;
+    }
     #endregion
 
     #region Public Static Properties
     public static Options Options => options;
     public static Options options;
 
+    public static TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(1);
+
     // Do not cache the token as it could change ever .5 hrs or so
     public static string BearerToken => WaterSightAccessToken();
     #endregion
 
     #region Private Static Properties      
-    private static HttpClient HttpClient => httpClient ??= new HttpClient();
+    //private static HttpClient HttpClient => httpClient ??= new HttpClient { Timeout = Timeout };
     private static ILogger Logger => WS.Logger;
 
 
@@ -416,5 +492,27 @@ public static class Request
 
     #region Private Static Fields
     private static HttpClient? httpClient;
+    private static HttpClientFactory httpClientFactory = new HttpClientFactory();
+    #endregion
+
+    #region Helper Class
+    class HttpClientFactory
+    {
+        public HttpClient CreateClient()
+        {
+            var httpClient = new HttpClient();
+            httpClient.Timeout = Timeout;
+
+            if (string.IsNullOrEmpty(Options.PAT))
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
+            else
+            {
+                httpClient.DefaultRequestHeaders.Add("X-API-Key", Options.PAT);
+                httpClient.DefaultRequestHeaders.Add("X-Digital-Twin-Id", Options.DigitalTwinId.ToString());
+            }
+
+            return httpClient;
+        }
+    }
     #endregion
 }

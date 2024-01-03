@@ -37,7 +37,9 @@ public class WS
         Env env = Env.Prod,
         ILogger? logger = null,
         string subDomainSuffix = "",
-        string? restToken = null)
+        string? restToken = null,
+        string? pat = null,
+        string? logFilesDir = null)
     {
         Options = new Options(
             digitalTwinId,
@@ -46,11 +48,12 @@ public class WS
             subDomainSuffix: subDomainSuffix,
             restToken: restToken);
 
+        Options.PAT = pat;
         Options.EPSGCode = epsgCode;
         Request.options = Options;
         EndPoints = new EndPoints(Options);
-                
-        
+
+
         DigitalTwin = new DigitalTwin(this);
         Sensor = new Sensors.Sensor(this);
         SmartMeter = new SmartMeters.SmartMeter(this);
@@ -67,11 +70,17 @@ public class WS
         CustomWaterModel = new WaterModel(this);
         BlobStorage = new BlobStorage(this);
         Home = new Home(this);
+        WatchDog = new Watchdog.WatchDog(this);
 
         if (logger == null)
         {
             var logTemplate = "{Timestamp:HH:mm:ss.ff} | {Level:u3} | {Message}{NewLine}{Exception}";
-            Logging.SetupLogger(appName: "WaterSightAPI", logTemplate: logTemplate, logEventLevel: Serilog.Events.LogEventLevel.Debug);
+            Logging.SetupLogger(
+                appName: "WaterSightAPI",
+                logTemplate: logTemplate,
+                logEventLevel: Serilog.Events.LogEventLevel.Debug,
+                logFilesDir: logFilesDir
+                );
         }
 
         Logger = Log.Logger;
@@ -90,7 +99,7 @@ public class WS
     {
         Options.DigitalTwinId = id;
         Options.Env = env;
-        EndPoints.Update(Options);
+        EndPoints.Update(apiVersion: "v1");
     }
 
 
@@ -386,7 +395,7 @@ public class WS
             Logger.Error($"💀 Failed to get {typeName} data. Reason: {res.ReasonPhrase}. Text: {resContentText}. URL: {url}");
             return t;
         }
-        
+
 
         if (!supportsLRO)
         {
@@ -439,5 +448,6 @@ public class WS
     public WaterModel CustomWaterModel { get; }
     public BlobStorage BlobStorage { get; }
     public Home Home { get; }
+    public Watchdog.WatchDog WatchDog  { get;}
     #endregion
 }

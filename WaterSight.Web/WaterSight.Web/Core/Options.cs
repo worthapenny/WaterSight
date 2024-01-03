@@ -41,6 +41,7 @@ public class Options
     public TimeZoneInfo LocalTimeZone { get; set; } = TimeZoneInfo.Local;
 
     public string? RestToken { get; set; }
+    public string? PAT { get; set; }
     public string TokenRegistryPath { get; private set; } = "";
     #endregion
 

@@ -23,7 +23,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.Authenticator", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.Authenticator.Test", "WaterSight.Authenticator\WaterSight.Authenticator\WaterSight.Authenticator.Test\WaterSight.Authenticator.Test.csproj", "{11D8CFA8-245C-43B5-90CD-FDA0E9F5F357}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaterSight.MonitoredFileDataPusher", "WaterSight.MonitoredFileDataPusher\WaterSight.MonitoredFileDataPusher.csproj", "{42490331-B86F-4AD5-9EED-F27FF9FD34BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.MonitoredFileDataPusher", "WaterSight.MonitoredFileDataPusher\WaterSight.MonitoredFileDataPusher.csproj", "{42490331-B86F-4AD5-9EED-F27FF9FD34BD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.WaterSightDataCollector", "WaterSight.WaterSightDataCollector\WaterSight.WaterSightDataCollector.csproj", "{10719424-4657-40DE-950C-76CA04014E2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaterSight.WaterSightDataCollector.Test", "WaterSight.WaterSightDataCollector.Test\WaterSight.WaterSightDataCollector.Test.csproj", "{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -167,6 +171,30 @@ Global
 		{42490331-B86F-4AD5-9EED-F27FF9FD34BD}.Release|x64.Build.0 = Release|Any CPU
 		{42490331-B86F-4AD5-9EED-F27FF9FD34BD}.Release|x86.ActiveCfg = Release|Any CPU
 		{42490331-B86F-4AD5-9EED-F27FF9FD34BD}.Release|x86.Build.0 = Release|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Debug|x64.Build.0 = Debug|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Debug|x86.Build.0 = Debug|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Release|x64.ActiveCfg = Release|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Release|x64.Build.0 = Release|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Release|x86.ActiveCfg = Release|Any CPU
+		{10719424-4657-40DE-950C-76CA04014E2E}.Release|x86.Build.0 = Release|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Debug|x64.Build.0 = Debug|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|x64.ActiveCfg = Release|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|x64.Build.0 = Release|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

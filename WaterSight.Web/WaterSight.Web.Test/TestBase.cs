@@ -23,6 +23,24 @@ public class TestBase
     public TestBase() : this(TEST_DT_Akshaya_4736, TEST_ENV)
     {
     }
+    public TestBase(int dtID, Env env, string pat)
+    {
+        ActiveEnvironment = env;
+        if (ActiveEnvironment == Env.Prod)
+        {
+            var message = $">>>>> You using {ActiveEnvironment} environment!!! <<<<<";
+            Log.Debug(message);
+            Debugger.Break();
+        }
+
+        WS = new WS(
+            tokenRegistryPath: "",
+            digitalTwinId: dtID,
+            env: ActiveEnvironment,
+            pat: pat);
+
+        WS.Options.EPSGCode = 26956; // Watertown DT
+    }
     public TestBase(int dtID, Env env)
     {
         ActiveEnvironment = env;
@@ -41,7 +59,7 @@ public class TestBase
 
         WS = new WS(tokenRegistryPath: registryPath, dtID, -1, ActiveEnvironment);
         WS.Options.EPSGCode = 26956; // Watertown DT
-        
+
     }
     private void RunWaterSightAuthenticator()
     {
@@ -81,10 +99,16 @@ public class TestBase
     [OneTimeSetUp]
     public async Task OneTimeSetupAsync()
     {
-        var dt = await WS.DigitalTwin.GetDigitalTwinAsync(WS.Options.DigitalTwinId);
+        var dt = WS.Options.DigitalTwinId;
+        var dtName = $"{dt} -- (Using PAT?)";
+        var userInfo = "(Using PAT?)";
 
-        var dtName = dt?.ID + ": " + dt?.Name + $" [{WS.Options.Env.ToString().ToUpper()}]";
-        var userInfo = (await this.WS.UserInfo.GetUserInfoAsync())?.ToString() ?? "";
+        if (string.IsNullOrEmpty(WS.Options.PAT))
+        {
+            var dtConfig = await WS.DigitalTwin.GetDigitalTwinAsync(WS.Options.DigitalTwinId);
+            dtName = dtConfig?.ID + ": " + dtConfig?.Name + $" [{WS.Options.Env.ToString().ToUpper()}]";
+            userInfo = (await this.WS.UserInfo.GetUserInfoAsync())?.ToString() ?? "";
+        }
 
         var width = 100;
 

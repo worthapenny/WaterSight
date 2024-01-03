@@ -5,7 +5,9 @@ using System.Data.OleDb;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
@@ -94,7 +96,7 @@ public class NumericModel : WSItem
         var modelDomains = await GetModelDomainsWaterType();
         ModelDomainConfig? modelDomain = null;
 
-        // if model domain is not there, CREATE model domain
+        // check for existing model domain, if not found, CREATE model domain
         if (modelDomains.Count > 0)
         {
             modelDomain = modelDomains.First();
@@ -135,12 +137,21 @@ public class NumericModel : WSItem
         //    $"&{query.SpinupHours(modelDomain.SpinUpHours.StatQueryValue)}&{query.HindcastHours(modelDomain.HindcastHours.StatQueryValue)}" +
         //    $"&actionId=http%3A%2F%2Fwatersight.bentley.com%2Fadministration%2Fmodel%3Fmodelid%3D{modelDomain.Id}%23upload";
 
+
+        // Get storage token and modify the URL
         var uploadTokenUrl = await WS.BlobStorage.GetStorageTokenUrlAsync();
+        var uploadTokenUrlParts = uploadTokenUrl.Split('?');
+        var fileName = fileInfo.Name;
+        var uploadTokenUrlModified = $"{uploadTokenUrlParts[0]}/{Uri.EscapeUriString(fileName)}?{uploadTokenUrlParts[1]}";
 
         // NOT sure exactly what happens here but we need to do a PUT request
         var httpContent = new StringContent(string.Empty);
-        httpContent.Headers.Add( "sas-token", "application/json" );
-        var isPutSuccessful = await WS.PutAsync(uploadTokenUrl, httpContent, "Upload Token URL");
+        httpContent.Headers.Add("X-Ms-Blob-Type", "BlockBlob");
+        httpContent.Headers.Add("X-Ms-Client-Request-Id", "89c1bd86-9c47-48be-9a32-9f0086d5752d"); // Not sure where this ID is coming from
+        httpContent.Headers.Add("X-Ms-Version", "2023-01-03");
+        // what else?
+
+        var isPutSuccessful = await WS.PutAsync(uploadTokenUrlModified, httpContent, "Upload Token URL");
         if (!isPutSuccessful)
         {
             Logger.Error($"PUT request on upload token failed.");

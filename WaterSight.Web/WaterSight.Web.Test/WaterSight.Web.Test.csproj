@@ -76,6 +76,7 @@
     <Compile Include="Landings\HomeTests.cs" />
     <Compile Include="NumericalModel\NumericalModelTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sensors\SensorsPatTest.cs" />
     <Compile Include="Sensors\SensorsTest.cs" />
     <Compile Include="Settings\CoordinateSystemsTest.cs" />
     <Compile Include="Settings\CostsTest.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="NumericalModel\TanksTest.cs" />
     <Compile Include="SmartMeters\SmartMetersTest.cs" />
     <Compile Include="TestBase.cs" />
+    <Compile Include="Watchdog\WatchdogTestFixture.cs" />
     <Compile Include="Zones\ZoneTest.cs" />
   </ItemGroup>
   <ItemGroup>

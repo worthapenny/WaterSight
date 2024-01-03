@@ -15,14 +15,17 @@ public static class Logging
     public static void SetupLogger(
         string appName = "UnknownProject",
         string logTemplate = "",
-        LogEventLevel logEventLevel = LogEventLevel.Information)
+        LogEventLevel logEventLevel = LogEventLevel.Information,
+        string? logFilesDir = null)
     {
-        
+
 #if DEBUG
         logEventLevel = LogEventLevel.Debug;
 #endif
 
         var genericLogFilePath = Path.Combine(GetLogFileDirectoryInfo(appName).FullName, $"{appName}..Log");
+        if (!string.IsNullOrEmpty(logFilesDir))
+            genericLogFilePath = Path.Combine(logFilesDir, $"{appName}..Log");
 
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
