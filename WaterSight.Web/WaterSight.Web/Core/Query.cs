@@ -73,7 +73,7 @@ public class Query
     public string Username(string name) => $"username={Uri.EscapeDataString(name)}";
     public string UseToken => $"useToken=True";
     public string Value(object value) => $"value={value}";
-    public string ValueUnit(string unit) => $"valueUnit={unit}";
+    public string ValueUnit(string unit) => $"valueUnit={Uri.EscapeDataString(unit)}";
     public string VectorType(string dataTypeName) => $"vectorType={Uri.EscapeDataString(dataTypeName)}";
     
     #endregion

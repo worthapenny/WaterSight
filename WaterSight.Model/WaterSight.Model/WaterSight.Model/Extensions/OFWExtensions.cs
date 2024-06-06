@@ -23,6 +23,7 @@ using Haestad.Framework.Support;
 using Haestad.Support.Units;
 using System.Xml.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace WaterSight.Model.Extensions;
 
@@ -76,7 +77,7 @@ public static class OFWExtensions
         return connectedLinks.First();
     }
     public static void ConnectedUpAndDownElements(
-        this IBaseDirectedNodeInput element, 
+        this IBaseDirectedNodeInput element,
         IWaterModel waterModel,
         out IWaterElement upLink,
         out IWaterElement upNode,
@@ -393,13 +394,13 @@ public static class OFWExtensions
 
     public static void TraceUpStream(this IWaterElement element, HmiNetwork network, out List<int> nodeIds, out List<int> linkIds, bool hasResults)
     {
-      
+
         nodeIds = new List<int>();
         linkIds = new List<int>();
 
         HmIDCollection nodes;
         HmIDCollection links; ;
-        
+
 
         if (hasResults)
         {
@@ -540,6 +541,15 @@ public static class OFWExtensions
     {
         return ((IWaterZoneableNetworkElementInput)cm.Input.AssociatedElement)?.Zone;
     }
+    public static Dictionary<int, List<ICustomerMeter>> ZoneSummary(this ICustomerMeters _, IWaterNetwork waterNetwork)
+    {
+        var map = waterNetwork.CustomerMeters.Elements()
+            .GroupBy(cm => cm.Zone()==null? -1: cm.Zone().Id)
+            .ToDictionary(g => g.Key, g=>g.ToList());
+
+        return map;
+    }
+
     #endregion
 
     #region Int

@@ -7,6 +7,7 @@ using OpenFlows.Domain.ModelingElements;
 using OpenFlows.Water.Application;
 using OpenFlows.Water.Domain;
 using OpenFlows.Water.Domain.ModelingElements.Components;
+using OpenFlows.Water.Domain.ModelingElements.NetworkElements;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -24,6 +25,7 @@ public interface ISCADADataSourceHistorical : IElement
     public void Add(string label);
     public int LoadSCADATags();
     public TestConnectionResult TestConnection();
+    public DatasourceUnitManager NewDatasourceUnitManager();
     public void CommitChanges();
     void Delete();
 
@@ -83,7 +85,6 @@ internal class SCADADataSource : ISCADADataSourceHistorical
 
         // TODO: Do Lazy Initialization
         InitializeFields();
-
     }
     public SCADADataSource(IWaterModel waterModel, int dataSourceId)
         : this(waterModel)
@@ -150,19 +151,28 @@ internal class SCADADataSource : ISCADADataSourceHistorical
     public TestConnectionResult TestConnection()
     {
         var connectionResult = DataSource.Connection.TestConnection(null);
-        Log.Information($"TestConnection result: {connectionResult.ToString()}");
+        Log.Information($"TestConnection result: {connectionResult}");
 
         return connectionResult;
     }
-    public void CommitChanges()
+    public DatasourceUnitManager NewDatasourceUnitManager()
     {
-        //
-        // Units
+        if (WaterApplicationManager.GetInstance() == null)
+            Debugger.Break();
+
         var unitManager = new DatasourceUnitManager(
             SupportElement.Id,
             GetUnitFields(),
             WaterApplicationManager.GetInstance().ParentFormModel.CurrentProject.NumericPresentationManager,
             "Unit");
+
+        return unitManager;
+    }
+    public void CommitChanges()
+    {
+        //
+        // Units
+        var unitManager = NewDatasourceUnitManager();
 
         // Note: During the construction of DataSourceUnitManager, it initializes
         // with the default fields, hence calling Commit is sufficient
@@ -217,6 +227,7 @@ internal class SCADADataSource : ISCADADataSourceHistorical
 
         // Units Fields
         /* Units fields are initialized and defaults are saved under CommitChanges() method */
+        
 
     }
     private IEditField SupportEditField(string fieldName)
@@ -269,7 +280,7 @@ internal class SCADADataSource : ISCADADataSourceHistorical
         dbDataSource.CustomizedSQLStatement = dbDataSource.HistoricalSelectStatement;
     }
 
-    private DatabaseDataSource GetNewDataSource()
+    public DatabaseDataSource GetNewDataSource()
     {
         var source = (DatabaseDataSource)ScadaFactory.NewDatabaseDataSource(
             scadaDataSourceType: DataSourceType,

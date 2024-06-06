@@ -46,5 +46,51 @@ public class JsonIO
         return success;
 
     }
+    public static T? LoadFromFile<T>(string fileFullPath)
+    {
+        var didRead = true;
+        var fileContents = string.Empty;
+
+        if (!File.Exists(fileFullPath))
+        {
+            var message = $"Given file path is not valid. Path: {fileFullPath}";
+            var ex = new FileNotFoundException(message);
+            Log.Error(ex, message);
+
+            Debugger.Break();
+            throw ex;
+        }
+
+        try
+        {
+            Log.Debug($"About to read a file. Path: {fileFullPath}");
+            fileContents = File.ReadAllText(fileFullPath);
+
+            Log.Debug($"Read '{fileContents.Length}' content-length from a file. Path: {fileFullPath}");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"...while reading a file. Path: {fileFullPath}");
+            didRead = false;
+            //Debugger.Break();
+        }
+
+        T? retVal = default;
+        if (didRead && !string.IsNullOrEmpty(fileContents))
+        {
+            try
+            {
+                retVal = JsonConvert.DeserializeObject<T>(fileContents);
+                Log.Information($"Deserialized the file contents of length '{fileContents.Length}'. Path: {fileFullPath}");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"...while deserializing the file contents of length '{fileContents.Length}'. Path: {fileFullPath}");
+                Debugger.Break();
+            }
+        }
+
+        return retVal;
+    }
     #endregion
 }

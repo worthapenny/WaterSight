@@ -1,11 +1,5 @@
 ﻿using Serilog;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WaterSight.Domain;
+using WaterSight.UI.App;
 using WaterSight.UI.Auth;
 using WaterSight.Web.Core;
 using WaterSight.Web.DT;
@@ -24,7 +18,9 @@ public class ProjectOpenSaveControlModel
     public void Initialize(SignInControlModel signInControlModel)
     {
         SignInControlModel = signInControlModel;
+
         signInControlModel.AuthEvent += (s, e) => AuthEventChanged(e);
+
 
     }
 
@@ -52,17 +48,27 @@ public class ProjectOpenSaveControlModel
 
     //    return saveFileDialog;
     //}
-    public async Task<List<DigitalTwinConfig>> GetDigitalTwinIdsAsync()
+
+    public async Task<Dictionary<int, DigitalTwinConfig>> GetDigitalTwinConfigMapAsync()
     {
+        if (_dtConfigMap != null)
+            return _dtConfigMap;
+
         if (WS == null) CreateNewWS(accessToken: SignInControlModel?.AccessToken);
-        var dts = await WS.DigitalTwin.GetDigitalTwinsAsync();
-        return dts;
+        var DTs = await WS.DigitalTwin.GetDigitalTwinsAsync();
+
+        _dtConfigMap = new Dictionary<int, DigitalTwinConfig>();
+        foreach (var dt in DTs)
+            _dtConfigMap.Add(dt.ID, dt);
+
+        return _dtConfigMap;
     }
+
 
     public async Task<bool> BindDigitalTwinComboBoxAsync(ComboBox cmb)
     {
         var success = true;
-        var dts = await GetDigitalTwinIdsAsync();
+        var dts = (await GetDigitalTwinConfigMapAsync()).Values.ToList();
 
         var dtMap = new Dictionary<string, DigitalTwinConfig>();
         try
@@ -92,6 +98,7 @@ public class ProjectOpenSaveControlModel
     }
     #endregion
 
+
     #region Private Methods
     private void AuthEventChanged(AuthEvent e)
     {
@@ -106,18 +113,38 @@ public class ProjectOpenSaveControlModel
     private void CreateNewWS(string? accessToken)
     {
         WS = new WS(
+            logger: Support.Logging.Logging.Logger,
             tokenRegistryPath: null,
             restToken: accessToken,
-            subDomainSuffix: (SignInControlModel?.IsEURegion ?? false) ? "-weu" : string.Empty);
+            subDomainSuffix: (SignInControlModel?.IsEURegion ?? false) ? "-weu" : string.Empty
+            );
     }
     #endregion
 
     #region Public Properties
     public string? ProjectFilePath { get; set; }
     public DigitalTwinConfig? SelectedDTConfig { get; set; }
+    public NewProjectControlModel? SelectedProject
+    {
+        get => _selecteNewProjectControlModel;
+        set
+        {
+            _selecteNewProjectControlModel = value;
+            UIApp.Instance.ActiveProjectModel = value;
+        }
+    }
 
-    public WS? WS { get; private set; }
+    public WS? WS {
+        get => UIApp.Instance.WS;
+        set => UIApp.Instance.WS = value;
+    }
     public SignInControlModel? SignInControlModel { get; private set; }
+    public bool IsOffline { get; set; } =false;
 
+    #endregion
+
+    #region Fields
+    private Dictionary<int, DigitalTwinConfig>? _dtConfigMap;
+    private NewProjectControlModel? _selecteNewProjectControlModel;
     #endregion
 }

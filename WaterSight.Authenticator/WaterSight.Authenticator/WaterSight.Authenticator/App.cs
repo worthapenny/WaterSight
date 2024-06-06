@@ -6,7 +6,7 @@ namespace WaterSight.Authenticator;
 
 public class App
 {
-    const string ConfigFileName = "configuration.json";
+    public static string ConfigFileName = "configuration.json";
 
     public static IConfigurationRoot GetConfiguration()
     {
@@ -20,6 +20,7 @@ public class App
             throw ex;
         }
 
+        Log.Debug($"Config file path: {configFilePath}");
         var builder = new ConfigurationBuilder()
                 .SetBasePath(cwd)
                 .AddJsonFile(ConfigFileName);
@@ -41,6 +42,7 @@ public class App
             throw ex;
         }
 
+        Log.Information($"Configuration file loaded. Path: {configFilePath}");
         return config;
     }
 }

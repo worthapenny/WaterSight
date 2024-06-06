@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -119,12 +120,12 @@ public class Alert : WSItem
 
 
 #region Model Classes
-public struct TimeSeries
-{
-    public const string FifteenMin = "PT15M";
-    public const string DailyMin = "D1min";
-    public const string DailyAvg = "D1avg";
-}
+//public struct TimeSeries
+//{
+//    public const string FifteenMin = "PT15M";
+//    public const string DailyMin = "D1min";
+//    public const string DailyAvg = "D1avg";
+//}
 
 public struct Duration
 {
@@ -175,7 +176,48 @@ public enum AlertOriginEnum
     Zone,
 }
 
+public enum AlertStatus
+{
+    New = 1,
+    UnderInvestigation = 2,
+    FieldWork = 3,
+    Closed = 4,
+    Open = 5,
+}
+
+public enum AlertCategory
+{
+    Unknown = 1,
+    MeterFailure = 2,
+    Burst = 3,
+    Leak = 4,
+    FlowIncrease = 5,
+    MaintenanceWork = 6,
+    ZoneChange = 7,
+    EquipmentFailure = 11,
+    Holiday = 12
+}
+
 [DebuggerDisplay("{ToString()}")]
+public class AlertDefaults
+{
+    public AlertStatus Status { get; set; } = AlertStatus.New;
+
+    public AlertCategory Category { get; set; } = AlertCategory.Unknown;
+
+    public bool RemoveFromPattern { get; set; } = false;
+
+    public string Comments { get; set; } = string.Empty;
+
+
+    public override string ToString()
+    {
+        return $"Status: {Status}, Category: {Category}, RemoveFromPattern: {RemoveFromPattern}, Comments: {Comments}";
+    }
+}
+
+
+
 public class AlertOrigin
 {
     #region Constructor
@@ -219,10 +261,11 @@ public struct AlertExtremes
 public class AlertConfig
 {
     public bool Active { get; set; }
+    public AlertDefaults AlertDefaults { get; set; }
     public bool DisplayOnTank { get; set; }
     public int Id { get; set; }
     public string MinDuration { get; set; } // PT30M
-    public object? Name { get; set; }
+    public string? Name { get; set; }
     public int NumericalModelTestType { get; set; } = 0; // 0: Water, 1: Sewer
     public List<AlertOrigin> Origins { get; set; } = new List<AlertOrigin>();
     public string PatternConfidenceHistoricalRange { get; set; } // P60D

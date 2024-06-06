@@ -34,6 +34,11 @@ public class TimeZone:WSItem
         var url = EndPoints.DTTimezoneSet(timezoneConfig.TimeZoneId);
         return await WS.PutAsync(url, null, "Timezone", additionalInfo: $"{timezoneConfig}");
     }
+    public async Task<bool> SetTimezone(string timeZone)
+    {
+        var url = EndPoints.DTTimezoneSet(timeZone);
+        return await WS.PutAsync(url, null, "Timezone", additionalInfo: $"TimeZone: {timeZone}");
+    }
     #endregion
 
     #endregion

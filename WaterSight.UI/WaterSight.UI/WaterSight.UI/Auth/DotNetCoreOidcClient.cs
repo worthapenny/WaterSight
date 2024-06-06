@@ -41,8 +41,9 @@ public class DotNetCoreOidcClient
 
     public async Task<RefreshTokenResult> RefreshTokenAsync()
     {
-        if (TokenState == null)
-            throw new InvalidOperationException("Must Login First");
+        if (TokenState?.RefreshToken == null)
+            throw new InvalidOperationException("Must Login First (or Refresh token is invalid)");
+
 
         var result = await Client.RefreshTokenAsync(TokenState.RefreshToken);
         TokenState.Update(result);

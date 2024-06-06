@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 
@@ -8,6 +9,14 @@ namespace WaterSight.Web.Settings;
 
 public class ServiceExpectations : WSItem
 {
+    #region Constants
+    public const string NameMaxPressure = "MaxPressure";
+    public const string NameMinPressure = "MinPressure";
+    public const string NameMinPumpEfficiency = "MinPumpEfficiency";
+    public const string NameRenewableEnergy = "RenewableEnergy";
+    public const string NameCO2EmissionFactor = "CO2EmissionFactor";
+    #endregion
+
     #region Constructor
     public ServiceExpectations(WS ws) : base(ws)
     {
@@ -25,50 +34,60 @@ public class ServiceExpectations : WSItem
     #endregion
 
     #region Get 
-    public async Task<ServiceExpectationItemConfig?> GetMaxPressure()
+    public ServiceExpectationItemConfig? GetMaxPressure(List<ServiceExpectationItemConfig?> serviceConfigs)
     {
-        var url = EndPoints.DTServiceExpectationsMaxPressure;
-        return await WS.GetAsync<ServiceExpectationItemConfig>(url, null, "SE Max Pressure");
+        var itemCheck = serviceConfigs.Where(s => s.Name == NameMaxPressure);
+        return itemCheck.Any() ? itemCheck.FirstOrDefault() : null;
     }
-    public async Task<ServiceExpectationItemConfig?> GetMinPressure()
+    public ServiceExpectationItemConfig? GetMinPressure(List<ServiceExpectationItemConfig?> serviceConfigs)
     {
-        var url = EndPoints.DTServiceExpectationsMaxPressure;
-        return await WS.GetAsync<ServiceExpectationItemConfig>(url, null, "SE Min Pressure");
+        var itemCheck = serviceConfigs.Where(s => s.Name == NameMinPressure);
+        return itemCheck.Any() ? itemCheck.FirstOrDefault() : null;
     }
-    public async Task<ServiceExpectationItemConfig?> GetTargetPumpEffi()
+    public ServiceExpectationItemConfig? GetTargetPumpEffi(List<ServiceExpectationItemConfig?> serviceConfigs)
     {
-        var url = EndPoints.DTServiceExpectationsMaxPressure;
-        return await WS.GetAsync<ServiceExpectationItemConfig>(url, null, "SE Target Pump Effi");
+        var itemCheck = serviceConfigs.Where(s => s.Name == NameMinPumpEfficiency);
+        return itemCheck.Any() ? itemCheck.FirstOrDefault() : null;
     }
-
+    public ServiceExpectationItemConfig? GetEnergyFromRenewableSources(List<ServiceExpectationItemConfig?> serviceConfigs)
+    {
+        var itemCheck = serviceConfigs.Where(s => s.Name == NameRenewableEnergy);
+        return itemCheck.Any() ? itemCheck.FirstOrDefault() : null;
+    }
+    public ServiceExpectationItemConfig? GetCO2EmissionFactor(List<ServiceExpectationItemConfig?> serviceConfigs)
+    {
+        var itemCheck = serviceConfigs.Where(s => s.Name == NameCO2EmissionFactor);
+        return itemCheck.Any() ? itemCheck.FirstOrDefault() : null;
+    }
     #endregion
 
     #region Set
-    public async Task<bool> SetMaxPressure(double pressure)
+    public async Task<bool> SetMaxPressure(double pressure, string unit)
     {
-        var url = EndPoints.DTServiceExpectationsMaxPressureSet(pressure);
-        return await WS.PostAsync(url, null, "SE Max Pressure", additionalInfo: $"{pressure}");
+        var url = EndPoints.DTServiceExpectationsMaxPressureSet(pressure, unit);
+        return await WS.PostAsync(url, null, "SE Max Pressure", additionalInfo: $"{pressure} {unit}");
 
     }
-    public async Task<bool> SetMinPressure(double pressure)
+    public async Task<bool> SetMinPressure(double pressure, string unit)
     {
-        var url = EndPoints.DTServiceExpectationsMinPressureSet(pressure);
-        return await WS.PostAsync(url, null, "SE Min Pressure", additionalInfo: $"{pressure}");
+        var url = EndPoints.DTServiceExpectationsMinPressureSet(pressure, unit);
+        return await WS.PostAsync(url, null, "SE Min Pressure", additionalInfo: $"{pressure} {unit}");
     }
     public async Task<bool> SetTargetPumpEfficiency(double effi)
     {
-        var url = EndPoints.DTServiceExpectationsTargetPumpEfficiencySet(effi);
-        return await WS.PostAsync(url, null, "SE Target Pump Effi.", additionalInfo: $"{effi}");
+        var unit = "%";
+        var url = EndPoints.DTServiceExpectationsTargetPumpEfficiencySet(effi, unit);
+        return await WS.PostAsync(url, null, "SE Target Pump Effi.", additionalInfo: $"{effi} {unit}");
     }
-    public async Task<bool> SetEnergyFromRenewableSources(double energy)
+    public async Task<bool> SetEnergyFromRenewableSources(double energy, string unit)
     {
-        var url = EndPoints.DTServiceExpectationsEnergyFromRenewableSourcesSet(energy);
-        return await WS.PostAsync(url, null, "SE Energy from Renewable Sources.", additionalInfo: $"{energy}");
+        var url = EndPoints.DTServiceExpectationsEnergyFromRenewableSourcesSet(energy, unit);
+        return await WS.PostAsync(url, null, "SE Energy from Renewable Sources.", additionalInfo: $"{energy} {unit}");
     }
     public async Task<bool> SetCO2EmissionFactor(double carbonFootprint, string unit)
     {
         var url = EndPoints.DTServiceExpectationsCO2EmissionFactorSet(carbonFootprint, unit);
-        return await WS.PostAsync(url, null, "SE Carbon Footprint.", additionalInfo: $"{carbonFootprint}");
+        return await WS.PostAsync(url, null, "SE Carbon Footprint.", additionalInfo: $"{carbonFootprint} {unit}");
     }
     #endregion
 

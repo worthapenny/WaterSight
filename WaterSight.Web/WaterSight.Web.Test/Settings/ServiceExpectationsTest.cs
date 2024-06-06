@@ -31,16 +31,17 @@ public class ServiceExpectationsTest : TestBase
         Separator("All GET");
 
         // Set
-        Assert.IsTrue(await ServiceExpectations.SetMaxPressure(9999));
-        Assert.IsTrue(await ServiceExpectations.SetMinPressure(1111));
+        Assert.IsTrue(await ServiceExpectations.SetMaxPressure(9999, "$"));
+        Assert.IsTrue(await ServiceExpectations.SetMinPressure(1111, "$"));
         Assert.IsTrue(await ServiceExpectations.SetTargetPumpEfficiency(99));
         Separator("Individual POSTs");
 
 
         // Get
-        Assert.IsTrue((await ServiceExpectations.GetMaxPressure())?.Value > 0);
-        Assert.IsTrue((await ServiceExpectations.GetMinPressure())?.Value > 0);
-        Assert.IsTrue((await ServiceExpectations.GetTargetPumpEffi())?.Value > 0);
+        var serviceExpectationItems = await ServiceExpectations.GetAll();
+        Assert.IsTrue((ServiceExpectations.GetMaxPressure(serviceExpectationItems)?.Value) > 0);
+        Assert.IsTrue((ServiceExpectations.GetMinPressure(serviceExpectationItems)?.Value) > 0);
+        Assert.IsTrue((ServiceExpectations.GetTargetPumpEffi(serviceExpectationItems)?.Value) > 0);
         Separator("Individual GETs");
 
     }

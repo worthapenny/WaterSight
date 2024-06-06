@@ -1,0 +1,14 @@
+﻿{
+  "OpenIdConnect": {
+    "Authority": "https://{{env}}ims.bentley.com",
+    "ClientId": "openflows-watersight-akshaya",
+    "RedirectUri": "http://localhost:5000/signin-oidc",
+    "Scope": "openid profile organization global_roles feature_tracking email imodels:modify imodels:read itwin-platform itwins:modify itwins:read openflows-watersight offline_access context-registry-service rbac-service"
+  },
+  "Logging": {
+    "LogEventLevel": "Debug",
+    "LogTemplate": "{Timestamp:HH:mm:ss.ff} | {Level:u3} | {Message}{NewLine}{Exception}",
+    "LogFileDir": ""
+
+  }
+}

@@ -34,6 +34,7 @@
             buttonLoadDigitalTwins = new Button();
             comboBoxDigitalTwins = new ComboBox();
             groupBoxProject = new GroupBox();
+            buttonCreateFolders = new Button();
             groupBoxProject.SuspendLayout();
             SuspendLayout();
             // 
@@ -44,7 +45,7 @@
             buttonNewProject.Name = "buttonNewProject";
             buttonNewProject.Size = new Size(95, 25);
             buttonNewProject.TabIndex = 6;
-            buttonNewProject.Text = "&New";
+            buttonNewProject.Text = "&New Project";
             buttonNewProject.UseVisualStyleBackColor = true;
             // 
             // buttonBrowseProjectPath
@@ -61,15 +62,15 @@
             // textBoxProjectPath
             // 
             textBoxProjectPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            textBoxProjectPath.Location = new Point(5, 22);
+            textBoxProjectPath.Location = new Point(43, 22);
             textBoxProjectPath.Name = "textBoxProjectPath";
-            textBoxProjectPath.Size = new Size(264, 23);
+            textBoxProjectPath.Size = new Size(226, 23);
             textBoxProjectPath.TabIndex = 4;
             // 
             // buttonLoadDigitalTwins
             // 
             buttonLoadDigitalTwins.Font = new Font("Segoe UI", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
-            buttonLoadDigitalTwins.Location = new Point(5, 48);
+            buttonLoadDigitalTwins.Location = new Point(6, 48);
             buttonLoadDigitalTwins.Name = "buttonLoadDigitalTwins";
             buttonLoadDigitalTwins.Size = new Size(31, 23);
             buttonLoadDigitalTwins.TabIndex = 7;
@@ -82,9 +83,9 @@
             comboBoxDigitalTwins.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             comboBoxDigitalTwins.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxDigitalTwins.FormattingEnabled = true;
-            comboBoxDigitalTwins.Location = new Point(42, 48);
+            comboBoxDigitalTwins.Location = new Point(43, 48);
             comboBoxDigitalTwins.Name = "comboBoxDigitalTwins";
-            comboBoxDigitalTwins.Size = new Size(227, 23);
+            comboBoxDigitalTwins.Size = new Size(226, 23);
             comboBoxDigitalTwins.TabIndex = 8;
             comboBoxDigitalTwins.SelectedIndexChanged += comboBoxDigitalTwins_SelectedIndexChanged;
             // 
@@ -93,6 +94,7 @@
             groupBoxProject.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             groupBoxProject.Controls.Add(comboBoxDigitalTwins);
             groupBoxProject.Controls.Add(textBoxProjectPath);
+            groupBoxProject.Controls.Add(buttonCreateFolders);
             groupBoxProject.Controls.Add(buttonLoadDigitalTwins);
             groupBoxProject.Controls.Add(buttonBrowseProjectPath);
             groupBoxProject.Controls.Add(buttonNewProject);
@@ -102,6 +104,17 @@
             groupBoxProject.TabIndex = 9;
             groupBoxProject.TabStop = false;
             groupBoxProject.Text = "Project";
+            // 
+            // buttonCreateFolders
+            // 
+            buttonCreateFolders.Font = new Font("Segoe UI", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonCreateFolders.Location = new Point(6, 24);
+            buttonCreateFolders.Name = "buttonCreateFolders";
+            buttonCreateFolders.Size = new Size(31, 23);
+            buttonCreateFolders.TabIndex = 7;
+            buttonCreateFolders.Text = "📂";
+            buttonCreateFolders.TextAlign = ContentAlignment.TopCenter;
+            buttonCreateFolders.UseVisualStyleBackColor = true;
             // 
             // ProjectOpenSaveControl
             // 
@@ -125,5 +138,6 @@
         private Button buttonLoadDigitalTwins;
         private ComboBox comboBoxDigitalTwins;
         private GroupBox groupBoxProject;
+        private Button buttonCreateFolders;
     }
 }

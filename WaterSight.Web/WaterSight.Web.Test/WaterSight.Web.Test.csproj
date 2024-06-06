@@ -112,12 +112,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WaterSight.Web\WaterSight.Web.csproj">
-      <Project>{3219d583-b78a-4fcc-b625-33ab9c30fbc9}</Project>
-      <Name>WaterSight.Web</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="TestFiles\Images\TestMtEverest.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -136,6 +130,12 @@
     <PackageReference Include="Serilog.Sinks.File">
       <Version>5.0.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WaterSight.Web\WaterSight.Web.csproj">
+      <Project>{3219d583-b78a-4fcc-b625-33ab9c30fbc9}</Project>
+      <Name>WaterSight.Web</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -21,7 +21,7 @@ public class EmailGroupTest : TestBase
     public EmailGroup EmailGroup => WS.Alert.EmailGroup;
     #endregion
 
-    #region Tets
+    #region Tests
 
     [Test, Category("CRUD")]
     public async Task EmailGroup_CRUD()
@@ -57,7 +57,7 @@ public class EmailGroupTest : TestBase
         Separator("Done create testing");
 
         // Add user/person
-        var userAdded = await WS.Alert.EmailGroup.AddSubscriber(
+        var userAdded = await WS.Alert.EmailGroup.AddSubscriberAsync(
             groupId: emailGroupCreated.ID,
             subscriberId: connectClientId);
         Assert.That(userAdded, Is.True);

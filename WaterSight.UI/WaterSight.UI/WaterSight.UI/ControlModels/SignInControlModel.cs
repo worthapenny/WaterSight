@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Serilog;
+using WaterSight.UI.App;
 using WaterSight.UI.Auth;
 using WaterSight.UI.Support;
 using WaterSight.Web.Core;
@@ -199,7 +200,7 @@ public class SignInControlModel : IDisposable
         var urlPrefixForDev = "qa-";
 
         // Get the configurations
-        var config = App.GetConfiguration();
+        var config = AppConfig.GetConfiguration();
 
         var settings = new OpenIdConnectConfig();
         config.GetSection("OpenIdConnect").Bind(settings);

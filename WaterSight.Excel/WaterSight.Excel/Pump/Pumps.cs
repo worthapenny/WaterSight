@@ -15,6 +15,13 @@ public class PumpsXlSheet : ExcelSheetBase
     }
     #endregion
 
+    #region Public Methods
+    public void Load()
+    {
+        PumpItemsList = Read<PumpItem>();
+    }
+    #endregion
+
     #region Public Properties
     public List<PumpItem> PumpItemsList { get; set; }
     #endregion

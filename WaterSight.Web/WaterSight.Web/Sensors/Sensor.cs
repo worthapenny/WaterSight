@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,8 @@ using WaterSight.Web.Support;
 using Ganss.Excel;
 using Serilog;
 using WaterSight.Web.Support.IO;
+using System.Web.UI.WebControls;
+using NodaTime;
 
 namespace WaterSight.Web.Sensors;
 
@@ -139,6 +142,73 @@ public class Sensor : WSItem
         return tsd15M;
     }
 
+    public async Task<bool> PostSqliteFileAsync(
+        string sqliteFilePath,
+        string tableName,
+        string col_tagName,
+        string col_timestamp,
+        string col_value,
+        DateTimeZone sourceTimeZone,
+        List<string>? tagIds, // to filter to tags of interest
+        bool onlyNoDataSensors = false,
+        bool useLastInstanceFromServer = true
+        )
+    {
+        if (!File.Exists(sqliteFilePath))
+            throw new FileNotFoundException(sqliteFilePath);
+
+        var tsdValues = new List<TSDValue>();
+
+        Log.Debug($"About to load data from SQLite. Path: {sqliteFilePath}");
+        
+        var connectionString = $"Data Source={sqliteFilePath}";
+        using (var connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
+
+            string query = $"SELECT * FROM {tableName}";
+            using (SQLiteCommand command = new SQLiteCommand(query, connection))
+            {
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        try
+                        {
+                            // convert the date to DateTimeOffset
+                            var at = Convert.ToDateTime(reader[col_timestamp]);
+                            Instant instant = sourceTimeZone.AtLeniently(LocalDateTime.FromDateTime(at)).ToInstant();
+                            var dateTimeOffset = instant.InUtc().ToDateTimeOffset();
+
+
+                            var tsdValue = new TSDValue
+                            {
+                                ID =  reader[col_tagName],
+                                Instant = dateTimeOffset,
+                                Value = Convert.ToDouble(reader[col_value]),
+                            };
+                            tsdValues.Add(tsdValue);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error(ex, $"while reading data from SQLite table.");
+                        }
+                    }
+                }
+            }
+        }
+
+        Log.Debug($"Data loaded from SQLite. Count: {tsdValues.Count}");
+        var success = await PostTsdDataAsync(
+            tsdValues: tsdValues,
+            tagIds: tagIds,
+            onlyNoDataSensors: onlyNoDataSensors,
+            useLastInstanceFromServer: useLastInstanceFromServer);
+
+        Log.Debug($"Done posting TSD Data.");
+        return success;
+    }
+
     public async Task<bool> PostJsonFileAsync(
         string jsonFilePath,
         List<string>? tagIds, // to filter to tags of interest
@@ -180,7 +250,7 @@ public class Sensor : WSItem
                 .Where(s => tagIds.Contains(s.TagId))
                 .ToList();
 
-            Log.Debug($"Due to given 'tasIds', number of sensors to work with: {sensorsConfig.Count}");
+            Log.Debug($"Due to given 'tagIds', number of sensors to work with: {sensorsConfig.Count}");
         }
 
         // filter to sensors that have no data at all on WaterSight
@@ -208,7 +278,7 @@ public class Sensor : WSItem
                    .Where(d => d.ID?.ToString() == wsTag && d.Value.HasValue)
                    .ToList();
 
-                Log.Debug($"Number of data row to push against the '{wsTag}', name '{sensorConfig.Name}' tag is: {filteredData.Count}");
+                Log.Debug($"'{filteredData.Count}' Number of data row to push against the '{wsTag}', name '{sensorConfig.Name}' tag.");
                 if(!filteredData.Any() )
                 {
                     Log.Information($"No data found for tag '{wsTag}', name '{sensorConfig.Name}' to push.");
@@ -549,8 +619,11 @@ public class TSDValue
     }
     #endregion
 
+    //[Obsolete("This 'ID' property is deprecated. Try not to use this.", false)]
     public object? ID { get; set; }
     public double? Value { get; set; }
+    public bool IsEstimate {  get; set; }
+    public double? EstimationPercent {  get; set; }
 
     public DateTimeOffset Instant { get; set; }
 

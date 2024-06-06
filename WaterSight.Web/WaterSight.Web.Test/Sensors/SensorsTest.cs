@@ -15,6 +15,7 @@ public class SensorsTest : TestBase
     #region Constructor
     public SensorsTest()
     //: base(4549, Env.Qa)
+        //:base(139, Env.Prod)
     {
         Separator($"----+----+---- Performing Sensors Related Tests ----+----+----");
     }
@@ -23,7 +24,6 @@ public class SensorsTest : TestBase
     #region Properties
     public Sensor Sensor => WS.Sensor;
     #endregion
-
 
     #region Tests
 
@@ -101,17 +101,17 @@ public class SensorsTest : TestBase
     public async Task Sensor_TSD_NoPattern()
     {
         // Delete all existing
-        var delted = await Sensor.DeleteSensorsConfigAsync();
-        Assert.IsTrue(delted);
+        var deleted = await Sensor.DeleteSensorsConfigAsync();
+        Assert.IsTrue(deleted);
 
         // Create
         var sensor = await NewSensorConfigAsync();
-        var sensorCreaded = await Sensor.AddSensorConfigAsync(sensor);
-        Assert.IsNotNull(sensorCreaded);
-        Assert.IsTrue(sensorCreaded?.ID > 0);
+        var sensorCreated = await Sensor.AddSensorConfigAsync(sensor);
+        Assert.IsNotNull(sensorCreated);
+        Assert.IsTrue(sensorCreated?.ID > 0);
 
         // Push new TSD data
-        List<TSDValue> tsdList = GetTSDLits();
+        List<TSDValue> tsdList = GetLocalTSDList();
         var success = await Sensor.PostSensorTSDAsync(
             sensorId: sensor.ID,
             data: tsdList);
@@ -139,7 +139,7 @@ public class SensorsTest : TestBase
         }
     }
 
-    private List<TSDValue> GetTSDLits()
+    private List<TSDValue> GetLocalTSDList()
     {
         var tsdValue9999 = new TSDValue()
         {
@@ -191,20 +191,23 @@ public class SensorsTest : TestBase
 
     public async Task<SensorConfig> NewSensorConfigAsync()
     {
-        var sensor = new SensorConfig();
-        sensor.TagId = $"Sensor_Test_{DateTime.Now:u}";
-        sensor.Name = $"Sensor Test_{DateTime.Now:u}";
-        sensor.ParameterType = "Level";
-        sensor.Units = "ft";
-        sensor.Priority = 1;
-        sensor.Latitude = -104.98332839223629;
-        sensor.Longitude = 39.98767804586302;
-        sensor.ReferenceElevation = 100;
-        sensor.ReferenceElevationUnits = "ft";
-        sensor.RegistrationFrequency = 15;
-        sensor.CommunicationFrequency = 15;
-        sensor.Tags = "";
-        sensor.UtcOffSet = "00:00";
+        var sensor = new SensorConfig
+        {
+            TagId = $"Sensor_Test_{DateTime.Now:u}",
+            Name = $"Sensor Test_{DateTime.Now:u}",
+            ParameterType = "Level",
+            Units = "ft",
+            Priority = 1,
+            Latitude = -104.98332839223629,
+            Longitude = 39.98767804586302,
+            ReferenceElevation = 100,
+            ReferenceElevationUnits = "ft",
+            RegistrationFrequency = 15,
+            CommunicationFrequency = 15,
+            Tags = "",
+            UtcOffSet = "00:00",
+            TimeZoneId = "America/New_York"
+        };
 
         var allPatternWeeks = await WS.Settings.PatternWeeks.GetPatternWeeksConfigAsync();
         var patternWeek = allPatternWeeks.Where(p => p.IsDefault).First();

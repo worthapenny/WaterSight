@@ -10,6 +10,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <BaseOutputPath>..\..\..\..\Output\WaterSight.UI\bin</BaseOutputPath>
     <BaseIntermediateOutputPath>..\..\..\..\Output\WaterSight.UI\obj</BaseIntermediateOutputPath>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +24,6 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="Serilog.Sinks.InMemory" Version="0.11.0" />
   </ItemGroup>
 
   <ItemGroup>

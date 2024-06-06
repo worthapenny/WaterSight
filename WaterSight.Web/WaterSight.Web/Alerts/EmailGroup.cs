@@ -16,7 +16,7 @@ public class EmailGroup: WSItem
     #endregion
 
     #region Public Methods
-    public async Task<bool> AddSubscriber(int groupId, int subscriberId)
+    public async Task<bool> AddSubscriberAsync(int groupId, int subscriberId)
     {
         var url = EndPoints.MailmanGroupSubscriberDTIDGroupIdSubscriberId(groupId, subscriberId);
         return await WS.PostJson(url, null, false, "Add Subscriber");
@@ -59,6 +59,16 @@ public class EmailGroup: WSItem
         var url = EndPoints.MailmanSubsGroupQDT;
         return await WS.UpdateAsync(mmConfig.ID, mmConfig, url, "Email Group", true);
     }
+    public async Task<bool> AddAlertId(EmailGroupConfig mmConfig, int alertId)
+    {
+        var url = EndPoints.MailmanGroupSubscriptionDTIDSubsTypeSubsKey(
+            subscriptionType: $"{0}",
+            subscriptionKey: $"{alertId}");        
+
+        var groups = new List<int>() { mmConfig.ID };
+        return await WS.UpdateAsync(null, groups, url, "Email Group", true);
+    }
+
 
     //
     // DELETE

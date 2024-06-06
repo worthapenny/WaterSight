@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.MonitoredFileDat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.WaterSightDataCollector", "WaterSight.WaterSightDataCollector\WaterSight.WaterSightDataCollector.csproj", "{10719424-4657-40DE-950C-76CA04014E2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaterSight.WaterSightDataCollector.Test", "WaterSight.WaterSightDataCollector.Test\WaterSight.WaterSightDataCollector.Test.csproj", "{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.WaterSightDataCollector.Test", "WaterSight.WaterSightDataCollector.Test\WaterSight.WaterSightDataCollector.Test.csproj", "{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,8 +123,8 @@ Global
 		{5E9E89D3-CA28-4C2E-A159-7FD68A6EB716}.Release|x64.Build.0 = Release|Any CPU
 		{5E9E89D3-CA28-4C2E-A159-7FD68A6EB716}.Release|x86.ActiveCfg = Release|Any CPU
 		{5E9E89D3-CA28-4C2E-A159-7FD68A6EB716}.Release|x86.Build.0 = Release|Any CPU
-		{F3E8E0A6-BD0D-440C-BB68-CF09C8730EB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3E8E0A6-BD0D-440C-BB68-CF09C8730EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3E8E0A6-BD0D-440C-BB68-CF09C8730EB9}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{F3E8E0A6-BD0D-440C-BB68-CF09C8730EB9}.Debug|Any CPU.Build.0 = Debug|x64
 		{F3E8E0A6-BD0D-440C-BB68-CF09C8730EB9}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{F3E8E0A6-BD0D-440C-BB68-CF09C8730EB9}.Debug|x64.Build.0 = Debug|Any CPU
 		{F3E8E0A6-BD0D-440C-BB68-CF09C8730EB9}.Debug|x86.ActiveCfg = Debug|Any CPU

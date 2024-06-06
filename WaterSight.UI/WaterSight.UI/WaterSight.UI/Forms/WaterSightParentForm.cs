@@ -1,6 +1,10 @@
 ﻿using Serilog;
+using System.ComponentModel;
+using System.Diagnostics;
+using WaterSight.UI.App;
 using WaterSight.UI.Auth;
 using WaterSight.UI.ControlModels;
+using WaterSight.UI.Controls;
 using WaterSight.UI.Forms.Support;
 using WaterSight.UI.Support;
 using WaterSight.Web.Core;
@@ -26,15 +30,47 @@ public partial class WaterSightParentForm : Form
 
         //});
 
+
+        WaterSight.UI.Support.Logging.Logging.InMemorySink.Logged += (s, e) => WriteToUI(e);
+
         // Initialize Control Models
         var signInControlModel = new SignInControlModel();
         this.signInControl.Initialize(signInControlModel);
         this.projectOpenSaveControl.Initialize(signInControlModel);
+        this.projectOpenSaveControlWaterModelTab.Initialize(signInControlModel);
+        
+        if(this.projectOpenSaveControlWaterModelTab.ProjectOpenSaveControlModel != null)
+            this.projectOpenSaveControlWaterModelTab.ProjectOpenSaveControlModel.IsOffline = true;
 
         InitializeEvents();
+
+        //this.listBoxActionsRepo.Items.Clear();
+        //this.listBoxActionsRepo.Items.Add(new DragableControlBase() { Title = "Dynamic 1", Section = "Excel" });
+        //this.listBoxActionsRepo.Items.Add(new DragableControlBase() { Title = "Dynamic 2", Section = "Excel" });
+
+        foreach (var control in flowLayoutPanelActionsRepo.Controls)
+        {
+            if (control is DragableControlBase dragableControl)
+            {
+                dragableControl.AddOrRemoveButtonClicked += (s, e) => { AddOrRemoveControl(dragableControl); };
+            }
+        }
+
     }
 
-
+    private void AddOrRemoveControl(DragableControlBase dragableControl)
+    {
+        if (dragableControl.CanAddControl)
+        {
+            flowLayoutPanelActions.Controls.Add(dragableControl);
+            flowLayoutPanelActionsRepo.Controls.Remove(dragableControl);
+        }
+        else
+        {
+            flowLayoutPanelActions.Controls.Remove(dragableControl);
+            flowLayoutPanelActionsRepo.Controls.Add(dragableControl);
+        }
+    }
 
     private void InitializeEvents()
     {
@@ -49,7 +85,26 @@ public partial class WaterSightParentForm : Form
         {
             await AuthEventChangedAsync(e);
         };
+
+        UIApp.Instance.DigitalTwinChanged += (s, e) => UpdateParentFormTitle();
+
+        //this.dragableControlBase2.DragEventStarted += (s, e) => flowLayoutPanel1.SuspendLayout();
+        //this.dragableControlBase2.DragEventEnded += (s, e) => flowLayoutPanel1.ResumeLayout();
     }
+
+    private void UpdateParentFormTitle()
+    {
+        var wsProject = UIApp.Instance.ActiveProjectModel;
+        if (wsProject == null)
+            return;
+
+        var envAndName = string.Empty;
+        if (UIApp.Instance.WS != null)
+            envAndName = $"[{UIApp.Instance.WS.Options.Env}: {UIApp.Instance.WS.UserInfo.Name}]";
+                   
+        Invoke(() => Text = $"WaterSight - {wsProject.DigitalTwinId}: {wsProject.Name} {envAndName}");
+    }
+
     private void InitializeVisually()
     {
 
@@ -74,18 +129,25 @@ public partial class WaterSightParentForm : Form
                 break;
 
             case AuthEvent.LoggedIn:
-                SetFormTitle($"{SignInControlModel?.Email}");
                 var busyWindow = new BusyWindow();
                 busyWindow.Show(this);
+                Application.DoEvents();
+
                 try
                 {
-                    await projectOpenSaveControl.LoadDigitalTwinsAsync();
+                    await Invoke(async () =>
+                    {
+                        EnableControls(true);
+                        SetFormTitle($"{SignInControlModel?.Email}");
+                        await projectOpenSaveControl.LoadDigitalTwinsAsync();
+                    });
+
                 }
                 finally
                 {
                     busyWindow.Done();
                 }
-                EnableControls(true);
+
                 break;
 
             case AuthEvent.LoggedOut:
@@ -108,9 +170,12 @@ public partial class WaterSightParentForm : Form
                 break;
 
             default:
-                MessageBox.Show(this, $"Unsupported Auth Event {e}", "Error");
+                using (new CenterWinDialog(ParentForm))
+                    MessageBox.Show(this, $"Unsupported Auth Event {e}", "Error");
                 break;
         }
+
+
     }
 
     private void SetFormTitle(string title)
@@ -127,7 +192,7 @@ public partial class WaterSightParentForm : Form
         UpdateUI(() =>
         {
             this.projectOpenSaveControl.Enabled = enable;
-            this.splitContainerMain.Enabled = enable;
+            //this.splitContainerMain.Enabled = enable;
         });
     }
     private void UpdateUI(Action action)
@@ -136,6 +201,67 @@ public partial class WaterSightParentForm : Form
             Invoke(action);
         else
             action();
+
+    }
+    private void WriteToUI(string e)
+    {
+        try
+        {
+            richTextBoxLog.Text += e;
+            richTextBoxLog.SelectionStart = richTextBoxLog.Text.Length;
+            richTextBoxLog.ScrollToCaret();
+        }
+        catch
+        {
+        }
+    }
+
+    private void splitContainerMain_Panel1_DragEnter(object sender, DragEventArgs e)
+    {
+        if (e.Data?.GetDataPresent(typeof(DragableControlBase)) ?? false)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+    }
+
+    private void splitContainerMain_Panel1_DragDrop(object sender, DragEventArgs e)
+    {
+        if (e.Data?.GetDataPresent(typeof(DragableControlBase)) ?? false)
+        {
+            var control = (DragableControlBase)e.Data.GetData(typeof(DragableControlBase));
+
+        }
+    }
+
+    private void splitContainerActions_Panel1_DragOver(object sender, DragEventArgs e)
+    {
+        Debug.Print("sc Over");
+    }
+
+    private void splitContainerActions_Panel1_DragDrop(object sender, DragEventArgs e)
+    {
+        Debug.Print("sc DragDrop");
+    }
+
+    private void listBoxActions_DragEnter(object sender, DragEventArgs e)
+    {
+        Debug.Print($"DragEnter {DateTime.Now.Millisecond}");
+        var a = e.Data?.GetData(typeof(string));
+    }
+
+    private void listBoxActions_DragDrop(object sender, DragEventArgs e)
+    {
+        Debug.Print("DragDrop");
+    }
+
+    private void listBoxActions_DragLeave(object sender, EventArgs e)
+    {
+        Debug.Print("DragDrop leave");
+    }
+
+    private void listBoxActions_DragOver(object sender, DragEventArgs e)
+    {
+        //Debug.Print("DragDrop over");
 
     }
 

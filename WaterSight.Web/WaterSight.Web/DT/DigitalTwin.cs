@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -27,6 +28,15 @@ public class DigitalTwin : WSItem
     //
     // ADD / CREATE
     // 
+    public async Task<DigitalTwinConfig>AddWaterDigitalTwinAsync(string name)
+    {
+        var url = EndPoints.DTConnectedQDtNameQDtType(name, (int)DigitalTwinType.Water);
+        var dtConfig = await WS.AddAsync<DigitalTwinConfig>(url, "CreateDT");
+        return dtConfig;
+    }
+
+    // Looks like creating DT has been simplified
+    // this might need an update
     public async Task<DigitalTwinConfig?> AddDigitalTwinAsync(DigitalTwinCreateOptions createOptions)
     {
         var url = EndPoints.DTConnectedQDtNameQDtType(createOptions.DigitalTwinName, (int)createOptions.DigitalTwinType);
@@ -53,22 +63,23 @@ public class DigitalTwin : WSItem
         return digitalTwins;
     }
 
-    public async Task<DigitalTwinConfig> GetDigitalTwinAsync(int dtId)
+    public async Task<DigitalTwinConfig> GetDigitalTwinAsync()
     {
         var url = EndPoints.DTDigitalTwinsQDT;
+        var dtId = WS.Options.DigitalTwinId;
         return await WS.GetAsync<DigitalTwinConfig>(url, dtId, "Digital Twin");
     }
-    
 
+   
     //
-    // UPDATE Digital Twin's Description
+    // UPDATE Digital Twin's Name and Description
     //
-    public async Task<bool> UpdateDigitalTwinDescriptionAsync(DigitalTwinConfig digitalTwinConfig)
+    public async Task<bool> UpdateDigitalTwinNameAndDescriptionAsync(string name, string description)
     {
-        var url = $"{EndPoints.DTDigitalTwinsQDT}&{EndPoints.Query.Name(digitalTwinConfig.Name)}";
+        var url = $"{EndPoints.DTDigitalTwinsQDT}&{EndPoints.Query.Name(name)}";
         return await WS.UpdateAsync<dynamic>(
             null,
-            new { Description = digitalTwinConfig.Description },
+            new { Description = description },
             url,
             "Digital Twin");
     }
@@ -143,22 +154,6 @@ public class DigitalTwin : WSItem
     #endregion
 }
 
-public static class DigitalTwinExt
-{
-    //public static async Task<List<DigitalTwinConfig>> GetDigitalTwinsAsync(this WS ws)
-    //{
-        
-    //}
-
-    
-
-    //public static async Task<bool> IsWaterSightAccessibleAsync(this WS ws)
-    //{
-    //    var dts = await ws.GetDigitalTwinsAsync();
-    //    return dts != null && dts.Count > 0;
-    //}
-}
-
 
 [DebuggerDisplay("{ToString()}")]
 public class DigitalTwinConfig
@@ -168,29 +163,38 @@ public class DigitalTwinConfig
     public string Description { get; set; } = string.Empty;
     public string Avatar { get; set; } = string.Empty;
     public string GUID { get; set; } = string.Empty;
+    public string RegionId { get; set; } = string.Empty;
     public bool Published { get; set; }
     public double Latitude { get; set; }
     public double Longitude { get; set; }
     public bool MarkedForDeletion { get; set; }
     public string ImodelName { get; set; } = string.Empty;
-    public Entity Entity { get; set; } = new Entity();
+    public string TimeZoneId { get; set; } 
+    public string TimeDisplay { get; set; }
     public int DigitalTwinType { get; set; }
-    public List<TagGroup> TagGroups { get; set; } = new List<TagGroup>();
-    public string RegionId { get; set; } = string.Empty;
+    public Entity Entity { get; set; } = new Entity();
+    public List<TagGroup> Groups { get; set; } = new List<TagGroup>();
+    public DateTimeOffset CreatedInstant { get; set; }
 
     public override string ToString()
     {
-        return $"{ID}: {Name}";
+        return $"{Name} [{ID}]";
     }
 }
 
 
-[DebuggerDisplay("{ID}: {Name}")]
+[DebuggerDisplay("{ToString()}")]
 public class Entity
 {
     public int ID { get; set; }
     public string Name { get; set; } = string.Empty;
     public string BentleyId { get; set; } = string.Empty;
+
+
+    public override string ToString()
+    {
+        return $"{ID}: {Name}";
+    }
 }
 
 [DebuggerDisplay("{ToString()}")]

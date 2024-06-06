@@ -22,5 +22,9 @@ public static class SCADADataSourceConnectionExtensions
     {
         return new SCADADataSource(waterModel);
     }
+    public static ISCADADataSourceHistorical SCADADataSource(this IWaterModelSupport _, IWaterModel waterModel,int dataSourceId)
+    {
+        return new SCADADataSource(waterModel, dataSourceId);
+    }
 }
 #endregion

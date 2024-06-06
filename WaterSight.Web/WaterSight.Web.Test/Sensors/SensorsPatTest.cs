@@ -15,7 +15,7 @@ public class SensorsPatTest : TestBase
         : base(
         dtID: 139, // TEST_DT_Akshaya_4736,
         env: Env.Prod, // TEST_ENV,
-        pat: "tfkcpLhHbZRX6LIkkn74qtAfNkPf8221XdxeSoOL7v8b6p1wqpQr" // Generate a new one for testing
+        pat: "ozPhDjQwKSeajHtPwF7BMCoZaujuHK4kEmVsfgrfjV7wz0sauTZc" // Generate a new one for testing
         )
     {
     }
@@ -52,6 +52,7 @@ public class SensorsPatTest : TestBase
         Assert.That(success, Is.True);
     }
 
+   
     [Test]
     public async Task PostJsonTest()
     {

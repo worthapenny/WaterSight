@@ -1,5 +1,6 @@
 ﻿using WaterSight.UI.Auth;
 using WaterSight.UI.ControlModels;
+using WaterSight.UI.Forms.Support;
 using WaterSight.Web.Core;
 
 namespace WaterSight.UI.Controls;
@@ -46,7 +47,8 @@ public partial class SignInControl : UserControl
                 break;
 
             case AuthEvent.LoggingError:
-                MessageBox.Show(this, "Logging in was not successful. Please review the log or try again", "Failed to sign in.", MessageBoxButtons.OK, MessageBoxIcon.Error); ;
+                using (new CenterWinDialog(ParentForm))
+                    MessageBox.Show(this, "Logging in was not successful. Please review the log or try again", "Failed to sign in.", MessageBoxButtons.OK, MessageBoxIcon.Error); ;
                 ChangeSignInButtonText("Sign In...");
                 break;
 
@@ -62,7 +64,8 @@ public partial class SignInControl : UserControl
 
             case AuthEvent.LoggingOutError:
                 ChangeSignInButtonText("Err Sign Out");
-                MessageBox.Show(this, "Logging out was not successful. Please review the log or try again", "Failed to sign out.", MessageBoxButtons.OK, MessageBoxIcon.Error); ;
+                using (new CenterWinDialog(ParentForm))
+                    MessageBox.Show(this, "Logging out was not successful. Please review the log or try again", "Failed to sign out.", MessageBoxButtons.OK, MessageBoxIcon.Error); ;
                 break;
 
             case AuthEvent.RefreshStarted:

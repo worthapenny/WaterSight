@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Sensors;
+using WaterSight.Web.Support;
 
 namespace WaterSight.Web.NumericModels;
 
@@ -220,7 +221,7 @@ public class NumericModel : WSItem
     {
         return await WS.UpdateAsync(
             id: modelDomain.Id,
-            t: modelDomain,
+            payLoad: modelDomain,
             url: EndPoints.NumModelingModelDomainDomainsQDTQDomainId(modelDomain.Id.Value),
             typeName: "Model Domain",
             usePostMethod: true);
@@ -283,7 +284,7 @@ public class NumericModel : WSItem
         return map;
     }
 
-    public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElementsWaterModel(string modelDomainName = "")
+    public async Task<Dictionary<string, List<ModelScadaElementConfig>>> GetModelTargetElementsWaterModel(string? modelDomainName = "")
     {
         if (!string.IsNullOrEmpty(modelDomainName))
             return await GetModelTargetElements(modelDomainName);
@@ -361,7 +362,70 @@ public class NumericModel : WSItem
         var tsdResults = await WS.GetAsync<ElementTsdResult>(url, null, "Element TSD Result");
         return tsdResults;
     }
+    public async Task<List<PreviousSimulation>> GetPreviousSimulations(
+        DateTimeOffset startDate,
+        DateTimeOffset endDate)
+    {
+        var url = $"{EndPoints.NumModelingModelRunsQDT}&startDate={startDate.UtcDateTime:O}&endDate={endDate.UtcDateTime:O}";
+        var simulations = await WS.GetManyAsync<PreviousSimulation>(url, "PreviousSimulations");
+        return simulations;
+    }
+    public async Task<List<PreviousSimulation>> GetPreviousSimulationsLast24Hrs()
+    {
+        return await GetPreviousSimulations(
+            startDate: DateTimeOffset.UtcNow.AddDays(-1),
+            endDate: DateTimeOffset.UtcNow);
+    }
 
+    public async Task<string?> DownloadPreviousSimulation(PreviousSimulation prevSim, bool onlyLogFiles, string outputDir)
+    {
+        var sw = Util.StartTimer();
+        var onlyLogFilesInt = onlyLogFiles ? 1 : 0;
+        var actionId = $"http://watersight.bentley.com/simulations/previous?modelrunid={prevSim.ID}#download";
+
+        // Step 1 - Telll the server to prepare the file        
+        var sb = new StringBuilder(EndPoints.NumModelingModelRunsDataFileQDT(prevSim.ID))
+            .Append($"&onlyLogFiles={onlyLogFilesInt}")
+            .Append($"&actionId={actionId}");
+        var url = sb.ToString();
+
+        Logger.Information($"About to prepare the file to download... URL: {url}");
+
+        var posted = await WS.PostAsync(
+            url: url,
+            content: null,
+            typeName: "PreviousSimDownload",
+            supportsLRO: true);
+
+        // Setp 2 - Download the file
+        if (posted)
+        {
+            Logger.Information($"File is read to be downloaded to local...");
+            sb = new StringBuilder(EndPoints.NumModelingModelRunsDataFileQDT(prevSim.ID))
+                        .Append($"&onlyLogFiles={onlyLogFilesInt}");
+            var urlDownload = sb.ToString() ;
+                        
+            var filePath = await WS.GetFile(
+                url: urlDownload, 
+                fileDestinationPath: outputDir,
+                typeName: "DownloadPrevModelFile");
+
+            if (File.Exists(filePath))
+            {
+                Logger.Information($"[🕛 {sw.Elapsed}] ✅ Downloaded successfully. Path: {filePath}");
+                Logger.Debug(Util.LogSeparatorEquals);
+            }
+            else
+                Logger.Error($"❌ Failed to download the file. Please review the logs.");
+
+            return filePath;
+        }
+        else{
+            Logger.Error($"❌ Preparing file failed. Please review the logs.");
+        }
+
+        return null;
+    }
     #endregion
 
     #endregion
@@ -576,5 +640,27 @@ public class ModelDomainConfig
     }
 }
 
+
+[DebuggerDisplay("{ToString()}")]
+public class PreviousSimulation
+{
+    public int ID { get; set; }
+    public DateTimeOffset StartInstant { get; set; }
+    public DateTimeOffset EndInstant { get; set; }
+    public int ModelDomainID { get; set; }
+    public string ModelDomainName { get; set; }
+    public int ModelType { get; set; }
+    public string DataPreparationError { get; set; }
+    public string DataStorageError { get; set; }
+    public string ModelExecutionError { get; set; }
+    public string ModelFileName { get; set; }
+    public bool RunSuccessful { get; set; }
+    public double Runtime { get; set; }
+
+    public override string ToString()
+    {
+        return $"{ID}: MDN = {ModelDomainName} [{ModelType}] [{StartInstant}, {EndInstant}] Run Success = {RunSuccessful}";
+    }
+}
 
 #endregion

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Serilog;
+using System.Diagnostics;
 using WaterSight.Excel;
 using WaterSight.UI.Support.Model;
 using WaterSight.Web.Core;
@@ -7,7 +8,7 @@ using WaterSight.Web.DT;
 
 namespace WaterSight.Domain;
 
-public class Folders
+public class WaterSightFolders
 {
     #region Constants
     /*       
@@ -39,7 +40,7 @@ public class Folders
     public const string DocsDirName = "03_Docs";
     public const string UserFileArchiveDirName = "04_User_File_Archive";
 
-    public const string ConfigWSDirName = "00_Settings_Config";
+    public const string SettingsConfigDirName = "00_Settings_Config";
     public const string ModelsWSDirName = "01_Models";
     public const string GisWSDirName = "02_GIS";
     public const string ConsumptionWSDirName = "03_Consumption";
@@ -52,16 +53,23 @@ public class Folders
     #endregion
 
     #region Constructor
-    public Folders(string projectDir)
+    public WaterSightFolders(string projectDir)
     {
-        ProjectDir = projectDir;
+        if (projectDir == null)
+        {
+            var message = $"Project Dir cannot be null.";
+            Log.Error(message);
+            Debugger.Break();
+            throw new ArgumentNullException(message);
+        }
 
+        ProjectDir = projectDir;
         DocsDir = Path.Combine(projectDir, DocsDirName);
         FileArchiveDir = Path.Combine(projectDir, UserFileArchiveDirName);
 
         // 01_WaterSight_Config and sub directories
         WaterSightDir = Path.Combine(projectDir, WaterSightConfigDirName);
-        WsConfigDir = Path.Combine(WaterSightDir, ConfigWSDirName);
+        WsConfigDir = Path.Combine(WaterSightDir, SettingsConfigDirName);
         WsModelsDir = Path.Combine(WaterSightDir, ModelsWSDirName);
         WsGisDir = Path.Combine(WaterSightDir, GisWSDirName);
         WsConsumptionDir = Path.Combine(WaterSightDir, ConsumptionWSDirName);
@@ -70,7 +78,7 @@ public class Folders
 
         // 02_Analysis and sub directories
         AnalysisDir = Path.Combine(projectDir, AnalysisDirName);
-        AnaConfigDir = Path.Combine(AnalysisDir, ConfigWSDirName);
+        AnaConfigDir = Path.Combine(AnalysisDir, SettingsConfigDirName);
         AnaModelsDir = Path.Combine(AnalysisDir, ModelsWSDirName);
         AnaGisDir = Path.Combine(AnalysisDir, GisWSDirName);
         AnaConsumptionDir = Path.Combine(AnalysisDir, ConsumptionWSDirName);
@@ -80,7 +88,14 @@ public class Folders
         AnaPumpsDir = Path.Combine(AnalysisDir, PumpsDirName);
         AnaTanksDir = Path.Combine(AnalysisDir, TanksDirName);
 
+        //CreateFolders();
 
+    }
+    #endregion
+
+    #region Public Methods
+    public void CreateFolders()
+    {
         // Create Folders
         Directory.CreateDirectory(DocsDir);
         Directory.CreateDirectory(FileArchiveDir);
@@ -110,7 +125,6 @@ public class Folders
         //WtrgFilePath = Path.Combine(projectDir, wtgFilePath);
         //PressureZoneZippedShpFilePath = Path.Combine(WsGisDir, pressureZoneZippedShpFileName);
         //PressureZoneShpFilePath = Path.Combine(WsGisDir, pressureZoneShpFileName);
-
     }
     #endregion
 
@@ -142,74 +156,38 @@ public class Folders
 
     #endregion
 
+
 }
 
 public class WaterSightProject
 {
     #region Constants  
-    readonly string _ProjectFileName = $"WaterSightProject.ws.json";
+    //readonly string _ProjectFileName = $"WaterSightProject.ws.json";
     #endregion
 
-    public static async Task<WaterSightProject> LoadFromWebAsync(WS ws, DigitalTwinConfig dtConfig)
+    #region Static Constructor
+
+    public static async Task<WaterSightProject> LoadFromWebAsync(WS ws)
     {
         var instance = new WaterSightProject();
-        instance.WSSetting = await instance.WSSetting.LoadFromWebAsync(ws, dtConfig);
-
+        instance.WSSetting = await instance.WSSetting.LoadFromWeb(ws);
         return instance;
     }
+    public static WaterSightProject? LoadFromJson(string jsonFilePath)
+    {
+        if (!File.Exists(jsonFilePath))
+            throw new FileNotFoundException($"Give json file path is invalid. Path:{jsonFilePath}");
+
+        var project = JsonIO.LoadFromFile<WaterSightProject>(jsonFilePath);
+        return project;
+    }
+    #endregion
+
 
     #region Constructor
     public WaterSightProject()
     {
-    }
-    public WaterSightProject(
-        int dtID,
-        Env env = Env.Prod,
-        string name = "",
-        string shortName = "",
-        int epsgCode = 4326,
-        string timeZoneString = "", // https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/default-time-zones?view=windows-11
-        double[]? latLng = null,
-        string projectDir = ""
-        ) : this()
-    {
-
-
-        // Folder Structure
-        Folders = new Folders(projectDir);
-
-        // Info
-        Env = env;
-        WSSetting.Info.DTID = dtID;
-        WSSetting.Info.Name = name;
-        WSSetting.Info.ShortName = shortName;
-
-        // EPSG Codes
-        WSSetting.Geo.SensorEPSG = epsgCode;
-        WSSetting.Geo.CustomersEPSG = epsgCode;
-        WSSetting.Geo.WorkOrdersEPSG = epsgCode;
-        WSSetting.Geo.SmartMetersEPSG = epsgCode;
-
-
-        if (latLng?.Length >= 2)
-        {
-            WSSetting.Geo.Latitude = latLng[0];
-            WSSetting.Geo.Longitude = latLng[1];
-        }
-
-        // TimeZone
-        if (!string.IsNullOrEmpty(timeZoneString))
-        {
-            WSSetting.Geo.TimeZoneString = timeZoneString;
-            TimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZoneString);
-        }
-
-
-        XlFileNames = new FileNames(Folders.WaterSightDir);
-        SCADA = new SCADA(Folders.WsScadaDir, null);
-
-        Log.Debug($"Project initialized for  {WSSetting.Info.DTID}: {WSSetting.Info.Name} in {Env}");
-    }
+    }    
     #endregion
 
     #region Public Methods
@@ -217,56 +195,62 @@ public class WaterSightProject
     {
         return JsonConvert.SerializeObject(this, Formatting.Indented);
     }
-    public bool ToJsonFile()
-    {
-        if (!Directory.Exists(Folders.ProjectDir))
-        {
-            Log.Error($"Project directory '{Folders.ProjectDir}' is not valid");
-            return false;
-        }
+    //public bool ToJsonFile()
+    //{
+    //    if (!Directory.Exists(Folders.ProjectDir))
+    //    {
+    //        Log.Error($"Project directory '{Folders.ProjectDir}' is not valid");
+    //        return false;
+    //    }
 
+    //    var _ProjectFileName = $"{WSSetting.Info.Name}"; 
+    //    var success = true;
+    //    try
+    //    {
+    //        var jsonFilePath = Path.Combine(Folders.ProjectDir, _ProjectFileName);
+    //        File.WriteAllText(jsonFilePath, ToJson());
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        var message = $"While writing to {_ProjectFileName}";
+    //        Log.Error(ex, message);
+    //        success = false;
+    //    }
 
-        var success = true;
-        try
-        {
-            var jsonFilePath = Path.Combine(Folders.ProjectDir, _ProjectFileName);
-            File.WriteAllText(jsonFilePath, ToJson());
-        }
-        catch (Exception ex)
-        {
-            var message = $"While writing to {_ProjectFileName}";
-            Log.Error(ex, message);
-            success = false;
-        }
-
-        return success;
-    }
+    //    return success;
+    //}
     #endregion
 
     #region Public Properties
+    public string? ProjectDir
+    {
+        get => _projectDir;
+        set { _projectDir = value; Folders = new WaterSightFolders(value); }
+    } 
+
+    public string? WaterModelPath { get; set; }
+    
+
     public bool UseAnalysisDir { get; set; } = true;
     public Env Env { get; set; }
 
-    public WsSetting WSSetting { get; set; } = new WsSetting();
+    public WaterSightWebSetting WSSetting { get; set; } = new WaterSightWebSetting();
 
-    //public string? Name { get; set; }
-    //public string? ShortName { get; set; }
-    //public int DTID { get; set; }
-    //public string TimeZoneString { get; set; }
-    //public int EPSGCode { get; set; }
 
     [JsonIgnore]
     public TimeZoneInfo TimeZoneInfo { get; } = TimeZoneInfo.Local;
 
     [JsonIgnore]
-    public Folders? Folders { get; set; }
+    public WaterSightFolders? Folders { get; set; }
 
     [JsonIgnore]
     public SCADA? SCADA { get; set; }
-    //public double[]? LatLng { get; set;
-    //
 
     [JsonIgnore]
     public FileNames? XlFileNames { get; set; }
+    #endregion
+
+    #region Fields
+    private string? _projectDir;
     #endregion
 }

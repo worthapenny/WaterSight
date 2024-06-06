@@ -1,4 +1,6 @@
-﻿namespace WaterSight.UI.Forms.Support;
+﻿using System.Security.Cryptography;
+
+namespace WaterSight.UI.Forms.Support;
 
 
 
@@ -11,7 +13,7 @@ public class CenteredToolForm
         this.ParentForm = parentForm;
         this.Control = control;
         this.Size = size;
-        this.Icon = icon;
+        this.Icon = icon;        
     }
     #endregion
 
@@ -43,6 +45,7 @@ public class CenteredToolForm
         if (Icon != null)
             form.Icon = Icon;
 
+        form.MinimumSize = Size;
         form.StartPosition = FormStartPosition.Manual;
         form.Location = CenteredLocation(ParentForm, form);
 

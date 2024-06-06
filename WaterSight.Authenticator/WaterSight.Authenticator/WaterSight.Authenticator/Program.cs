@@ -60,6 +60,11 @@ public class Program
         //
         var intervalInMinutes = ParseArguments(args, out Env env);
         Log.Information($"Env: {env}");
+        if (env != Env.Prod)
+        {
+            App.ConfigFileName = "configurationQA.json";
+            App.ConfigFileName = "configuration.json";
+        }
 
 
         // Apply user options

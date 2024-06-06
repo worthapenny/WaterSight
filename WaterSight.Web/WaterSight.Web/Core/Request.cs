@@ -26,7 +26,7 @@ public static class Request
     #region Public Static Methods
 
     #region CRUD Operation
-    public static async Task<HttpResponseMessage> Get(string url, bool firstTry = true)
+    public static async Task<HttpResponseMessage> Get(string url, bool firstTry = true, TimeSpan? timeout = null)
     {
         Logger.Debug($"GET request, URL: {url}");
 
@@ -36,18 +36,27 @@ public static class Request
         // client
         var httpClient = new HttpClientFactory().CreateClient();
 
+        if(timeout.HasValue)
+            httpClient.Timeout = timeout.Value;
+
         try
         {
             var sw = Util.StartTimer();
             var res = await httpClient.GetAsync(uri);
 
-            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            if (res.StatusCode == HttpStatusCode.Unauthorized && string.IsNullOrEmpty(Options.PAT))
             {
                 var isProd = url.StartsWith("https://connect");
                 var env = isProd ? "prod" : "qa";
                 if (RunWaterSightAuthenticator(env, forceStart: !firstTry))
                     return await Get(url, firstTry: false);
 
+            }
+
+            if (!res.IsSuccessStatusCode)
+            {
+                Log.Error($"💀 ...Request Headers: ");
+                LogHttpHeader(res);
             }
 
             if ((int)res.StatusCode >= 400)
@@ -78,6 +87,40 @@ public static class Request
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
     }
+    public static async Task<string?> GetFile(string url, string fileDestinationPath)
+    {
+        var sw = Util.StartTimer();
+        string? filePath = null;
+
+        var res = await Get(url, timeout: TimeSpan.FromMinutes(10));
+        var success = res.IsSuccessStatusCode;
+        if (success)
+        {
+            try
+            {
+                var fileName = res.Content.Headers.ContentDisposition.FileName;
+                filePath = Path.Combine(fileDestinationPath, fileName);
+
+                using var stream = await res.Content.ReadAsStreamAsync();
+                using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                await stream.CopyToAsync(fileStream);
+
+
+                Logger.Information($"[✅ 🕛 {sw.Elapsed}] File is saved at: {filePath}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"...while getting the file content to download. \nMessage:{ex.Message}");
+            }
+        }
+        else
+        {
+            var resContentText = res.Content == null ? "" : await res.Content?.ReadAsStringAsync();
+            Logger.Error($"💀 Failed to get the file content. Reason: {res.ReasonPhrase}. Text: {resContentText}. URL: {url}");
+        }
+
+        return filePath;
+    }
     public static async Task<HttpResponseMessage> Put(string url, HttpContent? content)
     {
         WS.Logger?.Debug($"Put request, URL: {url}");
@@ -95,10 +138,16 @@ public static class Request
             var sw = Util.StartTimer();
             var res = await httpClient.PutAsync(uri, content);
 
-            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            if (!res.IsSuccessStatusCode)
             {
-                Debugger.Break();
+                Log.Error($"💀 ...Request Headers: ");
+                LogHttpHeader(res);
             }
+
+
+            if (res.StatusCode == HttpStatusCode.Unauthorized)
+                Debugger.Break();
+
 
             Logger.Debug($"Put request time-taken: {sw.Elapsed}. {url}");
             Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
@@ -132,11 +181,15 @@ public static class Request
                 httpClient.Timeout = timeout.Value;
 
             var res = await httpClient.PostAsync(uri, content);
+            
+            if(!res.IsSuccessStatusCode)
+            {
+                Log.Error($"💀 ...Request Headers: ");
+                LogHttpHeader(res);
+            }
 
             if (res.StatusCode == HttpStatusCode.Unauthorized)
-            {
                 Debugger.Break();
-            }
 
             Logger.Debug($"Post request time-taken: {sw.Elapsed}. {url}");
             Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
@@ -146,11 +199,14 @@ public static class Request
         }
         catch (HttpRequestException ex)
         {
-            Logger.Error(ex, "...while performing the post request.");
+            Logger.Error(ex, "💀 ...while performing the post request.");
         }
 
         return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
     }
+
+    
+
     public static async Task<HttpResponseMessage> Delete(string url)
     {
         WS.Logger?.Debug($"Delete request, URL: {url}");
@@ -165,10 +221,14 @@ public static class Request
             var sw = Util.StartTimer();
             var res = await httpClient.DeleteAsync(uri);
 
-            if (res.StatusCode == HttpStatusCode.Unauthorized)
+            if (!res.IsSuccessStatusCode)
             {
-                Debugger.Break();
+                Log.Error($"💀 ...Request Headers: ");
+                LogHttpHeader(res);
             }
+
+            if (res.StatusCode == HttpStatusCode.Unauthorized)
+                Debugger.Break();
 
             Logger.Debug($"Delete request time-taken: {sw.Elapsed}. {url}");
             Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
@@ -318,7 +378,7 @@ public static class Request
 
                 if ((int)statusCode == 0 || (int)statusCode == 1)
                 {
-                    WS.Logger.Information($"LRO status {statusCode}, [{percentDone}%] Message: {message}, Source: {source}. Sleeping for {checkIntervalSeconds} seconds...");
+                    WS.Logger.Information($"[🕛 {stopwatch.Elapsed}] LRO status {statusCode}, [{percentDone}%] Message: {message}, Source: {source}. Sleeping for {checkIntervalSeconds} seconds...");
                     await Task.Delay(checkIntervalSeconds * 1000);
                 }
                 else if ((int)statusCode == 2)
@@ -338,7 +398,7 @@ public static class Request
         var timeTaken = stopwatch.Elapsed;
         stopwatch.Stop();
 
-        WS.Logger.Information($"Time-taken by LRO: {timeTaken}");
+        WS.Logger.Information($"🕛 Time-taken by LRO: {timeTaken}");
         Logger.Debug(Util.LogSeparator("LRO Ended", Util.XSmall));
 
         return isLroSuccessful;
@@ -347,6 +407,11 @@ public static class Request
     #endregion
 
     #region Private Static Methods
+    private static void LogHttpHeader(HttpResponseMessage res)
+    {
+        foreach (var header in res.Headers)
+            Log.Debug($"\t{header.Key}: {string.Join(", ", header.Value)}");
+    }
     private static string WaterSightAccessToken()
     {
         if (!string.IsNullOrEmpty(Options.PAT))

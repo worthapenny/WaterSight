@@ -13,14 +13,14 @@ namespace WaterSight.Web.Test;
 public class TestBase
 {
     #region Static Fields
-    public static int TEST_DT_Akshaya_4736 = 4736; // __Test_Bed_Akshaya
+    public static int TEST_DT_Akshaya_2731 = 2731; // __Test_Bed_Akshaya
     public static int TEST_DT_ID2 = 4827;
     public static int TEST_DT_ID3 = 4828; // Fully Setup
     public static Env TEST_ENV = Env.Qa;
     #endregion
 
     #region Constructor
-    public TestBase() : this(TEST_DT_Akshaya_4736, TEST_ENV)
+    public TestBase() : this(TEST_DT_Akshaya_2731, TEST_ENV)
     {
     }
     public TestBase(int dtID, Env env, string pat)
@@ -54,6 +54,7 @@ public class TestBase
         var registryPath = env == Env.Prod
                 ? @"SOFTWARE\WaterSight\BentleyProdOIDCToken"
                 : @"SOFTWARE\WaterSight\BentleyQaOIDCToken";
+
 
         RunWaterSightAuthenticator();
 
@@ -105,7 +106,7 @@ public class TestBase
 
         if (string.IsNullOrEmpty(WS.Options.PAT))
         {
-            var dtConfig = await WS.DigitalTwin.GetDigitalTwinAsync(WS.Options.DigitalTwinId);
+            var dtConfig = await WS.DigitalTwin.GetDigitalTwinAsync();
             dtName = dtConfig?.ID + ": " + dtConfig?.Name + $" [{WS.Options.Env.ToString().ToUpper()}]";
             userInfo = (await this.WS.UserInfo.GetUserInfoAsync())?.ToString() ?? "";
         }

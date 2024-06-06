@@ -27,8 +27,13 @@ public class Location : WSItem
     #region Set
     public async Task<bool> SetLocation(LocationConfig locationConfig)
     {
-        var url = EndPoints.DTCoordinatesQDTSet(locationConfig.Latitude ?? 0, locationConfig.Longitude ?? 0);
+        var url = EndPoints.DTCoordinatesQDTSet(locationConfig.Latitude ?? 0, locationConfig.Longitude?? 0);
         return await WS.PostAsync(url, null, "Location", additionalInfo: $"{locationConfig}");
+    }
+    public async Task<bool> SetLocation(float? latitude, float? longitude)
+    {
+        var url = EndPoints.DTCoordinatesQDTSet(latitude ?? 0, longitude ?? 0);
+        return await WS.PostAsync(url, null, "Location", additionalInfo: $"Lat/Long = [{latitude}, {longitude}]");
     }
     #endregion
 
@@ -50,12 +55,12 @@ public class LocationConfig
     /// 
     /// </summary>
     /// <param name="latLng">First parameter must be Lat</param>
-    public LocationConfig(double[] latLng)
+    public LocationConfig(float[] latLng)
     {
         Latitude = latLng[0];
         Longitude = latLng[1];
     }
-    public LocationConfig(double lat, double lng)
+    public LocationConfig(float lat, float lng)
     {
         Latitude = lat;
         Longitude = lng;
@@ -63,10 +68,10 @@ public class LocationConfig
     #endregion
 
     [JsonProperty("Latitude")]
-    public double? Latitude { get; set; }
+    public float? Latitude { get; set; }
 
     [JsonProperty("Longitude")]
-    public double? Longitude { get; set; }
+    public float? Longitude { get; set; }
 
     public override string ToString()
     {

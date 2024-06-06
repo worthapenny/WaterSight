@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Web;
+using System.Web.UI.WebControls;
 
 
 namespace WaterSight.Web.Core;
@@ -32,7 +33,6 @@ public class EndPoints
         if (Options.Env == Env.Qa) EnvironmentPrefix = QaPrefix;
         if (Options.Env == Env.Prod) EnvironmentPrefix = ProdPrefix;
 
-        DTID = Options.DigitalTwinId;
         Query = new Query(Options);
         ApiVersion = apiVersion;
 
@@ -52,7 +52,7 @@ public class EndPoints
     #endregion
 
     #region Public ReadOnly Properties
-    public int DTID { get; set; }
+    public int DTID => Options.DigitalTwinId;
     public Query Query { get; private set; }
     public string EnvironmentPrefix { get; private set; } = "";
     public string ApiVersion { get; private set; }
@@ -99,8 +99,8 @@ public class EndPoints
     public string MailmanSubsGroupQDT => $"{MailmanSubsGroup}?{Query.DTID}";
     public string MailmanSubsGroupQDTGroupId(int? id) => $"{MailmanSubsGroupQDT}&{Query.GroupId(id)}";
     public string MailmanSubsGroupQDtQSubsGroupId(int id) => $"{MailmanSubsGroupQDT}&{Query.SubscriberGroupId(id)}";
-    public string MailmanSysnSubscribers => $"{Mailman}/SyncSubscribers";
-    public string MailmanSysnSubscribersQDT => $"{MailmanSysnSubscribers}?{Query.DTID}";
+    public string MailmanSyncSubscribers => $"{Mailman}/SyncSubscribers";
+    public string MailmanSyncSubscribersQDT => $"{MailmanSyncSubscribers}?{Query.DTID}";
 
     public string MailmanGroupSubscriber => $"{Mailman}/GroupSubscriber";
     public string MailmanGroupSubscriberDTID => $"{MailmanGroupSubscriber}?{Query.DTID}";
@@ -108,6 +108,8 @@ public class EndPoints
 
     public string MailmanGroupSubscription => $"{Mailman}/GroupSubscription";
     public string MailmanGroupSubscriptionDTID => $"{MailmanGroupSubscription}?{Query.DTID}";
+    public string MailmanGroupSubscriptionDTIDSubsTypeSubsKey(string subscriptionType, string subscriptionKey) => $"{MailmanGroupSubscriptionDTID}&subscriptionType={subscriptionType}&subscriptionKey={subscriptionKey}";
+
 
     //
     // RTDA
@@ -219,6 +221,11 @@ public class EndPoints
     public string NumModelingParamResultAttribInfo => $"{NumModelingParam}/ResultAttributeInfos";
     public string NumModelingModelTSD => $"{NumModeling}/ModelTimeSeriesValues";
 
+    public string NumModelingModelRuns => $"{NumModeling}/ModelRuns";
+    public string NumModelingModelRunsQDT => $"{NumModelingModelRuns}?{Query.DTID}";
+    public string NumModelingModelRunsDataFile(int modelRunId) => $"{NumModelingModelRuns}/{modelRunId}/DataFile";
+    public string NumModelingModelRunsDataFileQDT(int modelRunId) => $"{NumModelingModelRunsDataFile(modelRunId)}?{Query.DTID}";
+
     //
     // Blob Storage
     public string BlobStorage => $"{DT}/BlobStorage";
@@ -286,10 +293,10 @@ public class EndPoints
     public string DTServiceExpectationsMinPumpEfficiency => $"{DTServiceExpectations}/MinPumpEfficiency";
     public string DTServiceExpectationsEnergyFromRenewableSources => $"{DTServiceExpectations}/RenewableEnergy";
     public string DTServiceExpectationsCO2EmissionFactor => $"{DTServiceExpectations}/CO2EmissionFactor";
-    public string DTServiceExpectationsMaxPressureSet(double pressure) => $"{DTServiceExpectationsMaxPressure}?{Query.Value(pressure)}";
-    public string DTServiceExpectationsMinPressureSet(double pressure) => $"{DTServiceExpectationsMinPressure}?{Query.Value(pressure)}";
-    public string DTServiceExpectationsTargetPumpEfficiencySet(double efficiency) => $"{DTServiceExpectationsMinPumpEfficiency}?{Query.Value(efficiency)}";
-    public string DTServiceExpectationsEnergyFromRenewableSourcesSet(double renewableEnergy) => $"{DTServiceExpectationsEnergyFromRenewableSources}?{Query.Value(renewableEnergy)}";
+    public string DTServiceExpectationsMaxPressureSet(double pressure, string unit) => $"{DTServiceExpectationsMaxPressure}?{Query.Value(pressure)}&{Query.ValueUnit(unit)}";
+    public string DTServiceExpectationsMinPressureSet(double pressure, string unit) => $"{DTServiceExpectationsMinPressure}?{Query.Value(pressure)}&{Query.ValueUnit(unit)}";
+    public string DTServiceExpectationsTargetPumpEfficiencySet(double efficiency, string unit) => $"{DTServiceExpectationsMinPumpEfficiency}?{Query.Value(efficiency)}&{Query.ValueUnit(unit)}";
+    public string DTServiceExpectationsEnergyFromRenewableSourcesSet(double renewableEnergy, string unit) => $"{DTServiceExpectationsEnergyFromRenewableSources}?{Query.Value(renewableEnergy)}&{Query.ValueUnit(unit)}";
     public string DTServiceExpectationsCO2EmissionFactorSet(double emissionFactor, string unit) => $"{DTServiceExpectationsCO2EmissionFactor}?{Query.Value(emissionFactor)}&{Query.ValueUnit(unit)}";
 
     //
@@ -298,9 +305,9 @@ public class EndPoints
     public string DTCostsAvgVolumetricProduction => $"{DTCosts}/AvgVolumetricProductionCost";
     public string DTCostsAvgVolumetricTariff => $"{DTCosts}/AvgVolumetricTariff";
     public string DTCostsAvgEnergyCost => $"{DTCosts}/AvgEnergyCost";
-    public string DTCostsAvgVolumetricProductionSet(double cost) => $"{DTCostsAvgVolumetricProduction}?{Query.Value(cost)}";
-    public string DTCostsAvgVolumetricTariffSet(double cost) => $"{DTCostsAvgVolumetricTariff}?{Query.Value(cost)}";
-    public string DTCostsAvgEnergyCostSet(double cost) => $"{DTCostsAvgEnergyCost}?{Query.Value(cost)}";
+    public string DTCostsAvgVolumetricProductionSet(double cost, string unit) => $"{DTCostsAvgVolumetricProduction}?{Query.Value(cost)}&{Query.ValueUnit(unit)}";
+    public string DTCostsAvgVolumetricTariffSet(double cost, string unit) => $"{DTCostsAvgVolumetricTariff}?{Query.Value(cost)}&{Query.ValueUnit(unit)}";
+    public string DTCostsAvgEnergyCostSet(double cost, string unit) => $"{DTCostsAvgEnergyCost}?{Query.Value(cost)}&{Query.ValueUnit(unit)}";
 
     //
     // Coordinate Systems

@@ -19,23 +19,23 @@ public class Units : WSItem
 
     public async Task<bool> SetToUSUnitsAsync()
     {
-        _ = await SetPressureUnit(Pressure.psi);
+        _ = await SetAreaUnit(Area.ft_squared);
+        _ = await SetCO2EmissionFactorUnit(CO2EmissionFactor.ton_per_kWh, 2);
+        _ = await SetCarbonFootprintUnit(CarbonFootprint.kg);
+        _ = await SetCurrencyUnit(Currency.USDoller, 2);
+        _ = await SetDiameterUnit(Length.inch);
+        _ = await SetEnergyUnit(Energy.kWh, 1);
         _ = await SetFlowUnit(VolumeFlow.gal_US_per_min);
         _ = await SetLengthUnit(Length.ft);
-        _ = await SetDiameterUnit(Length.inch);
-        _ = await SetAreaUnit(Area.ft_squared);
-        _ = await SetVolumeUnit(Volume.Mgal_US, 2);
-        _ = await SetPowerUnit(Power.kW, 1);
-        _ = await SetEnergyUnit(Energy.kWh, 1);
-        _ = await SetVelocityUnit(Speed.ft_per_s, 1);
-        _ = await SetWaterAgeUnit(Duration.h, 1);
         _ = await SetMassConcentrationUnit(MassConcentration.mg_per_L, 2);
-        _ = await SetTemperatureUnit(Temperature.degree_F);
+        _ = await SetPowerUnit(Power.kW, 1);
+        _ = await SetPressureUnit(Pressure.psi);
         _ = await SetRatioUnit(Ratio.percent, 1);
-        _ = await SetCurrencyUnit(Currency.USDoller, 2);
+        _ = await SetTemperatureUnit(Temperature.degree_F);
+        _ = await SetVelocityUnit(Speed.ft_per_s, 1);
+        _ = await SetVolumeUnit(Volume.Mgal_US, 2);
         _ = await SetWatherUnit(Weather.Imperial);
-        _ = await SetCarbonFootprintUnit(CarbonFootprint.kg);
-        _ = await SetCO2EmissionFactorUnit(CO2EmissionFactor.ton_per_kWh, 2);
+        _ = await SetWaterAgeUnit(Duration.h, 1);
 
         return true;
     }
@@ -593,6 +593,23 @@ public static class Currency
     public static string Euro => "€";
     public static string Pound => "£";
 
+    public static string AED => "AED";
+    public static string BRL => "BRL";
+    public static string CHF => "CHF";
+    public static string CNY => "CNY";
+    public static string EUR => "EUR";
+    public static string GBP => "GBP";
+    public static string INR => "INR";
+    public static string JPY => "JPY";
+    public static string KRW => "KRW";
+    public static string MXN => "MXN";
+    public static string PHP => "PHP";
+    public static string PLN => "PLN";
+    public static string SEK => "SEK";
+    public static string SGD => "SGD";
+    public static string TRY => "TRY";
+    public static string USD => "USD";
+    public static string ZAR => "ZAR";
 }
 
 #endregion

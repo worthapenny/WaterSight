@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -9,6 +10,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using WaterSight.Web.Alerts;
 using WaterSight.Web.BlobStorages;
 using WaterSight.Web.Custom;
 using WaterSight.Web.Customers;
@@ -71,6 +73,7 @@ public class WS
         BlobStorage = new BlobStorage(this);
         Home = new Home(this);
         WatchDog = new Watchdog.WatchDog(this);
+        EmailGroup = new EmailGroup(this);
 
         if (logger == null)
         {
@@ -83,11 +86,11 @@ public class WS
                 );
         }
 
-        Logger = Log.Logger;
+        Logger = Serilog.Log.Logger;
 
         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-        Log.Debug("");
+        Logger.Information("☑️ WaterSight instance created.");
     }
     #endregion
 
@@ -130,7 +133,7 @@ public class WS
     }
     public async Task<T> AddAsync<T>(string url, string typeName)
     {
-        var res = await Request.Post(url, null);
+        var res = await Request.Post(url, new StringContent(string.Empty));
         T retValue = default;
         if (res.IsSuccessStatusCode)
         {
@@ -194,6 +197,20 @@ public class WS
     }
 
     //
+    // Get File 
+    //
+    public async Task<string?> GetFile(string url, string fileDestinationPath, string typeName)
+    {
+        var filePath = await Request.GetFile(url, fileDestinationPath);
+        if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+            Logger.Information($"✅ Download complete for {typeName}. Path = {filePath}.");
+        else
+            Logger.Error($"💀 Failed to download {typeName} content. URL: {url}");
+
+        return filePath;
+    }
+
+    //
     // GET Many / READ many
     //
     public async Task<List<T>> GetManyAsync<T>(string url, string typeName)
@@ -220,14 +237,14 @@ public class WS
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="id">For better logging</param>
-    /// <param name="t"></param>
+    /// <param name="payLoad"></param>
     /// <param name="url"></param>
     /// <param name="typeName"></param>
     /// <param name="usePostMethod"></param>
     /// <returns></returns>
-    public async Task<bool> UpdateAsync<T>(int? id, T t, string url, string typeName, bool usePostMethod = false)
+    public async Task<bool> UpdateAsync<T>(int? id, T payLoad, string url, string typeName, bool usePostMethod = false)
     {
-        if (t == null)
+        if (payLoad == null)
         {
             Logger.Error($"{typeName} cannot be null");
             return false;
@@ -235,15 +252,17 @@ public class WS
 
         HttpResponseMessage? res = null;
         if (!usePostMethod)
-            res = await Request.PutJsonString(url, JsonConvert.SerializeObject(t));
+        {
+            res = await Request.PutJsonString(url, JsonConvert.SerializeObject(payLoad));
+        }
         else
-            res = await Request.PostJsonString(url, JsonConvert.SerializeObject(t));
+            res = await Request.PostJsonString(url, JsonConvert.SerializeObject(payLoad));
 
         if (res?.IsSuccessStatusCode ?? false)
             Logger.Information($"✅ {typeName} updated successfully.");
 
         else
-            Logger.Error($"💀 Failed to update {typeName} with id: {id} ({t}). Reason: {res?.ReasonPhrase}. Text: {await res?.Content.ReadAsStringAsync()}. URL: {url}");
+            Logger.Error($"💀 Failed to update {typeName} with id: {id} ({payLoad}). Reason: {res?.ReasonPhrase}. Text: {await res?.Content.ReadAsStringAsync()}. URL: {url}");
 
         return res.IsSuccessStatusCode;
     }
@@ -448,6 +467,7 @@ public class WS
     public WaterModel CustomWaterModel { get; }
     public BlobStorage BlobStorage { get; }
     public Home Home { get; }
-    public Watchdog.WatchDog WatchDog  { get;}
+    public Watchdog.WatchDog WatchDog { get; }
+    public EmailGroup EmailGroup { get; }
     #endregion
 }

@@ -1,8 +1,10 @@
 ﻿using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using Serilog.Sinks.InMemory;
+using Serilog.Formatting.Display;
+using Serilog.Formatting;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.Collections.Concurrent;
 
 namespace WaterSight.UI.Support.Logging;
 
@@ -12,40 +14,15 @@ public static class Logging
         LogEventLevel logEventLevel = LogEventLevel.Information,
         string logTemplate = "{Timestamp:HH:mm:ss.ff} | {Level:u3} | {Message}{NewLine}{Exception}")
     {
-        // Get the configurations
-        var config = App.GetConfiguration();
-        var loggingSection = config.GetSection("Logging");
-        var logLevelStr = loggingSection.GetSection("LogEventLevel").Value;
-        var logTemplateStr = loggingSection.GetSection("LogTemplate").Value;
-        if (!string.IsNullOrEmpty(logLevelStr))
-        {
-            try
-            {
-                logEventLevel = (LogEventLevel)Enum.Parse(typeof(LogEventLevel), logLevelStr);
-            }
-            catch { }
-        }
-        else
-        {
-            logEventLevel = LogEventLevel.Information;
-
-        }
-
-#if DEBUG
-            logEventLevel = LogEventLevel.Debug;
-#endif
-
-        // Log file path
-        var logFileDir = loggingSection.GetSection("LogFileDir").Value;
-        if(string.IsNullOrEmpty(logFileDir))
-            logFileDir = Path.Join(Path.GetTempPath(), "__WaterSight.UI");
+        var logFileDir = Path.Join(Path.GetTempPath(), "__WaterSight.UI");
+        logEventLevel = LogEventLevel.Debug;
 
         if(!Directory.Exists(logFileDir))
             Directory.CreateDirectory(logFileDir);
 
         var genericLogFilePath = Path.Combine(logFileDir, "WaterSight.UI..log");
 
-        Log.Logger = new LoggerConfiguration()
+        Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .MinimumLevel.ControlledBy(LoggingLevelSwitch) // Default's to Information 
             .WriteTo.Console(outputTemplate: logTemplate, theme: AnsiConsoleTheme.Code)
@@ -61,6 +38,7 @@ public static class Logging
                 logEventLevel,
                 LoggingLevelSwitch).CreateLogger();
 
+        Log.Logger = Logger;
         LoggingLevelSwitch.MinimumLevel = logEventLevel;
 
         Log.Information(new string('█', 100));
@@ -69,6 +47,7 @@ public static class Logging
 
 
     #region Public Static Properties
+    public static ILogger Logger { get; private set; } 
     public static InMemorySink InMemorySink { get; private set; } = new InMemorySink();
     public static LoggingLevelSwitch LoggingLevelSwitch { get; } = new LoggingLevelSwitch();
     #endregion
@@ -79,3 +58,23 @@ public static class Logging
 }
 
 
+
+public class InMemorySink : ILogEventSink
+{
+    readonly ITextFormatter _textFormatter = new MessageTemplateTextFormatter("{Timestamp:HH:mm:ss.ff} | {Level:u3} | {Message}{NewLine}{Exception}");
+
+    public ConcurrentQueue<string> Events { get; } = new ConcurrentQueue<string>();
+    public event EventHandler<string>? Logged;
+
+    public void Emit(LogEvent logEvent)
+    {
+        if (logEvent != null && Logged != null)
+        {
+            var renderSpace = new StringWriter();
+            _textFormatter.Format(logEvent, renderSpace);
+            Events.Enqueue(renderSpace.ToString());
+
+            Logged.Invoke(this, renderSpace.ToString());
+        }
+    }
+}

@@ -32,16 +32,16 @@ public class CostsTest : TestBase
         Separator("All GET");
 
         // Set
-        Assert.IsTrue(await Costs.SetAvgVolumeticProductionCost(9.99));
-        Assert.IsTrue(await Costs.SetAvgVolumetricTarrif(1.11));
-        Assert.IsTrue(await Costs.SetAvgEnergyCost(99.99));
+        Assert.IsTrue(await Costs.SetAvgVolumeticProductionCost(9.99, "$"));
+        Assert.IsTrue(await Costs.SetAvgVolumetricTarrif(1.11, "$"));
+        Assert.IsTrue(await Costs.SetAvgEnergyCost(99.99, "$"));
         Separator("Individual POSTs");
 
 
         // Get
-        Assert.IsTrue((await Costs.GetAvgVolumeticProductionCost())?.Value > 0);
-        Assert.IsTrue((await Costs.GetAvgVolumetricTarrif())?.Value > 0);
-        Assert.IsTrue((await Costs.GetAvgEnergyCost())?.Value > 0);
+        Assert.IsTrue((await Costs.GetAvgVolumeticProductionCost()) > 0);
+        Assert.IsTrue((await Costs.GetAvgVolumetricTarrif()) > 0);
+        Assert.IsTrue((await Costs.GetAvgEnergyCost()) > 0);
         Separator("Individual GETs");
 
     }
