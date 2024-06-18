@@ -6,13 +6,13 @@ using WaterSight.Web.Settings;
 namespace WaterSight.Web.Test;
 
 [TestFixture, Order(100200), Category("Settings"), Category("Zones")]
-public class TimezoneTest : TestBase
+public class TimeZoneTest : TestBase
 {
     #region Constructor
-    public TimezoneTest()
+    public TimeZoneTest()
     //: base(4549, Env.Qa)
     {
-        Logger.Debug($"----+----+---- Performing Timezone Related Tests ----+----+----");
+        Logger.Debug($"----+----+---- Performing TimeZone Related Tests ----+----+----");
     }
     #endregion
 
@@ -22,27 +22,27 @@ public class TimezoneTest : TestBase
 
     #region Tests
     [Test, Category("Settings")]
-    public async Task Timezone_Test()
+    public async Task TimeZone_Test()
     {
-        var timezoneConfig = new TimeZoneConfig();
-        var timezoneName = "Nepal Standard Time";
-        timezoneConfig.TimeZoneId = timezoneName;
+        var timeZoneConfig = new TimeZoneConfig();
+        var timeZoneName = "America/New_York";
+        timeZoneConfig.TimeZoneId = timeZoneName;
 
         // Set
-        var timezoneUpdated = await TimeZone.SetTimezone(timezoneConfig);
-        Assert.AreEqual(true, timezoneUpdated);
-        Separator("Timezone Set");
+        var timeZoneUpdated = await TimeZone.SetTimezone(timeZoneConfig);
+        Assert.AreEqual(true, timeZoneUpdated);
+        Separator("TimeZone Set");
 
         // Get Current/Active
-        var timezone = await TimeZone.GetTimeZoneName();
-        Assert.IsNotNull(timezone);
-        Assert.AreEqual(timezoneName, timezone);
-        Separator("Timezone Get");
+        var timeZone = await TimeZone.GetTimeZoneName();
+        Assert.IsNotNull(timeZone);
+        Assert.AreEqual(timeZoneName, timeZone);
+        Separator("TimeZone Get");
 
-        // Get All supported timezones
-        var timezones = await TimeZone.GetTimeZones();
-        Assert.IsNotNull(timezones);
-        Assert.IsNotEmpty(timezones);
+        // Get All supported timeZones
+        var timeZones = await TimeZone.GetTimeZones();
+        Assert.IsNotNull(timeZones);
+        Assert.IsNotEmpty(timeZones);
 
     }
     #endregion

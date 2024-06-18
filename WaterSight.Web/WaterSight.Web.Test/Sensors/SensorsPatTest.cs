@@ -1,21 +1,23 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Sensors;
 
-namespace WaterSight.Web.Test.Sensors;
+namespace WaterSight.Web.Test;
 
+[TestFixture, Order(101010), Category("Sensors")]
 public class SensorsPatTest : TestBase
 {
     #region Constructor
     public SensorsPatTest()
         : base(
-        dtID: 139, // TEST_DT_Akshaya_4736,
-        env: Env.Prod, // TEST_ENV,
-        pat: "ozPhDjQwKSeajHtPwF7BMCoZaujuHK4kEmVsfgrfjV7wz0sauTZc" // Generate a new one for testing
+        dtID: TEST_DT_Akshaya_2731,
+        env: Env.Qa,
+        pat: "XlRKb19UGDywaqfgq0rO94u7Qjph2OooeSKBaaLdcy5bbBaJeldY" // Generate a new one for testing
         )
     {
     }
@@ -60,7 +62,8 @@ public class SensorsPatTest : TestBase
         Assert.That(sensorConfigs, Is.Not.Empty);
 
         var jsonFilePath = @"C:\Users\Akshaya.Niraula\Downloads\JsonData\Data.json";
-        
+        Assert.That(File.Exists(jsonFilePath), Is.True);
+
         var success = await WS.Sensor.PostJsonFileAsync(
             jsonFilePath: jsonFilePath,
             tagIds: null,

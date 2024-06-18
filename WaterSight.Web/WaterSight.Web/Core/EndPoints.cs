@@ -83,8 +83,8 @@ public class EndPoints
 
     //
     // Smart Meters
-    public string SmartMeters => $"{RootApiVersion}/SmartMeter";
-    public string SmartMetersSmartMeters => $"{SmartMeters}/SmartMeter";
+    public string SmartMeters => $"{RootApiVersion}/SmartMeters";
+    public string SmartMetersSmartMeters => $"{SmartMeters}/SmartMeters";
     public string SmartMetersSmartMetersQDT => $"{SmartMetersSmartMeters}?{Query.DTID}";
     public string SmartMetersSmartMetersForId(int id) => $"{SmartMetersSmartMeters}/{id}?{Query.DTID}";
     public string SmartMetersSmartMetersFromFile => $"{SmartMeters}/SmartMetersFromFile";

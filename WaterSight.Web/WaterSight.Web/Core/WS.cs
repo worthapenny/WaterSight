@@ -20,6 +20,7 @@ using WaterSight.Web.HydrulicStructures;
 using WaterSight.Web.Landings;
 using WaterSight.Web.NumericModels;
 using WaterSight.Web.Support;
+using WaterSight.Web.Support.IO;
 using WaterSight.Web.User;
 using WaterSight.Web.Zones;
 
@@ -52,7 +53,7 @@ public class WS
 
         Options.PAT = pat;
         Options.EPSGCode = epsgCode;
-        Request.options = Options;
+        Request._options = Options;
         EndPoints = new EndPoints(Options);
 
 
@@ -114,7 +115,7 @@ public class WS
     //
     public async Task<T> AddAsync<T>(object data, string url, string typeName)
     {
-        var jsonText = JsonConvert.SerializeObject(data);
+        var jsonText =JsonConvert.SerializeObject(data);
         var res = await Request.PostJsonString(url, jsonText);
         //int? id = null;
         T t = default;

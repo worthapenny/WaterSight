@@ -71,7 +71,8 @@ public class TanksTest : TestBase
         Separator("Tank deleted");
 
         // Delete All
-        Assert.CatchAsync<NotSupportedException>(async () => await Tank.DeleteTanksConfigAsync());
+        var allDeleted = await Tank.DeleteTanksConfigAsync();
+        Assert.That(allDeleted, Is.True);
         Separator("All tanks deleted");
     }
 

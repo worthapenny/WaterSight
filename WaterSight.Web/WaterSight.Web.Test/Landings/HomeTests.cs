@@ -1,13 +1,10 @@
 ﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace WaterSight.Web.Test.Landings;
+namespace WaterSight.Web.Test;
 
-[TestFixture, Category("Landings"), Category("Home")]
+[TestFixture, Order(110100), Category("Landings"), Category("Home")]
 public class HomeTests: TestBase
 {
     #region Constructor

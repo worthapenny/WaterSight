@@ -24,7 +24,7 @@ public class GisTest : TestBase
     // Pipes
     //
     [Test, Order(103010)]
-    public async Task UploadZippedPipeShpe()
+    public async Task UploadZippedPipeShapefile()
     {
         // Check if something already exits
         var shapefileProps = await WS.GIS.GetShapefileProperties();
@@ -93,7 +93,7 @@ public class GisTest : TestBase
         var success = await WS.GIS.DeletePressureZoneZippedShpFile();
         Assert.IsTrue(success);
 
-        Separator("Delted zone shp");
+        Separator("Deleted zone shp");
     }
 
     //
@@ -120,7 +120,7 @@ public class GisTest : TestBase
         var success = await WS.GIS.DeleteAnyZippedShpFile(myDataType);
         Assert.IsTrue(success);
 
-        Separator("Delted any shp");
+        Separator("Deleted any shp");
     }
 
 

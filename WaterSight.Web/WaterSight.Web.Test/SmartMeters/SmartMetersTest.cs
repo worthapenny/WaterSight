@@ -7,9 +7,10 @@ using System.Xml.Serialization;
 using WaterSight.Web.Alerts;
 using WaterSight.Web.Core;
 using WaterSight.Web.Sensors;
+using WaterSight.Web.Settings;
 using WaterSight.Web.SmartMeters;
 
-namespace WaterSight.Web.Test.SmartMeters;
+namespace WaterSight.Web.Test;
 
 [TestFixture, Order(101500), Category("SmartMeter")]
 public class SmartMetersTest: TestBase
@@ -31,25 +32,25 @@ public class SmartMetersTest: TestBase
     public async Task SmartMeter_CRUD()
     {
         // Create Object
-        var sm = await NewSmartMeterConfigAsync();
+        var sm = NewSmartMeterConfig();
         Assert.IsNotNull(sm);
 
         // Create
         var smCreated = await SmartMeter.AddSmartMeterConfigAsync(sm);
-        Assert.That(sm, Is.Not.Null);
-        Assert.That(sm.ConsumptionPointId > 0);
+        Assert.That(smCreated, Is.Not.Null);
+        Assert.That(smCreated.SignalId > 0);
         Separator("Done create testing");
 
         // Read
-        var smFound = await SmartMeter.GetSmartMeterConfigAsync(sm.ConsumptionPointId);
+        var smFound = await SmartMeter.GetSmartMeterConfigAsync(smCreated.ConsumptionPointId);
         Assert.That(smFound, Is.Not.Null);
-        Assert.That(smFound.ConsumptionPointId, Is.EqualTo(sm.ConsumptionPointId));
+        Assert.That(smFound.ConsumptionPointId, Is.EqualTo(smCreated.ConsumptionPointId));
         Separator("Done reading 'single item' testing");
 
         // Update
         var newName = "Smart Meter Name Updated";
         sm.Name = newName;
-        var success = await SmartMeter.UpdateSmartMeterConfigAsync(sm);
+        var success = await SmartMeter.UpdateSmartMeterConfigAsync(smFound);
         Assert.That(success, Is.True);
         Separator("Done update testing");
 
@@ -65,10 +66,10 @@ public class SmartMetersTest: TestBase
     #endregion
 
     #region Helper Methods
-    public async Task<SmartMeterConfig> NewSmartMeterConfigAsync()
+    public SmartMeterConfig NewSmartMeterConfig()
     {
         var sm = new SmartMeterConfig();
-        sm.Address = $"420 Lost Ln, Ghosttown"; 
+        sm.Address = $"420 Lost Ln, Ghost_town";
         sm.CommunicationFrequency = 15;
         sm.ConsumptionPointId = 0;
         sm.ConsumptionType = (int)ConsumptionTypeEnum.NotDefined;
@@ -78,14 +79,19 @@ public class SmartMetersTest: TestBase
         sm.InstallationDate = new DateTime(1999, 9, 9);
         sm.IsCritical = true;
         sm.IsLarge = true;
-        sm.Latitude = -104.98332839223629;
-        sm.Longitude = 39.98767804586302;
+        sm.Latitude = 39.98767804586302;
+        sm.Longitude = -104.98332839223629;
         sm.MeterType = (int)MeterTypeEnum.NotDefined;
         sm.Name = $"SmartMeter_TestName_{DateTime.Now:u}";
-        sm.ParameterType = $"{ParameterTypeEnum.Volume.ToString()}";
+        sm.ParameterType = $"{ParameterTypeEnum.Volume}";
+        sm.PatternSpecialPeriodIds = new List<int>();
+        sm.PatternWeekId = null;
+        sm.Priority = 1;
         sm.RegistrationFrequency = 15;
         sm.SignalId = 0;
         sm.Tags = "";
+        sm.TimeZoneId = "America/New_York";
+        sm.Units = Volume.m_cubed;
         sm.UtcOffSet = "00:00";
         sm.ZoneName = "";
 

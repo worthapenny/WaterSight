@@ -68,10 +68,10 @@ public class LocationConfig
     #endregion
 
     [JsonProperty("Latitude")]
-    public float? Latitude { get; set; }
+    public double? Latitude { get; set; }
 
     [JsonProperty("Longitude")]
-    public float? Longitude { get; set; }
+    public double? Longitude { get; set; }
 
     public override string ToString()
     {

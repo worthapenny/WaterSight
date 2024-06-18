@@ -16,7 +16,6 @@ public class ZoneTest : TestBase
     #region Constructor
     public ZoneTest()
     //: base(4549, Env.Qa)
-    : base(179, Env.Prod)
     {
         Logger.Debug($"----+----+---- Performing Zones Related Tests ----+----+----");
     }

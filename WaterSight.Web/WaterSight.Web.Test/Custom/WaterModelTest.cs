@@ -27,8 +27,8 @@ public class CustomWaterModelTest : TestBase
     {
         // if there is no model uploaded,
         //      upload one, as model results are required for this test
-        var modelDoamin = await WS.NumericModel.GetModelDomainsAllTypes();
-        if(!(modelDoamin?.Where(d=>d.Type?.ToLower().Contains("gems") ?? false).Any() ?? false))
+        var modelDomain = await WS.NumericModel.GetModelDomainsAllTypes();
+        if(!(modelDomain?.Where(d=>d.Type?.ToLower().Contains("gems") ?? false).Any() ?? false))
         {
             var numericalModelTest = new NumericalModelTest();
             await numericalModelTest.UploadWaterModel();

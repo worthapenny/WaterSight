@@ -2,7 +2,9 @@
 using Serilog;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using WaterSight.Web.Core;
 using WaterSight.Web.Support;
@@ -26,6 +28,8 @@ public class TestBase
     public TestBase(int dtID, Env env, string pat)
     {
         ActiveEnvironment = env;
+
+        // Confirm if the test was intended to run on PROD
         if (ActiveEnvironment == Env.Prod)
         {
             var message = $">>>>> You using {ActiveEnvironment} environment!!! <<<<<";
@@ -33,14 +37,35 @@ public class TestBase
             Debugger.Break();
         }
 
+        // Create WaterSight instant
         WS = new WS(
             tokenRegistryPath: "",
             digitalTwinId: dtID,
             env: ActiveEnvironment,
             pat: pat);
 
-        WS.Options.EPSGCode = 26956; // Watertown DT
+
+        //WS.Options.EPSGCode = 26956; // Watertown DT
     }
+
+    private string GetWaterSightAuthenticatorExePath()
+    {
+        var cwd = Directory.GetParent(Assembly.GetExecutingAssembly().Location);
+        var outputDir = cwd.Parent;
+        Assert.That(outputDir.Name, Is.EqualTo("Output"));
+
+        var authenticatorDir = Path.Combine(outputDir.FullName, Request.WaterSightAuthenticatorName);
+        Assert.That(Directory.Exists(authenticatorDir), Is.True);
+
+        var authenticatorExeDir = Path.Combine(authenticatorDir, "bin", "Debug", "net6.0");
+        Assert.That(Directory.Exists(authenticatorExeDir), Is.True);
+
+        var authenticatorExePath = Path.Combine(authenticatorExeDir, $"{Request.WaterSightAuthenticatorName}.exe");
+        Assert.That(File.Exists(authenticatorExePath), Is.True);
+
+        return authenticatorExePath;
+    }
+
     public TestBase(int dtID, Env env)
     {
         ActiveEnvironment = env;
@@ -100,6 +125,10 @@ public class TestBase
     [OneTimeSetUp]
     public async Task OneTimeSetupAsync()
     {
+        // Authenticator Path
+        Request.WaterSightAuthenticatorExePath = GetWaterSightAuthenticatorExePath();
+        Assert.That(File.Exists(Request.WaterSightAuthenticatorExePath), Is.True);
+
         var dt = WS.Options.DigitalTwinId;
         var dtName = $"{dt} -- (Using PAT?)";
         var userInfo = "(Using PAT?)";

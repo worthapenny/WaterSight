@@ -22,7 +22,7 @@ public class Units : WSItem
         _ = await SetAreaUnit(Area.ft_squared);
         _ = await SetCO2EmissionFactorUnit(CO2EmissionFactor.ton_per_kWh, 2);
         _ = await SetCarbonFootprintUnit(CarbonFootprint.kg);
-        _ = await SetCurrencyUnit(Currency.USDoller, 2);
+        _ = await SetCurrencyUnit(Currency.USD, 2);
         _ = await SetDiameterUnit(Length.inch);
         _ = await SetEnergyUnit(Energy.kWh, 1);
         _ = await SetFlowUnit(VolumeFlow.gal_US_per_min);
@@ -589,9 +589,9 @@ public static class Ratio
 #region Currency
 public static class Currency
 {
-    public static string USDoller => "$";
-    public static string Euro => "€";
-    public static string Pound => "£";
+    //public static string USDoller => "$";
+    //public static string Euro => "€";
+    //public static string Pound => "£";
 
     public static string AED => "AED";
     public static string BRL => "BRL";
@@ -619,8 +619,8 @@ public static class Weather
 {
     public static string Imperial => "Imperial";
     public static string Metric => "Metric";
-    public static string Metric_SI => "Metric SI";
-    public static string Hybrid => "Hybrid";
+    //public static string Metric_SI => "Metric SI";
+    //public static string Hybrid => "Hybrid";
 
 }
 

@@ -83,7 +83,7 @@
     <Compile Include="Settings\LocationTest.cs" />
     <Compile Include="Settings\PatternWeekTest.cs" />
     <Compile Include="Settings\ServiceExpectationsTest.cs" />
-    <Compile Include="Settings\TimezoneTest.cs" />
+    <Compile Include="Settings\TimeZoneTest.cs" />
     <Compile Include="Settings\UnitsTest.cs" />
     <Compile Include="Setup\SetupTest.cs" />
     <Compile Include="NumericalModel\TankCurvesTest.cs" />

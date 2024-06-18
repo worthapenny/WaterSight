@@ -7,6 +7,7 @@ CostsTest:100500
 LocationTest: 100600
 
 SensorsTest:101000
+SensorsPatTest:101010
 SmartSensorsTest:101500
 TanksTest:102000
 TankCurvesTest:102100
@@ -18,6 +19,6 @@ EmailGroupTest: 105100
 CustomersTest: 106000
 DigitalTwinTest: 107000
 CustomWaterModelTest:
-PowerBITest:
-HomeTests:
-SetupTest:
+PowerBITest:110000
+HomeTests:110100
+SetupTest:110200

@@ -8,13 +8,13 @@ using WaterSight.Web.Core;
 using WaterSight.Web.SmartMeters;
 using WaterSight.Web.Watchdog;
 
-namespace WaterSight.Web.Test.Watchdog;
+namespace WaterSight.Web.Test;
 
 public class WatchdogTestFixture: TestBase
 {
     #region Conscturctor
     public WatchdogTestFixture()
-    : base(3377, Env.Qa)
+    //: base(3377, Env.Qa)
     {
         Separator($"----+----+---- Performing Watchdog Related Tests ----+----+----");
     }

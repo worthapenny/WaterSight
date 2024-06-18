@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -27,12 +28,9 @@ public class SmartMeter : WSItem
     {
         // Post: https://connect-watersight.bentley.com/api/v1/SmartMeter/SmartMeter?digitalTwinId=308
         var url = EndPoints.SmartMetersSmartMetersQDT;
-        int? id = await WS.AddAsync<int?>(config, url, Name);
-        if (id.HasValue)
-        {
-            config.ConsumptionPointId = id.Value;
-            return config;
-        }
+        var updatedConfig = await WS.AddAsync<SmartMeterConfig?>(config, url, Name);
+        if (updatedConfig?.SignalId != null)
+            return updatedConfig;
 
         return null;
     }
@@ -145,11 +143,13 @@ public class SmartMeterConfig
     public string? MeterTypeAsString { get; set; } = MeterTypeEnum.Volumetric.ToString();
     public string Name { get; set; } = string.Empty;
     public string ParameterType { get; set; } = ParameterTypeEnum.Flow.ToString();
+    public List<int> PatternSpecialPeriodIds { get; set; } = new List<int>();
     public int? PatternWeekId { get; set; } = null;
     public int Priority { get; set; } = 1;
     public int RegistrationFrequency { get; set; } = 15;
     public int SignalId { get; set; } = 0;
     public string Tags { get; set; } = string.Empty;
+    public string TimeZoneId {  get; set; } = "UTC";
     public string Units { get; set; } = "gpd";
     public string UtcOffSet { get; set; } = "00:00:00";
     public string ZoneName { get; set; } = string.Empty;

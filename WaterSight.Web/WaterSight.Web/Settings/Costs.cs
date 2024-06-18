@@ -23,35 +23,35 @@ public class Costs : WSItem
     #endregion
 
     #region Get 
-    public async Task<double?> GetAvgVolumeticProductionCost()
+    public async Task<CostsConfig?> GetAvgVolumetricProductionCost()
     {
         var url = EndPoints.DTCostsAvgVolumetricProduction;
-        return await WS.GetAsync<double?>(url, null, "AvgVolProdCost");
+        return await WS.GetAsync<CostsConfig?>(url, null, "AvgVolProdCost");
     }
-    public async Task<double?> GetAvgVolumetricTarrif()
+    public async Task<CostsConfig?> GetAvgVolumetricTariff()
     {
         var url = EndPoints.DTCostsAvgVolumetricTariff;
-        return await WS.GetAsync<double?>(url, null, "AvgVolTarrif");
+        return await WS.GetAsync<CostsConfig?>(url, null, "AvgVolTariff");
     }
-    public async Task<double?> GetAvgEnergyCost()
+    public async Task<CostsConfig?> GetAvgEnergyCost()
     {
         var url = EndPoints.DTCostsAvgEnergyCost;
-        return await WS.GetAsync<double?>(url, null, "AvgEnergyCost");
+        return await WS.GetAsync<CostsConfig?>(url, null, "AvgEnergyCost");
     }
 
     #endregion
 
     #region Set
-    public async Task<bool> SetAvgVolumeticProductionCost(double cost, string unit)
+    public async Task<bool> SetAvgVolumetricProductionCost(double cost, string unit)
     {
         var url = EndPoints.DTCostsAvgVolumetricProductionSet(cost, unit);
         return await WS.PostAsync(url, null, "AvgVolProdCost", additionalInfo: $"{cost} {unit}");
 
     }
-    public async Task<bool> SetAvgVolumetricTarrif(double cost, string unit)
+    public async Task<bool> SetAvgVolumetricTariff(double cost, string unit)
     {
         var url = EndPoints.DTCostsAvgVolumetricTariffSet(cost, unit);
-        return await WS.PostAsync(url, null, "AvgVolTarrif", additionalInfo: $"{cost} {unit}");
+        return await WS.PostAsync(url, null, "AvgVolTariff", additionalInfo: $"{cost} {unit}");
     }
     public async Task<bool> SetAvgEnergyCost(double cost, string unit)
     {

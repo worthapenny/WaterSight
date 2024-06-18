@@ -43,37 +43,44 @@ public class UnitsTest : TestBase
     [Test]
     public async Task All_Units_Test()
     {
-        Assert.True(await Units.SetPressureUnit(Pressure.GPa));
-        Assert.True(await Units.SetLengthUnit(Length.kly));
-        Assert.True(await Units.SetVolumeUnit(Volume.bbl));
-        Assert.True(await Units.SetEnergyUnit(Energy.GJ));
-        Assert.True(await Units.SetWaterAgeUnit(Duration.micro_s));
-        Assert.True(await Units.SetTemperatureUnit(Temperature.degree_Rø));
-        Assert.True(await Units.SetCurrencyUnit(Currency.Euro));
-        Assert.True(await Units.SetFlowUnit(VolumeFlow.dm_cubed_per_min));
+        // TODO: Add missing units (CO2 emission, Carbon Footprint, etc.)
         Assert.True(await Units.SetAreaUnit(Area.dm_squared));
-        Assert.True(await Units.SetPowerUnit(Power.GJ_per_h));
-        Assert.True(await Units.SetVelocityUnit(Speed.cm_per_min));
+        Assert.True(await Units.SetCO2EmissionFactorUnit(CO2EmissionFactor.kg_per_kWh));
+        Assert.True(await Units.SetCarbonFootprintUnit(CarbonFootprint.kg));
+        Assert.True(await Units.SetCurrencyUnit(Currency.EUR));
+        Assert.True(await Units.SetDiameterUnit(Length.au));
+        Assert.True(await Units.SetWaterAgeUnit(Duration.micro_s));
+        Assert.True(await Units.SetEnergyUnit(Energy.GJ));
+        Assert.True(await Units.SetLengthUnit(Length.kly));
         Assert.True(await Units.SetMassConcentrationUnit(MassConcentration.cg_per_dL));
+        Assert.True(await Units.SetPowerUnit(Power.GJ_per_h));
+        Assert.True(await Units.SetPressureUnit(Pressure.GPa));
         Assert.True(await Units.SetRatioUnit(Ratio.percent_dot));
-        Assert.True(await Units.SetWatherUnit(Weather.Metric_SI));
+        Assert.True(await Units.SetVelocityUnit(Speed.cm_per_min));
+        Assert.True(await Units.SetTemperatureUnit(Temperature.degree_Rø));
+        Assert.True(await Units.SetVolumeUnit(Volume.bbl));
+        Assert.True(await Units.SetFlowUnit(VolumeFlow.dm_cubed_per_min));
+        Assert.True(await Units.SetWatherUnit(Weather.Metric));
         Separator("Individual POSTs");
 
         var supportedUnits = await Units.GetAllUnits();
-        Assert.True(supportedUnits.Where(u => u?.Name == "Pressure").First()?.Units == Pressure.GPa);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Length").First()?.Units == Length.kly);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Volume").First()?.Units == Volume.bbl);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Energy").First()?.Units == Energy.GJ);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Duration").First()?.Units == Duration.micro_s);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Temperature").First()?.Units == Temperature.degree_Rø);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Currency").First()?.Units == Currency.Euro);
-        Assert.True(supportedUnits.Where(u => u?.Name == "VolumeFlow").First()?.Units == VolumeFlow.dm_cubed_per_min);
         Assert.True(supportedUnits.Where(u => u?.Name == "Area").First()?.Units == Area.dm_squared);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Power").First()?.Units == Power.GJ_per_h);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Speed").First()?.Units == Speed.cm_per_min);
+        Assert.True(supportedUnits.Where(u => u?.Name == "CO2EmissionFactor").First()?.Units == CO2EmissionFactor.kg_per_kWh);
+        Assert.True(supportedUnits.Where(u => u?.Name == "CarbonFootprint").First()?.Units == CarbonFootprint.kg);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Currency").First()?.Units == Currency.EUR);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Diameter").First()?.Units == Length.au);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Duration").First()?.Units == Duration.micro_s);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Energy").First()?.Units == Energy.GJ);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Length").First()?.Units == Length.kly);
         Assert.True(supportedUnits.Where(u => u?.Name == "MassConcentration").First()?.Units == MassConcentration.cg_per_dL);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Power").First()?.Units == Power.GJ_per_h);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Pressure").First()?.Units == Pressure.GPa);
         Assert.True(supportedUnits.Where(u => u?.Name == "Ratio").First()?.Units == Ratio.percent_dot);
-        Assert.True(supportedUnits.Where(u => u?.Name == "Weather").First()?.Units == Weather.Metric_SI);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Speed").First()?.Units == Speed.cm_per_min);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Temperature").First()?.Units == Temperature.degree_Rø);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Volume").First()?.Units == Volume.bbl);
+        Assert.True(supportedUnits.Where(u => u?.Name == "VolumeFlow").First()?.Units == VolumeFlow.dm_cubed_per_min);
+        Assert.True(supportedUnits.Where(u => u?.Name == "Weather").First()?.Units == Weather.Metric);
         Separator("Individual GETs");
 
     }

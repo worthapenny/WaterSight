@@ -64,7 +64,7 @@ public class TankCurvesTest : TestBase
 
         // Delete All
         Assert.CatchAsync<NotSupportedException>(async () => await TankCurve.DeleteTankCurvesConfigAsync());
-        Separator($"Deleted all tank cruves");
+        Separator($"Deleted all tank curves");
     }
 
     private static TankCurveConfig NewTankCurveConfig()

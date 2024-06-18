@@ -6,6 +6,7 @@ using WaterSight.Web.ExternalService;
 
 namespace WaterSight.Web.Test;
 
+[TestFixture, Order(110000)]
 public class PowerBITest: TestBase
 {
     #region Constructor

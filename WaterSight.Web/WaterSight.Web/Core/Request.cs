@@ -20,7 +20,7 @@ namespace WaterSight.Web.Core;
 public static class Request
 {
     #region Constants
-    private const string WaterSightAuthenticatorName = "WaterSight.Authenticator";
+    
     #endregion
 
     #region Public Static Methods
@@ -59,14 +59,14 @@ public static class Request
                 LogHttpHeader(res);
             }
 
-            if ((int)res.StatusCode >= 400)
+            if ((int)res.StatusCode == 400)
             {
-                Logger.Error($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
+                Logger.Error($"Request status code: {(int)res.StatusCode}, reason: {res.ReasonPhrase}");
                 Debugger.Break();
             }
 
             Logger.Debug($"Get request time-taken: {sw.Elapsed}. {url}");
-            Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
+            Logger.Debug($"Request status code: {(int)res.StatusCode}, reason: {res.ReasonPhrase}");
             sw.Stop();
 
             return res;
@@ -150,7 +150,7 @@ public static class Request
 
 
             Logger.Debug($"Put request time-taken: {sw.Elapsed}. {url}");
-            Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
+            Logger.Debug($"Request status code: {(int)res.StatusCode}, reason: {res.ReasonPhrase}");
             sw.Stop();
 
             return res;
@@ -192,7 +192,7 @@ public static class Request
                 Debugger.Break();
 
             Logger.Debug($"Post request time-taken: {sw.Elapsed}. {url}");
-            Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
+            Logger.Debug($"Request status code: {(int)res.StatusCode}, reason: {res.ReasonPhrase}");
             sw.Stop();
 
             return res;
@@ -231,7 +231,7 @@ public static class Request
                 Debugger.Break();
 
             Logger.Debug($"Delete request time-taken: {sw.Elapsed}. {url}");
-            Logger.Debug($"Request status code: {res.StatusCode}, reason: {res.ReasonPhrase}");
+            Logger.Debug($"Request status code: {(int)res.StatusCode}, reason: {res.ReasonPhrase}");
             sw.Stop();
 
             return res;
@@ -482,18 +482,25 @@ public static class Request
         return token ?? "";
     }
     private static bool RunWaterSightAuthenticator(string env, bool forceStart)
-    {
+    {        
         var wsAuthProcess = GetWaterSightAuthenticator();
 
-        // It's not running, start it
+        
+        if (!File.Exists(WaterSightAuthenticatorExePath))
+        {
+            Log.Error($"💀 WaterSight Authenticator exe path is not valid. Current Path: {WaterSightAuthenticatorExePath}");
+            return false;
+        }
+
+
+        // Authenticator is not running, start it
         if (wsAuthProcess == null)
         {
             Log.Information($"'{WaterSightAuthenticatorName}' is NOT started, so starting it...");
             try
             {
-                var assemblyPath = @"D:\Development\DotNet\WaterSight\Output\WaterSight.Authenticator\bin\Debug\net6.0\WaterSight.Authenticator.exe";
                 var process = new Process();
-                process.StartInfo.FileName = assemblyPath;
+                process.StartInfo.FileName = WaterSightAuthenticatorExePath;
                 process.StartInfo.Arguments = $"{env} 30";
 
                 Log.Information($"About to start WS Authenticator. Env: {env}, ForceStart: {forceStart}");
@@ -539,10 +546,12 @@ public static class Request
     #endregion
 
     #region Public Static Properties
-    public static Options Options => options;
-    public static Options options;
+    public static Options Options => _options;
+    public static Options _options;
 
     public static TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(1);
+    public static string WaterSightAuthenticatorExePath { get; set; }
+    public static string WaterSightAuthenticatorName => "WaterSight.Authenticator";
 
     // Do not cache the token as it could change ever .5 hrs or so
     public static string BearerToken => WaterSightAccessToken();

@@ -11,18 +11,9 @@ namespace WaterSight.Authenticator;
 public class Program
 {
 
-    [System.Runtime.InteropServices.DllImport("kernel32.dll")]
-    static extern bool AttachConsole(int dwProcessId);
-    private const int ATTACH_PARENT_PROCESS = -1;
-
     [STAThread]
     public static async Task Main(string[] args)
     {
-        // redirect console output to parent process;
-        // must be before any calls to Console.WriteLine()
-        AttachConsole(ATTACH_PARENT_PROCESS);
-        Console.WriteLine("About to setup logger");
-
         //
         // Logging
         //
@@ -62,8 +53,8 @@ public class Program
         Log.Information($"Env: {env}");
         if (env != Env.Prod)
         {
-            App.ConfigFileName = "configurationQA.json";
-            App.ConfigFileName = "configuration.json";
+            App.ConfigFileName = "configurationQA.json"; // Need to find right client id so that a new DT can be created
+            App.ConfigFileName = "configuration.json"; // this works even for QA but can't create a new DT 
         }
 
 
@@ -162,6 +153,7 @@ public class Program
 
     private static void AuthStateChanged(AuthEvent e)
     {
+        // Update Registry
         switch (e)
         {
             case AuthEvent.LoggedIn:

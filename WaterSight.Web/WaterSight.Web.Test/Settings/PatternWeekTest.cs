@@ -22,7 +22,7 @@ public class PatternWeeksTest : TestBase
     #endregion
 
     #region Properties
-    public WaterSight.Web.Settings.PatternWeeks PatternWeeks => WS.Settings.PatternWeeks;
+    public PatternWeeks PatternWeeks => WS.Settings.PatternWeeks;
     #endregion
 
     #region Tests

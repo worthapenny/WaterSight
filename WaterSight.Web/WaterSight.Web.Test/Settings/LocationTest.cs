@@ -26,8 +26,8 @@ public class LocationTest : TestBase
     public async Task Location_Test()
     {
         var locationConfig = new LocationConfig();
-        locationConfig.Latitude = 1234.1234F;
-        locationConfig.Longitude = -4321.4321F;
+        locationConfig.Latitude = 39.98741 ;
+        locationConfig.Longitude = -104.95621;
 
         // Set
         Assert.IsTrue(await Location.SetLocation(locationConfig));
@@ -36,8 +36,8 @@ public class LocationTest : TestBase
         // Get
         var location = await Location.GetLocation();
         Assert.That(location, Is.Not.Null);
-        Assert.That(location.Latitude, Is.EqualTo(1234.1234).Within(0.001));
-        Assert.That(location.Longitude, Is.EqualTo(-4321.4321).Within(0.001));
+        Assert.That(location.Latitude, Is.EqualTo(39.98741).Within(0.001));
+        Assert.That(location.Longitude, Is.EqualTo(-104.95621).Within(0.001));
         Separator("Location GET");
 
     }
