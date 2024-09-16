@@ -22,7 +22,7 @@ public class DemandWithPattern
     #region Overridden Methods
     public override string ToString()
     {
-        return $"Demand: {Demand}, Pattern: {Pattern.IdLabel()}";
+        return $"Demand: {Demand}, Pattern: {Pattern.IdLabel}";
     }
     #endregion
 

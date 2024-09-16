@@ -33,7 +33,7 @@ public class CustomersTest : TestBase
         FileAssert.Exists(excelFilePath);
 
         var uploaded = await Meters.UploadMeterFileAsync(new FileInfo(excelFilePath));
-        Assert.IsTrue(uploaded);
+        Assert.That(uploaded, Is.True);
         Separator("Uploaded");
     }
 
@@ -47,7 +47,7 @@ public class CustomersTest : TestBase
         await Task.Delay(5 * 1000);
         var excelFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"TestFiles\Setup\Watertown_Configuration.xlsx");
         var uploaded = await Billings.UploadBillingFileAsync(new FileInfo(excelFilePath));
-        Assert.IsTrue(uploaded);
+        Assert.That(uploaded, Is.True);
         Separator("Uploaded Excel");
 
         // CSV Upload
@@ -60,7 +60,7 @@ public class CustomersTest : TestBase
         File.WriteAllText(csvFilePath, csvData);
 
         uploaded = await Billings.UploadBillingFileAsync(new FileInfo(csvFilePath));
-        Assert.IsTrue(uploaded);
+        Assert.That(uploaded, Is.True);
         Separator("Uploaded CSV");
 
         // delete csvFile

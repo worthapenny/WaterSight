@@ -14,29 +14,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Haestad.Domain.ModelingObjects;
-using WaterSight.Model.Sensors;
+using Niraula.Extensions.Water.Sensors;
 
 namespace WaterSight.Model.Support;
 
-public enum Direction
-{
-    E = 0,
-    NNE = 22,
-    NE = 45,
-    ENE = 67,
-    N = 90,
-    NNW = 112,
-    NW = 135,
-    WNW = 157,
-    W = 180,
-    WSW = 202,
-    SW = 225,
-    SSW = 247,
-    S = 270,
-    SSE = 292,
-    SE = 315,
-    ESE = 337,
-}
 
 public class ModelEditor
 {
@@ -48,50 +29,52 @@ public class ModelEditor
     #endregion
 
     #region Public Methods
-    public async Task<bool> CreateSCADElementsAsync(List<Sensor> sensors, double distance)
-    {
-        SCADAElments = WaterModel.Network.SCADAElements.Elements(ElementStateType.Active);
+    //public async Task<bool> CreateSCADElementsAsync(List<Sensor> sensors, double distance)
+    //{
+    //    SCADAElments = WaterModel.Network.SCADAElements.Elements(ElementStateType.Active);
 
-        foreach (var sensor in sensors)
-        {
-            var element = sensor.NetworkElement;
+    //    foreach (var sensor in sensors)
+    //    {
+    //        var element = sensor.NetworkElement;
 
-            if (element == null)
-                Log.Warning($"Network element is null, without which SCADAElement can't be created.");
-            else
-            {
-                // check if SCADA element is already there
-                var scadaElementCheck = SCADAElments.Where(s =>
-                    s.Input.TargetElement != null
-                    && s.Input.TargetElement.Id == element.Id
-                    && s.Input.TargetAttribute == sensor.TargetAttribute);
+    //        if (element == null)
+    //            Log.Warning($"Network element is null, without which SCADAElement can't be created.");
+    //        else
+    //        {
+    //            // check if SCADA element is already there
+    //            var scadaElementCheck = SCADAElments.Where(s =>
+    //                s.Input.TargetElement != null
+    //                && s.Input.TargetElement.Id == element.Id
+    //                && s.Input.TargetAttribute == sensor.TargetAttribute);
 
-                if (scadaElementCheck.Any()) // already exists
-                {
-                    var se = scadaElementCheck.First();
-                    Log.Information($"SCADA element {se} targeting {se.Input.TargetAttribute} already exist. SKIPPED creating a new one for {sensor}");
-                }
-                else // does not exists
-                {
-                    _ = await CreateSCADElementAsync(sensor, element, distance);
+    //            if (scadaElementCheck.Any()) // already exists
+    //            {
+    //                var se = scadaElementCheck.First();
+    //                Log.Information($"SCADA element {se} targeting {se.Input.TargetAttribute} already exist. SKIPPED creating a new one for {sensor}");
+    //            }
+    //            else // does not exists
+    //            {
+    //                _ = await CreateSCADElementAsync(sensor, element, distance);
 
-                    //if (element is IPointNodeInput)
-                    //    _ = await CreateSCADElementsForPointNodeAsync(sensor, element);
+    //                //if (element is IPointNodeInput)
+    //                //    _ = await CreateSCADElementsForPointNodeAsync(sensor, element);
 
-                    //else if (element is IBaseLinkInput)
-                    //    _ = await CreateSCADElementsForLink(sensor, element);
+    //                //else if (element is IBaseLinkInput)
+    //                //    _ = await CreateSCADElementsForLink(sensor, element);
 
-                    //else
-                    //    Log.Warning($"Unsupported element type. {element}. Type: {element.WaterElementType}");
-                }
-
-
-            }
-        }
+    //                //else
+    //                //    Log.Warning($"Unsupported element type. {element}. Type: {element.WaterElementType}");
+    //            }
 
 
-        return true;
-    }
+    //        }
+    //    }
+
+
+    //    return true;
+    //}
+
+
     /*public void AddConnectionToMSAccess(DataSourceConnectionOptions options)
     {
 
@@ -229,79 +212,59 @@ public class ModelEditor
 
     }
 
-    public bool MapSCADASignal(IWaterElement element, SCADATargetAttribute attribute, string tag, int dataSoucrceId)
-    {
-        var success = true;
-        var seCheck = element.ConnectedSCADAElements(WaterModel)
-            .Where(se => se.Input.TargetElement.Id == element.Id
-                && se.Input.TargetAttribute == attribute);
-        if (!seCheck.Any())
-        {
-            Log.Error($"No connected SCADA Element found for {element} with attribute {attribute}");
-            return false;
-        }
+    //public bool MapSCADASignal(IWaterElement element, SCADATargetAttribute attribute, string tag, int dataSoucrceId)
+    //{
+    //    var success = true;
+    //    var seCheck = element.GetConnectedSCADAElements(WaterModel)
+    //        .Where(se => se.Input.TargetElement.Id == element.Id
+    //            && se.Input.TargetAttribute == attribute);
+    //    if (!seCheck.Any())
+    //    {
+    //        Log.Error($"No connected SCADA Element found for {element} with attribute {attribute}");
+    //        return false;
+    //    }
 
-        var se = seCheck.First().Input;
+    //    var se = seCheck.First().Input;
 
-        // Check if SCADA signal is there already
-        var dataSource = WaterModel.Components.SCADASignals(dataSoucrceId);
-        var ssCheck = dataSource.Elements()
-                .Where(ss => ss.SignalLabel == tag);
+    //    // Check if SCADA signal is there already
+    //    var dataSource = WaterModel.Components.SCADASignals(dataSoucrceId);
+    //    var ssCheck = dataSource.Elements()
+    //            .Where(ss => ss.SignalLabel == tag);
 
-        if (ssCheck.Any())
-            se.HistoricalSignal = ssCheck.First();
-        else
-        {
-            var ss = dataSource.Create();
-            ss.SignalLabel = tag;
-            ss.Label = tag;
-            se.HistoricalSignal = ss;
-        }
+    //    if (ssCheck.Any())
+    //        se.HistoricalSignal = ssCheck.First();
+    //    else
+    //    {
+    //        var ss = dataSource.Create();
+    //        ss.SignalLabel = tag;
+    //        ss.Label = tag;
+    //        se.HistoricalSignal = ss;
+    //    }
 
-        Log.Debug($"Mapped SCADA Signal. element = {element.IdLabel()} to = {se.HistoricalSignal.IdLabel()} for attribute = {attribute.ToString()}");
-        return success;
-    }
-    public async Task<ISCADAElement> CreateSCADElementAsync(Sensor sensor, IWaterElement element, double distance)
-    {
-        try
-        {
-            var newSE = WaterModel.Network.SCADAElements.Create(
-            label: sensor.Label,
-            point: await GetLocationAsync(sensor, element, distance),
-            targetElement: element,
-            scadaTargetAttribute: sensor.TargetAttribute);
+    //    Log.Debug($"Mapped SCADA Signal. element = {element.IdLabel} to = {se.HistoricalSignal.IdLabel} for attribute = {attribute.ToString()}");
+    //    return success;
+    //}
 
-            return newSE;
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, $"...while creating SCADA elements for {element}. Sensor: {sensor}");
-            return null;
-        }
-    }
-    public void DeleteDuplicateSCADAElements()
-    {
-        var scadaElements = WaterModel.Network.SCADAElements.Elements(ElementStateType.Active);
 
-        var distinctSEIds = scadaElements
-            .GroupBy(se => new { se.Label, se.Input.TargetElement.Id, se.Input.TargetAttribute })
-            .Select(g => g.First())
-            .Select(se => se.Id)
-            .ToList();
+    //public async Task<ISCADAElement> CreateSCADElementAsync(Sensor sensor, IWaterElement element, double distance)
+    //{
+    //    try
+    //    {
+    //        var newSE = WaterModel.Network.SCADAElements.Create(
+    //        label: sensor.Label,
+    //        point: await GetLocationAsync(sensor, element, distance),
+    //        targetElement: element,
+    //        scadaTargetAttribute: sensor.TargetAttribute);
 
-        Log.Information($"'{distinctSEIds.Count}' of '{scadaElements.Count}' are unique.");
-
-        var seCheck = scadaElements.Where(se => !distinctSEIds.Contains(se.Id));
-
-        if (seCheck.Any())
-        {
-            foreach (var se in seCheck)
-            {
-                se.Delete();
-                Log.Information($"{se.IdLabel()} got deleted");
-            }
-        }
-    }
+    //        return newSE;
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Log.Error(ex, $"...while creating SCADA elements for {element}. Sensor: {sensor}");
+    //        return null;
+    //    }
+    //}
+    
     #endregion
 
     #region Private Methods
@@ -319,102 +282,102 @@ public class ModelEditor
     //}
 
 
-    private async Task<GeometryPoint> GetLocationAsync(Sensor sensor, IWaterElement element, double distance)
-    {
-        //var point =  await Task.Run(() =>
-        //{
-            // Calculate Slope
-            var slope = 0.0;
-            if (element is IBaseLinkInput)
-            {
-                slope = (element as IBaseLinkInput).SlopeAngle(out _);
-            }
-            else if (element is ITank || element is IReservoir)
-            {
-                slope = 0;
-            }
-            else if (element is IPointNodeInput)
-            {
-                var connectedLinks = element.ConnectedAdjacentElements(WaterModel);
-                if (connectedLinks.Any())
-                {
+    //private async Task<GeometryPoint> GetLocationAsync(Sensor sensor, IWaterElement element, double distance)
+    //{
+    //    //var point =  await Task.Run(() =>
+    //    //{
+    //        // Calculate Slope
+    //        var slope = 0.0;
+    //        if (element is IBaseLinkInput)
+    //        {
+    //            slope = (element as IBaseLinkInput).SlopeAngle(out _);
+    //        }
+    //        else if (element is ITank || element is IReservoir)
+    //        {
+    //            slope = 0;
+    //        }
+    //        else if (element is IPointNodeInput)
+    //        {
+    //            var connectedLinks = element.ConnectedAdjacentElements(WaterModel);
+    //            if (connectedLinks.Any())
+    //            {
 
-                    var slopeFirst = (connectedLinks.First() as IBaseLinkInput).SlopeAngle(out _);
-                    var slopeSecond = (connectedLinks.Last() as IBaseLinkInput).SlopeAngle(out _);
-                    slope = (slopeFirst + slopeSecond) / 2;
-                }
-            }
+    //                var slopeFirst = (connectedLinks.First() as IBaseLinkInput).SlopeAngle(out _);
+    //                var slopeSecond = (connectedLinks.Last() as IBaseLinkInput).SlopeAngle(out _);
+    //                slope = (slopeFirst + slopeSecond) / 2;
+    //            }
+    //        }
 
-            //Log.Debug($"Slope for {element} is: {slope}");
-            Log.Debug($"Slope for {element.Id}: {element.Label} is: {slope} radian, {slope * 180 / Math.PI} degree");
+    //        //Log.Debug($"Slope for {element} is: {slope}");
+    //        Log.Debug($"Slope for {element.Id}: {element.Label} is: {slope} radian, {slope * 180 / Math.PI} degree");
 
-            var location = new GeometryPoint();
+    //        var location = new GeometryPoint();
 
-            if (element is IBaseLinkInput)
-                location = GetLocationForPipe(slope, sensor, element, distance);
+    //        if (element is IBaseLinkInput)
+    //            location = GetLocationForPipe(slope, sensor, element, distance);
 
-            if (element is IPointNodeInput)
-                location = GetLocationForJunctionOrHydrant(slope, sensor, element, distance);
+    //        if (element is IPointNodeInput)
+    //            location = GetLocationForJunctionOrHydrant(slope, sensor, element, distance);
 
-            //else if (element is IJunction || element is IHydrant)
-            //    location = GetLocationForJunctionOrHydrant(slope, sensor, element);
+    //        //else if (element is IJunction || element is IHydrant)
+    //        //    location = GetLocationForJunctionOrHydrant(slope, sensor, element);
 
-            //else if (element is IBaseValveInput)
-            //    location = GetLocationForValves(slope, sensor, element);
+    //        //else if (element is IBaseValveInput)
+    //        //    location = GetLocationForValves(slope, sensor, element);
 
-            //else if (element is IPump)
-            //    location = GetLocationForPump(slope, sensor, element);
+    //        //else if (element is IPump)
+    //        //    location = GetLocationForPump(slope, sensor, element);
 
-            //else if (element is ITank)
-            //    location = GetLocatoinForTank(slope, sensor, element);
+    //        //else if (element is ITank)
+    //        //    location = GetLocatoinForTank(slope, sensor, element);
 
-            //else if (element is IReservoir)
-            //    location = GetLocationForReservoir(slope, sensor, element);
+    //        //else if (element is IReservoir)
+    //        //    location = GetLocationForReservoir(slope, sensor, element);
 
-            Log.Debug($"Location for {sensor} is: {location}");
-            return location;
-        //});
+    //        Log.Debug($"Location for {sensor} is: {location}");
+    //        return location;
+    //    //});
 
-        //return point;
-    }
-
-
-    /*
-     * PIPE
-     *             Flow (on positive side)
-     *                        |
-     *           o-------------------------o  -> 
-     *                        |
-     *             Status (on negative side)            
-     */
-    private GeometryPoint GetLocationForPipe(double slope, Sensor sensor, IWaterElement element, double distance)
-    {
-        var direction = (int)GetDirection(sensor) * Math.PI / 180;
-        var pipe = element as IPipe;
-        var midPoint = MathLibrary.GetPointAtDistanceIntoPolyline(pipe.Input.GetPoints().ToArray(), pipe.Input.Length / 2, out _);
-        var point = GetCoordinateAtDistanceAndAngle(midPoint, distance, direction, slope);
-
-        return point;
-    }
+    //    //return point;
+    //}
 
 
-    /*        
-     *             
-     *  JUNCTION / HYDRANT    
-     *            Pressure (on positive side)
-     *                        |
-     *           o------------O------------o  ->     
-     *                        |
-     *                  Concentration
-     */
-    private GeometryPoint GetLocationForJunctionOrHydrant(double slope, Sensor sensor, IWaterElement element, double distance)
-    {
-        var direction = (int)GetDirection(sensor) * Math.PI / 180;
-        var node = element as IPointNodeInput;
-        var point = GetCoordinateAtDistanceAndAngle(node.GetPoint(), distance, direction, slope);
+    ///*
+    // * PIPE
+    // *             Flow (on positive side)
+    // *                        |
+    // *           o-------------------------o  -> 
+    // *                        |
+    // *             Status (on negative side)            
+    // */
+    //private GeometryPoint GetLocationForPipe(double slope, Sensor sensor, IWaterElement element, double distance)
+    //{
+    //    var direction = (int)GetDirection(sensor) * Math.PI / 180;
+    //    var pipe = element as IPipe;
+    //    var midPoint = MathLibrary.GetPointAtDistanceIntoPolyline(pipe.Input.GetPoints().ToArray(), pipe.Input.Length / 2, out _);
+    //    var point = GetCoordinateAtDistanceAndAngle(midPoint, distance, direction, slope);
 
-        return point;
-    }
+    //    return point;
+    //}
+
+
+    ///*        
+    // *             
+    // *  JUNCTION / HYDRANT    
+    // *            Pressure (on positive side)
+    // *                        |
+    // *           o------------O------------o  ->     
+    // *                        |
+    // *                  Concentration
+    // */
+    //private GeometryPoint GetLocationForJunctionOrHydrant(double slope, Sensor sensor, IWaterElement element, double distance)
+    //{
+    //    var direction = (int)GetDirection(sensor) * Math.PI / 180;
+    //    var node = element as IPointNodeInput;
+    //    var point = GetCoordinateAtDistanceAndAngle(node.GetPoint(), distance, direction, slope);
+
+    //    return point;
+    //}
 
     /*           
      *  PUMP    
@@ -485,57 +448,57 @@ public class ModelEditor
     //    return point;
     //}
 
-    private Direction GetDirection(Sensor sensor)
-    {
-        switch (sensor.SensorType)
-        {
-            case SensorType.Pressure:
-                var direction = Direction.N;
-                if (sensor.IsDirectional && sensor.IsDirectionOutward)
-                    direction = Direction.NE;
-                if (sensor.IsDirectional && !sensor.IsDirectionOutward)
-                    direction = Direction.NW;
-                return direction;
+    //private Direction GetDirection(Sensor sensor)
+    //{
+    //    switch (sensor.SensorType)
+    //    {
+    //        case SensorType.Pressure:
+    //            var direction = Direction.N;
+    //            if (sensor.IsDirectional && sensor.IsDirectionOutward)
+    //                direction = Direction.NE;
+    //            if (sensor.IsDirectional && !sensor.IsDirectionOutward)
+    //                direction = Direction.NW;
+    //            return direction;
 
-            case SensorType.Flow:
-                return Direction.N;
+    //        case SensorType.Flow:
+    //            return Direction.N;
 
-            case SensorType.Level:
-                return Direction.NE;
+    //        case SensorType.Level:
+    //            return Direction.NE;
 
-            case SensorType.Power:
-                return Direction.SE;
+    //        case SensorType.Power:
+    //            return Direction.SE;
 
-            case SensorType.Concentration:
-                return Direction.S;
+    //        case SensorType.Concentration:
+    //            return Direction.S;
 
-            case SensorType.Status:
-                return Direction.S;
+    //        case SensorType.Status:
+    //            return Direction.S;
 
-            case SensorType.HydraulicGrade:
-                return Direction.N;
+    //        case SensorType.HydraulicGrade:
+    //            return Direction.N;
 
-            case SensorType.PumpSpeed:
-                return Direction.SW;
+    //        case SensorType.PumpSpeed:
+    //            return Direction.SW;
 
-            case SensorType.pH:
-                return Direction.E;
+    //        case SensorType.pH:
+    //            return Direction.E;
 
-            default:
-                return Direction.W;
-        }
-    }
+    //        default:
+    //            return Direction.W;
+    //    }
+    //}
 
-    private GeometryPoint GetCoordinateAtDistanceAndAngle(
-        GeometryPoint from,
-        double distance,
-        double radianAngle,
-        double slopeAngle = 0.0)
-    {
-        return new GeometryPoint(
-            x: from.X + Math.Cos(radianAngle + slopeAngle) * distance,
-            y: from.Y + Math.Sin(radianAngle + slopeAngle) * distance);
-    }
+    //private GeometryPoint GetCoordinateAtDistanceAndAngle(
+    //    GeometryPoint from,
+    //    double distance,
+    //    double radianAngle,
+    //    double slopeAngle = 0.0)
+    //{
+    //    return new GeometryPoint(
+    //        x: from.X + Math.Cos(radianAngle + slopeAngle) * distance,
+    //        y: from.Y + Math.Sin(radianAngle + slopeAngle) * distance);
+    //}
     #endregion
 
     #region Private Properties

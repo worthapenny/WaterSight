@@ -1,4 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Niraula.Extensions.Water;
+using Niraula.Extensions.Water.Support;
+using Niraula.Extensions.Water.Support.TSD;
 using OpenFlows.Water.Domain.ModelingElements.NetworkElements;
 using System;
 using System.Collections.Generic;
@@ -9,14 +12,14 @@ using System.IO;
 namespace WaterSight.Model.Generator;
 
 
-public enum SupportedFileType
-{
-    CSV = 0,
-    //Excel=1,
-    SQLite = 2,
-    //Access=3,
-    SqlServer = 4,
-}
+//public enum SupportedFileType
+//{
+//    CSV = 0,
+//    //Excel=1,
+//    SQLite = 2,
+//    //Access=3,
+//    SqlServer = 4,
+//}
 
 [DebuggerDisplay("For: {Model}")]
 public class SCADADataGeneratorOptions
@@ -105,75 +108,75 @@ public class Output
 }
 
 
-[DebuggerDisplay("[{OutputFileType.ToString()}] {TableName} Path: {OutputFileName}")]
-public class OutputOptions
-{
-    public string GetExtension()
-    {
-        switch (OutputFileType)
-        {
-            case SupportedFileType.CSV:
-                return "csv";
+//[DebuggerDisplay("[{OutputFileType.ToString()}] {TableName} Path: {OutputFileName}")]
+//public class OutputOptions
+//{
+//    public string GetExtension()
+//    {
+//        switch (OutputFileType)
+//        {
+//            case SupportedFileType.CSV:
+//                return "csv";
 
-            case SupportedFileType.SQLite:
-                return "sqlite";
+//            case SupportedFileType.SQLite:
+//                return "sqlite";
 
-            default:
-            case SupportedFileType.SqlServer:
-                return "";
-        }
-    }
+//            default:
+//            case SupportedFileType.SqlServer:
+//                return "";
+//        }
+//    }
 
-    [Browsable(false)]
-    public SupportedFileType OutputFileType { get; set; } = SupportedFileType.SQLite;
+//    [Browsable(false)]
+//    public SupportedFileType OutputFileType { get; set; } = SupportedFileType.SQLite;
 
-    public string OutputFullFilePath => Path.Combine(OutputDir, $"{FileNameWithoutExt}.{GetExtension()}");
+//    public string OutputFullFilePath => Path.Combine(OutputDir, $"{FileNameWithoutExt}.{GetExtension()}");
 
-    public string OutputDir { get; set; }
-    public string FileNameWithoutExt { get; set; } = "GeneratedTimeSeriesData";
-    public string OptionsJsonFilePath => Path.Combine(OutputDir, $"TsdGenerationOptions.json");
-    public string SCADAElementsJsonFilePath => Path.Combine(OutputDir, "SCADAElements.json");
+//    public string OutputDir { get; set; }
+//    public string FileNameWithoutExt { get; set; } = "GeneratedTimeSeriesData";
+//    public string OptionsJsonFilePath => Path.Combine(OutputDir, $"TsdGenerationOptions.json");
+//    public string SCADAElementsJsonFilePath => Path.Combine(OutputDir, "SCADAElements.json");
 
-    public bool Enable { get; set; } = true;
+//    public bool Enable { get; set; } = true;
 
-    public bool ClearAllData { get; set; } = true;
+//    public bool ClearAllData { get; set; } = true;
 
-    public string TableName { get; set; } = "TimeSeriesData";
+//    public string TableName { get; set; } = "TimeSeriesData";
 
-}
+//}
 
-public class TsdOutputOptions : OutputOptions
-{
-    public TsdTable TsdTable { get; set; } = new TsdTable();
-    public bool TagContainsUnit { get; set; } = false;
+//public class TsdOutputOptions : OutputOptions
+//{
+//    public TsdTable TsdTable { get; set; } = new TsdTable();
+//    public bool TagContainsUnit { get; set; } = false;
 
-    public bool AddGeneratedDataSourceToSCADASignals { get; set; } = true;
-    public bool CreateSCADAElements { get; set; } = true;
-    public double SCADAElementLocationOffset { get; set; } = 10;
-    public bool TransformPumpRawData { get; set; } = false;
-    public int PumpOnValue { get; set; } = 1;
-    public bool TransformValveRawData { get; set; } = false;
-    public int ValveActiveValue { get; set; } = 1;
-    public int ValveClosedValue { get; set; } = 0;
-}
-
-
-[DebuggerDisplay("{SignalColumnName}: {ValueColumnName} @ {TimestampColumnName}")]
-public class TsdTable
-{
-    public string TimestampColumnName { get; set; } = "Timestamp";
-
-    public string TagColumnName { get; set; } = "Tag";
-
-    public string ValueColumnName { get; set; } = "Value";
-}
+//    public bool AddGeneratedDataSourceToSCADASignals { get; set; } = true;
+//    public bool CreateSCADAElements { get; set; } = true;
+//    public double SCADAElementLocationOffset { get; set; } = 10;
+//    public bool TransformPumpRawData { get; set; } = false;
+//    public int PumpOnValue { get; set; } = 1;
+//    public bool TransformValveRawData { get; set; } = false;
+//    public int ValveActiveValue { get; set; } = 1;
+//    public int ValveClosedValue { get; set; } = 0;
+//}
 
 
-public class BillingDataOutputOptions : OutputOptions
+//[DebuggerDisplay("{SignalColumnName}: {ValueColumnName} @ {TimestampColumnName}")]
+//public class TsdTable
+//{
+//    public string TimestampColumnName { get; set; } = "Timestamp";
+
+//    public string TagColumnName { get; set; } = "Tag";
+
+//    public string ValueColumnName { get; set; } = "Value";
+//}
+
+
+public class BillingDataOutputOptions :DataGeneratorOutputOptions
 {
     public BillingDataOutputOptions()
     {
-        OutputFileType = SupportedFileType.CSV;
+        OutputFileType = FileFormatType.CSV;
         TableName = "BillingData";
     }
 
@@ -265,18 +268,18 @@ public class ChangingPumpNode
 }
 
 
-[DebuggerDisplay("FlowErr: {FlowMeterErrorPercent} %, PressErr: {PressureMeterErrorPercent} %, PowerErr: {PowerMeterErrorPercent} %, LevelErr: {LevelMeterErrorPercent} %")]
-public class MeterError
-{
+//[DebuggerDisplay("FlowErr: {FlowMeterErrorPercent} %, PressErr: {PressureMeterErrorPercent} %, PowerErr: {PowerMeterErrorPercent} %, LevelErr: {LevelMeterErrorPercent} %")]
+//public class MeterError
+//{
 
-    public double FlowMeterErrorPercent { get; set; } = 0;
+//    public double FlowMeterErrorPercent { get; set; } = 0;
 
-    public double PressureMeterErrorPercent { get; set; } = 0;
+//    public double PressureMeterErrorPercent { get; set; } = 0;
 
-    public double PowerMeterErrorPercent { get; set; } = 0;
+//    public double PowerMeterErrorPercent { get; set; } = 0;
 
-    public double LevelMeterErrorPercent { get; set; } = 0;
-}
+//    public double LevelMeterErrorPercent { get; set; } = 0;
+//}
 
 
 [DebuggerDisplay("[{Type}] Id: {Id} DailyChange: {DailyPercentChance} % @ {FlowRateGPM} gpm at {FlowVariabilityPercent} %")]

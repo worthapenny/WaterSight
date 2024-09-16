@@ -74,8 +74,8 @@ public class Geo
 
         // Lat/Lng
         var location = taskLocation.Result;
-        Latitude = location?.Latitude ?? 0;
-        Longitude = location?.Longitude ?? 0;
+        Latitude = (float)(location?.Latitude ?? 0);
+        Longitude = (float)(location?.Longitude ?? 0);
 
 
         // TimeZone

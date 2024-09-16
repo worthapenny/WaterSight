@@ -62,7 +62,7 @@ public class TanksTest : TestBase
         var newName = "Tank config New Name";
         tankConfig.Name = newName;
         var success = await Tank.UpdateTankConfigAsync(tankConfig);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Separator("Tank updated");
 
         // Delete

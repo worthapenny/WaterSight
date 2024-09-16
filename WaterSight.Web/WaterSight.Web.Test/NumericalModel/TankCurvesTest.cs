@@ -54,7 +54,7 @@ public class TankCurvesTest : TestBase
         tankCurveConfig.Name = newName;
         tankCurveConfig.CurveData.Add(new CurveData(15, 15));
         var success = await TankCurve.UpdateTankCurveConfigAsync(tankCurveConfig);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Separator("Updated tank curve");
 
         // Delete

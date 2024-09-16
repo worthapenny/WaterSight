@@ -85,7 +85,7 @@ public class NumericalModelTest : TestBase
 
         var fileInfo = new FileInfo(zippedModelPath);
         var success = await NumericModel.UpdloadZippedWaterModel(fileInfo);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Separator("Model Uploaded");
     }
 
@@ -136,7 +136,7 @@ public class NumericalModelTest : TestBase
         modelDomain.HindcastHours = newHindcastHours;
         modelDomain.SpinUpHours = newSpinupHors;
         var success = await NumericModel.UpdateWaterModelDomain(modelDomain);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Separator($"Updated {nameof(NumericModel)}");
 
         //

@@ -1,0 +1,112 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>10.0</LangVersion>
+		<Platforms>AnyCPU;x64</Platforms>
+		<BaseOutputPath>.\..\..\Output\WaterSight.Support\bin\</BaseOutputPath>
+		<BaseIntermediateOutputPath>.\..\..\Output\WaterSight.Support\obj\</BaseIntermediateOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="NodaTime" Version="3.1.12" />
+		<PackageReference Include="Serilog" Version="4.0.1" />
+		<PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Haestad.Calculations.Pressure">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Calculations.Pressure.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Calculations.Support">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Calculations.Support.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Domain">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Domain.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Domain.ModelingObjects">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Domain.ModelingObjects.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Domain.ModelingObjects.Water">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Domain.ModelingObjects.Water.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Drawing.Control">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Drawing.Control.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Drawing.Domain">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Drawing.Domain.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Framework">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Framework.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Framework.Windows.Forms">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Framework.Windows.Forms.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.LicensingFacade">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.LicensingFacade.dll</HintPath>
+		</Reference>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Newtonsoft.Json.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Network">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Network.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.NetworkBuilder">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.NetworkBuilder.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.SCADA.Domain">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.SCADA.Domain.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.SCADA.Domain.Support">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.SCADA.Domain.Support.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.SCADA.Forms">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.SCADA.Forms.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Shapefile">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Shapefile.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Support">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Support.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Water.Forms">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Water.Forms.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.WaterProduct">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.WaterProduct.dll</HintPath>
+		</Reference>
+		<Reference Include="OpenFlows">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\OpenFlows.dll</HintPath>
+		</Reference>
+		<Reference Include="OpenFlows.Water">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\OpenFlows.Water.dll</HintPath>
+		</Reference>
+		<Reference Include="OpenFlows.Water.Application">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\OpenFlows.Water.Application.dll</HintPath>
+		</Reference>
+
+	</ItemGroup>
+
+
+
+
+
+	<ItemGroup>
+		<Reference Include="Niraula.Extensions">
+			<HintPath>..\..\..\..\Niraula\DotNET\Output\Niraula.Extensions\bin\x64\Debug\net48\Niraula.Extensions.dll</HintPath>
+		</Reference>
+		<Reference Include="Niraula.Extensions.Water">
+			<HintPath>..\..\..\..\Niraula\DotNET\Output\Niraula.Extensions.Water\bin\x64\Debug\net48\Niraula.Extensions.Water.dll</HintPath>
+		</Reference>
+		<Reference Include="WaterSight.Excel">
+		  <HintPath>..\..\..\..\BentleyRepo\OpenFlowsTools\WaterSight\Output\WaterSight.Web\bin\x64\Debug\WaterSight.Excel.dll</HintPath>
+		</Reference>
+		<Reference Include="WaterSight.Web">
+		  <HintPath>..\..\..\..\BentleyRepo\OpenFlowsTools\WaterSight\Output\WaterSight.Web\bin\x64\Debug\WaterSight.Web.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+</Project>

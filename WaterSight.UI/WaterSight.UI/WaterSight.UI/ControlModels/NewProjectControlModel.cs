@@ -110,10 +110,10 @@ public class NewProjectControlModel : INotifyPropertyChanged  //ReadWriteBase
         // Costs
         var costPerVolUnit = "";
         var costPerPowerUnit = "";
-        await ws.Settings.Costs.SetAvgVolumeticProductionCost(
+        await ws.Settings.Costs.SetAvgVolumetricProductionCost(
             cost: wsProject.WSSetting.Operations.AverageVolumeProductionCost,
             unit: costPerVolUnit);
-        await ws.Settings.Costs.SetAvgVolumetricTarrif(
+        await ws.Settings.Costs.SetAvgVolumetricTariff(
             cost: wsProject.WSSetting.Operations.AverageVolumeTariff,
             unit: costPerVolUnit);
         await ws.Settings.Costs.SetAvgEnergyCost(

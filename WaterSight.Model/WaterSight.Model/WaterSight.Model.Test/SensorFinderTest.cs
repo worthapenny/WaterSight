@@ -20,7 +20,7 @@ namespace WaterSight.Model.Test
 
             //OpenModel(modelPath);
 
-            Assert.IsNotNull(WaterModel);
+            Assert.That(WaterModel, Is.Not.Null);
         }
         #endregion
 

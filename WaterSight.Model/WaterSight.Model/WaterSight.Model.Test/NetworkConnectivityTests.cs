@@ -56,8 +56,8 @@ public class NetworkConnectivityTests : OpenFlowsWaterTestFixtureBase
         nodes = nodeIds.Select(id => id.WaterElement(WaterModel)).ToList();
         links = linkIds.Select(id => id.WaterElement(WaterModel)).ToList();
 
-        Log.Debug($"DownStream nodes: {string.Join(", ", nodes.Select(n => n.IdLabel()))}");
-        Log.Debug($"DownStream links: {string.Join(", ", links.Select(n => n.IdLabel()))}");
+        Log.Debug($"DownStream nodes: {string.Join(", ", nodes.Select(n => n.IdLabel))}");
+        Log.Debug($"DownStream links: {string.Join(", ", links.Select(n => n.IdLabel))}");
 
         //
         // Trace UpSteam
@@ -67,8 +67,8 @@ public class NetworkConnectivityTests : OpenFlowsWaterTestFixtureBase
         nodes = nodeIds.Select(id => id.WaterElement(WaterModel)).ToList();
         links = linkIds.Select(id => id.WaterElement(WaterModel)).ToList();
 
-        Log.Debug($"UpStream nodes: {string.Join(", ", nodes.Select(n => n.IdLabel()))}");
-        Log.Debug($"UpStream links: {string.Join(", ", links.Select(n => n.IdLabel()))}");
+        Log.Debug($"UpStream nodes: {string.Join(", ", nodes.Select(n => n.IdLabel))}");
+        Log.Debug($"UpStream links: {string.Join(", ", links.Select(n => n.IdLabel))}");
 
 
         //
@@ -77,10 +77,10 @@ public class NetworkConnectivityTests : OpenFlowsWaterTestFixtureBase
         var nodeId = 140; // Example 5
         var node = nodeId.WaterElement(WaterModel);
         var connectedNodes = node.ConnectedAdjacentNodes(WaterModel);
-        Log.Debug($"Connected adjacent nodes from {node.IdLabel()}: {string.Join(", ", connectedNodes.Select(n => n.IdLabel()))}");
+        Log.Debug($"Connected adjacent nodes from {node.IdLabel}: {string.Join(", ", connectedNodes.Select(n => n.IdLabel))}");
 
         var connectedNodesByExtraLevel1 = node.ConnectedAdjacentNodes(WaterModel, 2);
-        Log.Debug($"Connected adjacent + 1 depth nodes from {node.IdLabel()}: {string.Join(", ", connectedNodesByExtraLevel1.Select(n => n.IdLabel()))}");
+        Log.Debug($"Connected adjacent + 1 depth nodes from {node.IdLabel}: {string.Join(", ", connectedNodesByExtraLevel1.Select(n => n.IdLabel))}");
 
 
         //
@@ -89,10 +89,10 @@ public class NetworkConnectivityTests : OpenFlowsWaterTestFixtureBase
         var linkId = 452; // Example 5
         var link = linkId.WaterElement(WaterModel);
         var connectedLinks = link.ConnectedAdjacentLinks(WaterModel);
-        Log.Debug($"Connected adjacent links from {link.IdLabel()}: {string.Join(", ", connectedLinks.Select(n => n.IdLabel()))}");
+        Log.Debug($"Connected adjacent links from {link.IdLabel}: {string.Join(", ", connectedLinks.Select(n => n.IdLabel))}");
 
         var connectedLinksByExtraLevel1 = link.ConnectedAdjacentLinks(WaterModel, 2);
-        Log.Debug($"Connected adjacent + 1 depth links from {link.IdLabel()}: {string.Join(", ", connectedLinksByExtraLevel1.Select(n => n.IdLabel()))}");
+        Log.Debug($"Connected adjacent + 1 depth links from {link.IdLabel}: {string.Join(", ", connectedLinksByExtraLevel1.Select(n => n.IdLabel))}");
 
     }
     #endregion

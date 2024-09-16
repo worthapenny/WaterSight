@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net48</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<BaseOutputPath>..\..\Output\WaterSight.Support\bin\x64\</BaseOutputPath>
+		<BaseIntermediateOutputPath>\..\..\Output\WaterSight.Support\obj\x64\</BaseIntermediateOutputPath>
+		<LangVersion>10.0</LangVersion>
+		<Platforms>AnyCPU;x64</Platforms>
+	</PropertyGroup>
+
+	<ItemGroup>		
+		<PackageReference Include="NodaTime" Version="3.1.9" />
+		<PackageReference Include="Serilog" Version="4.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Haestad.Domain">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Domain.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Domain.ModelingObjects.Water">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Domain.ModelingObjects.Water.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Framework">
+		  <HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Framework.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Framework.Windows.Forms">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Framework.Windows.Forms.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Network">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Network.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.NetworkBuilder">
+		  <HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.NetworkBuilder.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.SCADA.Forms">
+		  <HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.SCADA.Forms.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.SQLite">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.SQLite.dll</HintPath>
+		</Reference>
+		<Reference Include="Haestad.Support">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Haestad.Support.dll</HintPath>
+		</Reference>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\Newtonsoft.Json.dll</HintPath>
+		</Reference>
+		<Reference Include="Niraula.Extensions.Water">
+		  <HintPath>..\..\..\..\Niraula\DotNET\Output\Niraula.Extensions.Water\bin\x64\Debug\net48\Niraula.Extensions.Water.dll</HintPath>
+		</Reference>
+		<Reference Include="OpenFlows">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\OpenFlows.dll</HintPath>
+		</Reference>
+		<Reference Include="OpenFlows.Water">
+			<HintPath>C:\Program Files\Bentley\OpenFlows Water\OpenFlows.Water.dll</HintPath>
+		</Reference>
+
+		<Reference Include="Niraula.Extensions">
+			<HintPath>..\..\..\..\Niraula\DotNET\Output\Niraula.Extensions\bin\x64\Debug\net48\Niraula.Extensions.dll</HintPath>
+		</Reference>
+		
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="cd $(ProjectDir)&#xD;&#xA;call _setup.bat &quot;$(TargetDir)&quot; $(PlatformName)" />
+	</Target>
+
+</Project>

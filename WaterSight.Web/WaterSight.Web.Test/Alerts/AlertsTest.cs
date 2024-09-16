@@ -79,7 +79,7 @@ public class AlertsTest : TestBase
         var newName = "Alert Test Updated";
         alert.Name = newName;
         var success = await Alert.UpdateAlertConfigAsync(alert);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Separator("Done update testing");
 
 

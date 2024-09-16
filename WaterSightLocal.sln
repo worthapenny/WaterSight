@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.WaterSightDataCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.WaterSightDataCollector.Test", "WaterSight.WaterSightDataCollector.Test\WaterSight.WaterSightDataCollector.Test.csproj", "{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WaterSight.Support", "WaterSight.Support\WaterSight.Support.csproj", "{36438251-82B7-4023-AEF7-AAF49A83DD68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +197,18 @@ Global
 		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|x64.Build.0 = Release|Any CPU
 		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|x86.ActiveCfg = Release|Any CPU
 		{F6CA76CD-72B6-4328-8B5B-7B76DFDA6197}.Release|x86.Build.0 = Release|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Debug|Any CPU.Build.0 = Debug|x64
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Debug|x64.Build.0 = Debug|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Debug|x86.Build.0 = Debug|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Release|x64.ActiveCfg = Release|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Release|x64.Build.0 = Release|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Release|x86.ActiveCfg = Release|Any CPU
+		{36438251-82B7-4023-AEF7-AAF49A83DD68}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

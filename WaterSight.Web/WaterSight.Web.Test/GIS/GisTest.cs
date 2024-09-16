@@ -39,7 +39,7 @@ public class GisTest : TestBase
         Assert.IsTrue(File.Exists(pipeZipFilePath));
 
         var success = await WS.GIS.UploadPipeZippedShpFile(pipeZipFilePath);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
         Separator("Pipe Uploaded");
     }
@@ -57,7 +57,7 @@ public class GisTest : TestBase
     public async Task DeleteZippedPipeShapefile()
     {
         var success = await WS.GIS.DeletePipeZippedShpFile();
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
         Separator("Delted Pipe Shp");
     }
@@ -82,7 +82,7 @@ public class GisTest : TestBase
         Assert.IsTrue(File.Exists(zoneZipFilePath));
 
         var success = await WS.GIS.UploadPressureZoneZippedShpFile(zoneZipFilePath);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
         Separator("Uploaded zone shp");
 
@@ -91,7 +91,7 @@ public class GisTest : TestBase
     public async Task DeleteZippedZoneShapefile()
     {
         var success = await WS.GIS.DeletePressureZoneZippedShpFile();
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
         Separator("Deleted zone shp");
     }
@@ -109,7 +109,7 @@ public class GisTest : TestBase
         Assert.IsTrue(File.Exists(anyShapefilePath));
 
         var success = await WS.GIS.UploadAnyZippedShpFile(anyShapefilePath, myDataType);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
         Separator("Uploaded Any shp");
     }
@@ -118,7 +118,7 @@ public class GisTest : TestBase
     {
         var myDataType = $"MyType_{DateTime.Now:yyyyMMdd}"; // this name MUST match with above test
         var success = await WS.GIS.DeleteAnyZippedShpFile(myDataType);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
         Separator("Deleted any shp");
     }

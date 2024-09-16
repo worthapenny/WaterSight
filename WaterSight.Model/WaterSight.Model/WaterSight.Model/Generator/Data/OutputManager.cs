@@ -16,11 +16,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using WaterSight.Model.Domain.Scada;
-using WaterSight.Model.Extensions;
-using WaterSight.Model.Library;
-using WaterSight.Model.Sensors;
 using WaterSight.Model.Support.Data;
+using Niraula.Extensions.Water.Sensors;
+using Niraula.Extensions.Water.Support.TSD;
+using Niraula.Extensions;
+using Niraula.Extensions.Water;
+using Niraula.Extensions.Water.Scada;
+using Niraula.Extensions.Library;
+using Niraula.Extensions.Water.Support;
+using OpenFlows.Water.Domain.ModelingElements.Components;
+
 
 namespace WaterSight.Model.Generator.Data;
 
@@ -113,7 +118,7 @@ public class OutputManager
         }
 
         Log.Information($"Created SQLite file. Successfully: {success}");
-        LogLibrary.Separate_SuperSoft();
+        LogLibrary.Separate_Dot();
 
         return success;
     }
@@ -275,7 +280,7 @@ public class OutputManager
 
         Log.Information($"Done reading '{tsds.Count}' rows of TimeSeriesData, Time taken: {timer.Elapsed}. Path: {Options.Output.TsdOutputOptions.OutputFullFilePath}");
 
-        LogLibrary.Separate_SuperSoft();
+        LogLibrary.Separate_Dot();
         return tsds;
     }
 
@@ -310,7 +315,7 @@ public class OutputManager
             success = false;
         }
 
-        LogLibrary.Separate_SuperSoft();
+        LogLibrary.Separate_Dot();
         return success;
     }
 
@@ -393,7 +398,7 @@ public class OutputManager
             success = false;
         }
 
-        LogLibrary.Separate_SuperSoft();
+        LogLibrary.Separate_Dot();
         return success;
     }
 
@@ -419,21 +424,21 @@ public class OutputManager
             success = success & element.Id > 0;
         }
 
-        LogLibrary.Separate_SuperSoft();
+        LogLibrary.Separate_Dot();
         return success;
     }
 
-    public List<ISCADAElement> CreateSCADAElements<T>(string dataSourceLabel, List<T> sensors) where T : Sensor
+    public List<ISCADAElement> CreateSCADAElements<T>(IElement dataSource, List<T> sensors) where T : Sensor
     {
         var elements = new List<ISCADAElement>();
         if (Options.Output.TsdOutputOptions.CreateSCADAElements)
         {
             elements = ScadaConnect.CreateSCADAElements(
                  sensors: sensors,
-                 dataSourceLabel: dataSourceLabel,
+                 dataSource: dataSource,
                  distance: Options.Output.TsdOutputOptions.SCADAElementLocationOffset);
 
-            LogLibrary.Separate_SuperSoft();
+            LogLibrary.Separate_Dot();
         }
         return elements;
     }
@@ -468,7 +473,7 @@ public class OutputManager
             throw ex;
         }
 
-        LogLibrary.Separate_SuperSoft();
+        LogLibrary.Separate_Dot();
         return success;
     }
     #endregion
@@ -589,54 +594,54 @@ public class OutputManager
     #endregion
 
 
-    private SensorType GetSensorType(SCADATargetAttribute targetAttribute)
+    private WaterSightSensorType GetSensorType(SCADATargetAttribute targetAttribute)
     {
         switch (targetAttribute)
         {
             case SCADATargetAttribute.RelativeClosure:
-                return SensorType.Other;
+                return WaterSightSensorType.Other;
 
             case SCADATargetAttribute.ConstituentConcentration:
-                return SensorType.Concentration;
+                return WaterSightSensorType.Concentration;
 
             case SCADATargetAttribute.PressureNodeDemand:
             case SCADATargetAttribute.FCValveSetting:
             case SCADATargetAttribute.Discharge:
-                return SensorType.Flow;
+                return WaterSightSensorType.Flow;
 
             case SCADATargetAttribute.ValveStatus:
             case SCADATargetAttribute.PumpStatus:
             case SCADATargetAttribute.PipeStatus:
-                return SensorType.Status;
+                return WaterSightSensorType.Status;
 
             case SCADATargetAttribute.TankLevel:
-                return SensorType.Level;
+                return WaterSightSensorType.Level;
 
             case SCADATargetAttribute.Pressure:
             case SCADATargetAttribute.PressureValveSetting:
             case SCADATargetAttribute.PressureOut:
             case SCADATargetAttribute.PressureIn:
-                return SensorType.Pressure;
+                return WaterSightSensorType.Pressure;
 
             case SCADATargetAttribute.HydraulicGrade:
             case SCADATargetAttribute.HydraulicGradeOut:
             case SCADATargetAttribute.HydraulicGradeIn:
-                return SensorType.HydraulicGrade;
+                return WaterSightSensorType.HydraulicGrade;
 
             case SCADATargetAttribute.PumpSetting:
-                return SensorType.PumpSpeed;
+                return WaterSightSensorType.PumpSpeed;
 
             case SCADATargetAttribute.TCValveSetting:
-                return SensorType.Other;
+                return WaterSightSensorType.Other;
 
             case SCADATargetAttribute.WirePower:
-                return SensorType.Power;
+                return WaterSightSensorType.Power;
 
             case SCADATargetAttribute.UnAssigned:
-                return SensorType.Other;
+                return WaterSightSensorType.Other;
         }
 
-        return SensorType.Other;
+        return WaterSightSensorType.Other;
     }
 
 

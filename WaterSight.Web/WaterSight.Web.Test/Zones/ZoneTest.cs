@@ -94,7 +94,7 @@ public class ZoneTest : TestBase
         //var newName = "New Zone Name";
         //zoneConfig.Name = newName;
         //var success = await Zone.UpdateZonesConfigAsync(zoneConfig);
-        //Assert.IsTrue(success);
+        //Assert.That(success, Is.True);
         //Separator("Update tested");
 
         // Delete

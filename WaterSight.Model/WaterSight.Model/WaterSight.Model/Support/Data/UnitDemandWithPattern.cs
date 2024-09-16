@@ -24,7 +24,7 @@ public class UnitDemandWithPattern
     #region Overridden Methods
     public override string ToString()
     {
-        return $"Unit Demand Type: {UnitDemand.UnitDemandType}, # Demand: {NumberOfUnitDemands},  Pattern: {Pattern.IdLabel()}";
+        return $"Unit Demand Type: {UnitDemand.UnitDemandType}, # Demand: {NumberOfUnitDemands},  Pattern: {Pattern.IdLabel}";
     }
     #endregion
 

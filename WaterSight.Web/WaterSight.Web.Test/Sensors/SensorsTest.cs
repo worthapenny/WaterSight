@@ -53,7 +53,7 @@ public class SensorsTest : TestBase
         var newName = "Sensor Test Updated";
         sensor.Name = newName;
         var success = await Sensor.UpdateSensorConfigAsync(sensor);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Separator("Done update testing");
 
 
@@ -71,7 +71,7 @@ public class SensorsTest : TestBase
     public async Task Sensors_Delete_all()
     {
         var success = await Sensor.DeleteSensorsConfigAsync();
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Separator("Done delete, all items, testing");
     }
 
@@ -115,7 +115,7 @@ public class SensorsTest : TestBase
         var success = await Sensor.PostSensorTSDAsync(
             sensorId: sensor.ID,
             data: tsdList);
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
 
         // Pull sensor list
         var sensorsConfig = await Sensor.GetSensorsConfigAsync();

@@ -32,7 +32,7 @@ public class SetupTest : TestBase
 
         // Sensors
         var success = await WS.Sensor.PostExcelFile(new FileInfo(excelFilePath));
-        Assert.IsTrue(success);
+        Assert.That(success, Is.True);
         Logger.Debug($"Uploaded {excelFilePath}");
         Separator("Uploaded Sensor Xl");
 

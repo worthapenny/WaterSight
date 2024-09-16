@@ -169,6 +169,12 @@
       <HintPath>C:\Program Files (x86)\Bentley\WaterGEMS\x64\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Niraula.Extensions">
+      <HintPath>..\..\..\..\..\..\Niraula\DotNET\Output\Niraula.Extensions.Water\bin\x64\Debug\net48\Niraula.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Niraula.Extensions.Water">
+      <HintPath>..\..\..\..\..\..\Niraula\DotNET\Output\Niraula.Extensions.Water\bin\x64\Debug\net48\Niraula.Extensions.Water.dll</HintPath>
+    </Reference>
     <Reference Include="OpenFlows">
       <HintPath>C:\Program Files (x86)\Bentley\WaterGEMS\x64\OpenFlows.dll</HintPath>
       <Private>False</Private>

@@ -40,12 +40,12 @@ public class InitializingManager
 #if DEBUG
             Debugger.Break();
 #endif
-            var message = $"Scenario ID {givenScenario.IdLabel()} is not a valid scenario.";
+            var message = $"Scenario ID {givenScenario.IdLabel} is not a valid scenario.";
             Log.Error(ex, message);
             return success;
         }
 
-        Log.Information($"Active Scenario: {WaterModel.ActiveScenario.IdLabel()}");
+        Log.Information($"Active Scenario: {WaterModel.ActiveScenario.IdLabel}");
         return success;
     }
 
@@ -74,7 +74,7 @@ public class InitializingManager
 #if DEBUG
             Debugger.Break();
 #endif
-            var message = $"...while updating Calc Options, {WaterModel.ActiveScenario.Options.IdLabel()}";
+            var message = $"...while updating Calc Options, {WaterModel.ActiveScenario.Options.IdLabel}";
             Log.Error(ex, message);
             return success;
         }
@@ -111,7 +111,7 @@ public class InitializingManager
 #if DEBUG
             Debugger.Break();
 #endif
-            var message = $"...while updating model date range, {WaterModel.ActiveScenario.Options.IdLabel()}. Range: {startDate.ToShortDateString()} - {endDate.ToShortDateString()}";
+            var message = $"...while updating model date range, {WaterModel.ActiveScenario.Options.IdLabel}. Range: {startDate.ToShortDateString()} - {endDate.ToShortDateString()}";
             Log.Error(ex, message);
             return success;
         }
